@@ -15,10 +15,10 @@ return new class extends Migration
             $table->string('id', 36)->primary();
             $table->string('guru_id', 36);
             $table->string('mapel_id', 36);
+            $table->string('kelas_id', 36);
             $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
             $table->time('jam_mulai');
             $table->time('jam_selesai');
-            $table->string('kelas', 50);
             $table->timestamps();
         });
     }

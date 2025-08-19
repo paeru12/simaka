@@ -12,7 +12,7 @@ class Guru extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'nik', 'nama', 'jenis_kelamin', 'alamat', 'no_hp', 'status_aktif', 'foto'
+        'id','jabatan_id', 'nik', 'nama', 'jenis_kelamin', 'alamat', 'no_hp', 'status_aktif', 'foto'
     ];
 
     protected static function boot()

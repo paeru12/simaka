@@ -125,6 +125,20 @@
                     <span>Jadwal</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{Request::is('rekap') ? 'active' : 'collapsed'}}"
+                    href="{{route('rekap.index')}}">
+                    <i class="bx bxs-shopping-bags"></i>
+                    <span>Rekapitulasi Absensi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{Request::is('gaji') ? 'active' : 'collapsed'}}"
+                    href="{{route('gaji.index')}}">
+                    <i class="bx bxs-shopping-bags"></i>
+                    <span>Laporan Gaji</span>
+                </a>
+            </li>
             
             <li class="nav-heading">Administrator</li>
             <li class="nav-item ">

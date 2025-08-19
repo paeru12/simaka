@@ -4,7 +4,7 @@
 
 <div class="pagetitle">
     <h1>Data Mapel</h1>
-    <nav>
+    <nav> 
         <ol class="breadcrumb">
             <li class="breadcrumb-item "><a href="/">Home</a></li>
             <li class="breadcrumb-item active">Mata Pelajaran</li>
