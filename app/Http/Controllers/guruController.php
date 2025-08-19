@@ -50,4 +50,51 @@ class guruController extends Controller
             ]);
         }
     }
+
+    function show($id)
+    {
+        $guru = Guru::findOrFail($id);
+        return response()->json($guru);
+    }
+
+     function update(Request $request, $id)
+    {
+         $validated = $request->validate([
+            'jabatan_id' => 'required|exists:jabatans,id',
+            'nama' => 'required|string|max:255',
+            'nik' => 'required|string|max:20',
+            'jenis_kelamin' => 'required|string|in:L,P',
+            'alamat' => 'required|string|max:255',
+            'no_hp' => 'required|string|max:15',
+            'foto' => 'nullable|image|mimes:jpg,png,webp,jfif,jpeg',
+        ]);
+
+        try {
+            if ($request->hasFile('foto')) {
+                $image = $request->file('foto');
+                $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $resized = $manager->read($image->getPathname())->toJpeg(60);
+                $imageName = time() . '_' . uniqid() . '.webp';
+                $savePath = 'uploads/' . $imageName;
+                file_put_contents(public_path($savePath), (string) $resized);
+                $validated['foto'] = $savePath;
+            }
+            $guru = Guru::findOrFail($id);
+            $guru->update($validated);
+            return response()->json(['success' => true, 'message' => "Guru berhasil diperbarui"]);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    function destroy($id)
+    {
+        try {
+            $guru = Guru::findOrFail($id);
+            $guru->delete();
+            return response()->json(['success' => true, 'message' => "Guru berhasil dihapus"]);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
 }

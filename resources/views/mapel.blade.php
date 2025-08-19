@@ -39,6 +39,10 @@
                                     <input type="text" class="form-control" name="kode_mapel" placeholder="Kode Mapel">
                                     <label>Kode Mapel</label>
                                 </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="gaji" placeholder="Gaji">
+                                    <label>Gaji</label>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -88,6 +92,7 @@
                             <th>No</th>
                             <th>Nama Mapel</th>
                             <th>Kode Mapel</th>
+                            <th>Gaji</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -97,6 +102,7 @@
                             <th>{{ $loop->iteration }}.</th>
                             <td>{{ $m->nama_mapel }}</td>
                             <td>{{ $m->kode_mapel }}</td>                            
+                            <td>Rp.{{ number_format($m->gaji, 0, ',', '.') }}</td>                           
                             <td class="aksi">
                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
