@@ -59,7 +59,7 @@
 
                                         <div class="form-floating mb-3">
                                             <select class="form-select" name="jenis_kelamin" id="jk">
-                                                <option value="" selected disabled>Pilih Jenis Kelamin</option>
+                                                <option value="" selected disabled>Open this select menu</option>
                                                 <option value="L">Laki-laki</option>
                                                 <option value="P">Perempuan</option>
                                             </select>
@@ -74,6 +74,15 @@
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control" name="no_hp" id="nohp" placeholder="No HP">
                                             <label for="nohp">No HP</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <select name="jabatan_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                <option selected disabled>Open this select menu</option>
+                                                @foreach ($jabatan as $j)
+                                                <option value="{{ $j->id }}">{{ $j->jabatan }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label for="floatingSelect">Pilih Jabatan</label>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -91,6 +100,7 @@
                                     <th scope="col">No</th>
                                     <th scope="col">Foto</th>
                                     <th scope="col">Nama Guru</th>
+                                    <th scope="col">Jabatan</th>
                                     <th scope="col">NIK</th>
                                     <th scope="col">JK</th>
                                     <th scope="col">Alamat</th>
@@ -108,6 +118,7 @@
                                             style="width: 60px;" loading="lazy">
                                     </td>
                                     <td>{{ $g->nama }}</td>
+                                    <td>{{ $g->jabatan->jabatan }}</td>
                                     <td>{{ $g->nik }}</td>
                                     <td>{{ $g->jenis_kelamin }}</td>
                                     <td>{{ $g->alamat }}</td>
@@ -153,65 +164,65 @@
 </section>
 
 <script>
-$(document).ready(function() {
-    $('#guruForm').on('submit', function(e) {
-        e.preventDefault();
+    $(document).ready(function() {
+        $('#guruForm').on('submit', function(e) {
+            e.preventDefault();
 
-        let formData = new FormData(this);
+            let formData = new FormData(this);
 
-        $.ajax({
-            url: "{{ route('guru.store') }}", // pastikan route ini sesuai
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function() {
-                Swal.fire({
-                    title: 'Processing...',
-                    text: 'Menyimpan data guru',
-                    didOpen: () => Swal.showLoading(),
-                    allowOutsideClick: false
-                });
-            },
-            success: function(response) {
-                Swal.close();
-                if (response.success) {
+            $.ajax({
+                url: "{{ route('guru.store') }}", // pastikan route ini sesuai
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: response.message,
-                        timer: 2000,
-                        showConfirmButton: false
+                        title: 'Processing...',
+                        text: 'Menyimpan data guru',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
                     });
+                },
+                success: function(response) {
+                    Swal.close();
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
 
-                    $('#guruForm')[0].reset();
-                    $('#verticalycentered').modal('hide');
-                    $('#gam').attr('src', "{{ asset('assets/img/blank.jpg') }}");
+                        $('#guruForm')[0].reset();
+                        $('#verticalycentered').modal('hide');
+                        $('#gam').attr('src', "{{ asset('assets/img/blank.jpg') }}");
 
-                    setTimeout(() => location.reload(), 1200);
-                } else {
+                        setTimeout(() => location.reload(), 1200);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.close();
+                    let msg = 'Terjadi kesalahan saat menyimpan data.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: response.message 
+                        text: msg
                     });
                 }
-            },
-            error: function(xhr) {
-                Swal.close();
-                let msg = 'Terjadi kesalahan saat menyimpan data.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    msg = xhr.responseJSON.message;
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: msg
-                });
-            }
+            });
         });
     });
-});
 </script>
 
 @endsection

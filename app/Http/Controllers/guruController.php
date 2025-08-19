@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManager;
 
@@ -10,13 +11,15 @@ class guruController extends Controller
 {
     function index()
     {
-        $guru = Guru::orderBy('created_at', 'desc')->get();
-        return response()->view('guru', ['guru' => $guru]);
+        $guru = Guru::with('jabatan')->orderBy('created_at', 'desc')->get();
+        $jabatan = Jabatan::orderBy('created_at', 'asc')->get();
+        return response()->view('guru', ['guru' => $guru, 'jabatan' => $jabatan]);
     }
 
     function store(Request $request)
     {
         $validated = $request->validate([
+            'jabatan_id' => 'required|exists:jabatans,id',
             'nama' => 'required|string|max:255',
             'nik' => 'required|string|max:20',
             'jenis_kelamin' => 'required|string|in:L,P',

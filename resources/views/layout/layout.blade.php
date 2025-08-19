@@ -105,6 +105,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{Request::is('jabatan') ? 'active' : 'collapsed'}}"
+                    href="{{route('jabatan.index')}}">
+                    <i class="bx bxs-shopping-bags"></i>
+                    <span>Jabatan</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{Request::is('guru') ? 'active' : 'collapsed'}}"
                     href="{{route('guru.index')}}">
                     <i class="bx bxs-shopping-bags"></i>

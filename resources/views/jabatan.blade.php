@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="pagetitle">
-    <h1>Absensi</h1>
+    <h1>Jabatan</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -52,6 +52,42 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Modal Update --}}
+            <div class="modal fade" id="editJabatanModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form id="updateJabatanForm" novalidate>
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="id" id="edit_id">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Update Jabatan</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="jabatan" id="edit_jabatan" placeholder="Jabatan">
+                                    <label>Jabatan</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="gapok" id="edit_gapok" placeholder="Gaji Pokok">
+                                    <label>Gaji Pokok</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="tunjangan" id="edit_tunjangan" placeholder="Tunjangan">
+                                    <label>Tunjangan</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-purple" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-hover datatable">
                     <thead>
@@ -60,14 +96,160 @@
                             <th>Jabatan</th>
                             <th>Gapok</th>
                             <th>Tunjangan</th>
-                            <th>Alfa</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse ($data as $jabatan)
+                        <tr>
+                            <th>{{ $loop->iteration }}.</th>
+                            <td>{{ $jabatan->jabatan }}</td>
+                            <td>Rp.{{ number_format($jabatan->gapok, 0, ',', '.') }}</td>
+                            <td>Rp.{{ number_format($jabatan->tunjangan, 0, ',', '.') }}</td>
+                            <td class="aksi">
+                                <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                                    <li>
+                                        <button class="dropdown-item d-flex align-items-center editBtn" data-id="{{ $jabatan->id }}">
+                                            <i class="bi bi-pencil-square"></i>
+                                            <span>Update</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item d-flex align-items-center deleteBtn" data-id="{{ $jabatan->id }}">
+                                            <i class="ri ri-delete-bin-6-fill"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <p>Tidak ada data</p>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    $(function() {
+        // CREATE
+        $('#jabatanForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "{{ route('jabatan.store') }}",
+                type: "POST",
+                data: $(this).serialize(),
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Menyimpan data Jabatan',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    Swal.close();
+                    if (res.success) {
+                        Swal.fire("Berhasil", res.message, "success");
+                        $('#jabatanForm')[0].reset();
+                        $('#addJabatanModal').modal('hide');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }
+            });
+        });
+
+        // SHOW UPDATE FORM
+        $('.editBtn').click(function() {
+            let id = $(this).data('id');
+            $.get("{{ url('jabatan') }}/" + id, function(data) {
+                $('#edit_id').val(data.id);
+                $('#edit_jabatan').val(data.jabatan);
+                $('#edit_gapok').val(data.gapok);
+                $('#edit_tunjangan').val(data.tunjangan);
+                $('#editJabatanModal').modal('show');
+            });
+        });
+
+        // UPDATE
+        $('#updateJabatanForm').submit(function(e) {
+            e.preventDefault();
+            let id = $('#edit_id').val();
+            $.ajax({
+                url: "{{ url('jabatan') }}/" + id,
+                type: "POST",
+                data: $(this).serialize(),
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Mengedit data Jabatan',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    Swal.close();
+                    if (res.success) {
+                        Swal.fire("Berhasil", res.message, "success");
+                        $('#updateJabatanForm')[0].reset();
+                        $('#editJabatanModal').modal('hide');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }
+            });
+        });
+
+        // DELETE
+        $('.deleteBtn').click(function() {
+            let id = $(this).data('id');
+            Swal.fire({
+                title: 'Hapus Data?',
+                text: 'Data yang dihapus tidak bisa dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('jabatan') }}/" + id,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        beforeSend: function() {
+                            Swal.fire({
+                                title: 'Processing...',
+                                text: 'Menghapus data jabatan',
+                                didOpen: () => Swal.showLoading(),
+                                allowOutsideClick: false
+                            });
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire("Berhasil", res.message, "success");
+                                setTimeout(() => location.reload(), 800);
+                            } else {
+                                Swal.fire("Gagal", res.message, "error");
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection

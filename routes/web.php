@@ -7,10 +7,12 @@ use App\Http\Controllers\jadwalController;
 use App\Http\Controllers\absensiController;
 use App\Http\Controllers\gajiController;
 use App\Http\Controllers\gajiansController;
+use App\Http\Controllers\JabatanController;
 Route::get('/', function () {
     return view('index');
 })->name('dashboard');
 
+Route::resource('/jabatan', JabatanController::class);
 Route::resource('/guru', guruController::class);
 Route::resource('/mapel', mapelController::class);
 Route::resource('/jadwal', jadwalController::class);

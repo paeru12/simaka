@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="pagetitle">
-    <h1>Data Mapel</h1>
+    <h1>Data Kelasl</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item "><a href="/">Home</a></li>
@@ -21,13 +21,9 @@
             <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addKelasModal">
                 Add Kelas
             </button>
+            
             {{-- Modal Add --}}
-            <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addMapelModal">
-                Add Mapel
-            </button>
-
-            {{-- Modal Add --}}
-            <div class="modal fade" id="addMapelModal" tabindex="-1">
+            <div class="modal fade" id="addKelaslModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <form id="kelasForm" class="need-validation" novalidate>
