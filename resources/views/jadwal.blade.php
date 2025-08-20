@@ -66,8 +66,15 @@
                                             </div>
                                             <div class="col-6">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" class="form-control" name="kelas" placeholder="Kelas">
-                                                    <label>Kelas</label>
+                                                    <select name="kelas_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @forelse($kelas as $k)
+                                                        <option value="{{$k->id}}">{{$k->kelas}} {{$k->rombel}}</option>
+                                                        @empty
+                                                        <option>No Data!!</option>
+                                                        @endforelse
+                                                    </select>
+                                                    <label for="floatingSelect">Pilih Kelas</label>
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -188,7 +195,7 @@
                                     <td>{{ $j->guru->nama }}</td>
                                     <td>{{ $j->mataPelajaran->nama_mapel }}</td>
                                     <td>{{ $j->hari }}</td>
-                                    <td>{{ $j->kelas }}</td>
+                                    <td>{{ $j->kelas->kelas }} {{ $j->kelas->rombel }}</td>
                                     <td>{{ $j->jam_mulai }}</td>
                                     <td>{{ $j->jam_selesai }}</td>
                                     <td class="aksi">

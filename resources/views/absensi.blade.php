@@ -145,7 +145,7 @@
                     $('#mapel_id').empty().append('<option value="">Pilih Mapel</option>');
                     res.jadwal.forEach(function(j) {
                         $('#jadwal_id').append(
-                            '<option value="' + j.id + '">' + j.hari + ' - ' + j.jam_mulai + ' s/d ' + j.jam_selesai + ' (' + j.kelas + ')</option>'
+                            '<option value="' + j.id + '">' + j.hari + ' - ' + j.jam_mulai + ' s/d ' + j.jam_selesai + ' (' + j.kelas.kelas +' '+ j.kelas.rombel + ')</option>'
                         );
                     });
                     window.jadwalData = res.jadwal;

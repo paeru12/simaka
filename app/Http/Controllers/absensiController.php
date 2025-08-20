@@ -23,7 +23,7 @@ class AbsensiController extends Controller
     public function getDataGuru($guru_id)
     {
         try {
-            $jadwal = Jadwal::with('mataPelajaran')->where('guru_id', $guru_id)->get();
+            $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', $guru_id)->get();
             return response()->json([
                 'success' => true,
                 'jadwal' => $jadwal

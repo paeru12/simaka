@@ -74,6 +74,10 @@
                                     <input type="text" class="form-control" name="kode_mapel" id="edit_kode_mapel" placeholder="Kode Mapel">
                                     <label>Kode Mapel</label>
                                 </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="gaji" id="edit_gaji" placeholder="Gaji">
+                                    <label>Gaji</label>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -177,6 +181,7 @@
                 $('#edit_id').val(data.id);
                 $('#edit_nama_mapel').val(data.nama_mapel);
                 $('#edit_kode_mapel').val(data.kode_mapel);
+                $('#edit_gaji').val(data.gaji);
                 $('#editMapelModal').modal('show');
             });
         });

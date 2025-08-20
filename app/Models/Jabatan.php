@@ -4,14 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+
 class Jabatan extends Model
 {
-    protected $table = 'jabatans'; 
+    protected $table = 'jabatans';
     public $incrementing = false; // non-integer ID
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id','jabatan', 'gapok', 'tunjangan' ];
+        'id',
+        'jabatan',
+        'gapok',
+        'tunjangan'
+    ];
 
     protected static function boot()
     {
@@ -21,5 +26,10 @@ class Jabatan extends Model
                 $model->id = (string) Str::uuid();
             }
         });
+    }
+
+    public function gurus()
+    {
+        return $this->hasMany(Guru::class, 'jabatan_id');
     }
 }

@@ -119,6 +119,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{Request::is('kelas') ? 'active' : 'collapsed'}}"
+                    href="{{route('kelas.index')}}">
+                    <i class="bx bxs-shopping-bags"></i>
+                    <span>Kelas</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{Request::is('mapel') ? 'active' : 'collapsed'}}"
                     href="{{route('mapel.index')}}">
                     <i class="bx bxs-shopping-bags"></i>

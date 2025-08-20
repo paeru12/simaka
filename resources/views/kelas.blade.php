@@ -21,9 +21,9 @@
             <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addKelasModal">
                 Add Kelas
             </button>
-            
+
             {{-- Modal Add --}}
-            <div class="modal fade" id="addKelaslModal" tabindex="-1">
+            <div class="modal fade" id="addKelasModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <form id="kelasForm" class="need-validation" novalidate>
@@ -110,4 +110,37 @@
         </div>
     </div>
 </section>
+
+<script>
+    $(function() {
+        // CREATE
+        $('#kelasForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "{{ route('kelas.store') }}",
+                type: "POST",
+                data: $(this).serialize(),
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Menyimpan data Kelas',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    Swal.close();
+                    if (res.success) {
+                        Swal.fire("Berhasil", res.message, "success");
+                        $('#kelasForm')[0].reset();
+                        $('#addKelasModal').modal('hide');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endsection

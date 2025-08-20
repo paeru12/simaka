@@ -57,9 +57,11 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama</th>
-                                <th>Bulan</th>
+                                <th>Jabatan</th>
+                                <th>Gapok</th>
+                                <th>Tunjangan</th>
                                 <th>Total Mapel</th>
-                                <th>M x Rp.8.000</th>
+                                <th>Total Masuk</th>
                                 <th>Total Gaji</th>
                                 <th>Aksi</th>
                             </tr>
@@ -103,44 +105,52 @@
                         let tbody = "";
                         if (res.length > 0) {
                             res.forEach((item, index) => {
+                                let gapok = item.gapok ?? 0;
+                                let tunjangan = item.tunjangan ?? 0;
+                                let honorMapel = item.gaji_mengajar ?? (item.total_hadir * 8000);
+                                let totalGaji = item.total_gaji ?? (gapok + tunjangan + honorMapel);
+
                                 tbody += `
-                                <tr>
-                                    <th>${index+1}.</th>
-                                    <td>${item.guru.nama}</td>
-                                    <td>${$("#bulan option:selected").text()} ${tahun}</td>
-                                    <td>${item.guru.total_mapel} Mapel</td>
-                                    <td>${item.hadir} x Rp.8.000</td>
-                                    <td>Rp. ${ (item.hadir * 8000).toLocaleString('id-ID') }</td>
-
-                                    <td class="aksi">
-                                        <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
-                                            <i class="ri-bar-chart-horizontal-fill"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center"
-                                                href="">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                    <span>Detail</span>
-                                                </a>
-                                            </li>
-
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                                    <i class="ri ri-delete-bin-6-fill"></i>
-                                                    <span>Delete</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            `;
+                                        <tr>
+                                            <th>${index+1}.</th>
+                                            <td>${item.nama}</td>
+                                            <td>${item.jabatan ?? '-'}</td>
+                                            <td>Rp. ${gapok.toLocaleString('id-ID')}</td>
+                                            <td>Rp. ${tunjangan.toLocaleString('id-ID')}</td>
+                                            <td>${item.total_mapel} Mapel</td>
+                                            <td>${item.total_hadir} </td>
+                                            <td>Rp. ${totalGaji.toLocaleString('id-ID')}</td>
+                                            <td class="aksi">
+                                                <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
+                                                    <i class="ri-bar-chart-horizontal-fill"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                            <span>Detail</span>
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <i class="ri ri-delete-bin-6-fill"></i>
+                                                            <span>Delete</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        `;
                             });
                         } else {
                             tbody = `<tr><td colspan="9" class="text-center text-danger">Tidak ada data</td></tr>`;
                         }
                         $("table tbody").html(tbody);
+                    },
+
+                    error: function(xhr) {
+                        console.log("Error:", xhr.responseText);
                     }
                 });
             }

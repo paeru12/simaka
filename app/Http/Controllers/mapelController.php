@@ -34,6 +34,7 @@ class mapelController extends Controller
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'required|string|max:20',
+            'gaji' => 'required|string|max:255',
         ]);
 
         try {

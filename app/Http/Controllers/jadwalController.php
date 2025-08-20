@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MataPelajaran;
 use App\Models\Guru;
 use App\Models\Jadwal;
+use App\Models\Kelas;
 
 class jadwalController extends Controller
 {
@@ -13,8 +14,9 @@ class jadwalController extends Controller
     {
         $mapel = MataPelajaran::all();
         $guru = Guru::all();
+        $kelas = Kelas::all();
         $jadwal = Jadwal::with(['guru', 'mataPelajaran'])->get();
-        return view('jadwal', compact('mapel', 'guru', 'jadwal'));
+        return view('jadwal', compact('mapel', 'guru', 'jadwal', 'kelas'));
     }
 
     function store(Request $request)
@@ -22,10 +24,10 @@ class jadwalController extends Controller
         $validated = $request->validate([
             'guru_id' => 'required|exists:gurus,id',
             'mapel_id' => 'required|exists:mata_pelajarans,id',
+            'kelas_id' => 'required|exists:kelass,id',
             'hari' => 'required|string|max:10',
             'jam_mulai' => 'required|date_format:H:i',
-            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
-            'kelas' => 'required|string|max:10',
+            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai'
         ]);
 
         try {

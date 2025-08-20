@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\KelasController;
 use App\Http\Controllers\guruController;
 use App\Http\Controllers\mapelController;
 use App\Http\Controllers\jadwalController;
@@ -14,6 +15,7 @@ Route::get('/', function () {
 
 Route::resource('/jabatan', JabatanController::class);
 Route::resource('/guru', guruController::class);
+Route::resource('/kelas', KelasController::class);
 Route::resource('/mapel', mapelController::class);
 Route::resource('/jadwal', jadwalController::class);
 Route::resource('/absensi', AbsensiController::class);
