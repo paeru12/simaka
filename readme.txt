@@ -1,6 +1,5 @@
 # admin
-paer@gmail.com / asdfghjk
-admin1@gmail.com / asdfghjk
+admin@gmail.com / asdfghjk
 
 # guru
 1. admin@admin.com / asdfghjk
