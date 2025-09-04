@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="pagetitle">
-    <h1>Detail Rekap Absen Guru {{ucfirst($guru->nama)}}</h1>
+    <h1>Detail Rekap Absen Guru {{ucfirst($guru->name)}}</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -15,8 +15,9 @@
 <section class="section">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title mb-0">Detail Rekap Absen Guru {{ucfirst($guru->nama)}}</h5>
-            <p class="card-text">{{$bulan}} {{$tahun}}</p>
+            <h5 class="card-title mb-0">Detail Rekap Absen Guru {{ucfirst($guru->name)}}</h5>
+            <p class="card-text">{{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}</p>
+
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-hover datatable">
@@ -34,7 +35,7 @@
                             @foreach($absensi as $d)
                             <tr>
                                 <th>{{$loop->iteration}}.</th>
-                                <td>{{ $d->mataPelajaran->nama_mapel }}</td>
+                                <td class="text-capitalize">{{ $d->mataPelajaran->nama_mapel }}</td>
                                 <td>{{ $d->hadir }}</td>
                                 <td>{{ $d->izin }}</td>
                                 <td>{{ $d->sakit }}</td>

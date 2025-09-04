@@ -4,47 +4,83 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Absensi;
-use App\Models\Guru;
 use App\Models\MataPelajaran;
 use App\Models\Jadwal;
+use Intervention\Image\ImageManager;
 
 class AbsensiController extends Controller
 {
     public function index()
     {
-        $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal'])->orderBy('tanggal', 'desc')->get();
-        $guru = Guru::all();
+        if (auth()->user()->role == 'admin') {
+            $absensi = Absensi::with(['user', 'mataPelajaran', 'jadwal.kelas'])->orderBy('created_at', 'desc')->get();
+        } else {
+            $absensi = Absensi::with(['user', 'mataPelajaran', 'jadwal.kelas'])->where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
+        }
         $mapel = MataPelajaran::all();
-        $jadwal = Jadwal::all();
-
-        return view('absensi', compact('absensi', 'guru', 'mapel', 'jadwal'));
+        $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('user_id', auth()->id())->get();
+        $hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+        // dd( $jadwal);
+        return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari'));
     }
 
-    public function getDataGuru($guru_id)
+    public function getKelasByHari(Request $request)
     {
         try {
-            $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', $guru_id)->get();
-            return response()->json([
-                'success' => true,
-                'jadwal' => $jadwal
-            ]);
+            $hari = $request->hari;
+            $jadwal = Jadwal::with('kelas')
+                ->where('user_id', auth()->id())
+                ->where('hari', $hari)
+                ->get();
+
+            return response()->json($jadwal);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'errors' => $th->getMessage()]);
+            return response()->json(['error' => $th->getMessage()], 500);
         }
+    }
+
+
+    public function getMapelByKelas(Request $request)
+    {
+        $kelasId = $request->kelas_id;
+        $jadwal = Jadwal::with('mataPelajaran')
+            ->where('user_id', auth()->id())
+            ->where('kelas_id', $kelasId)
+            ->get();
+
+        return response()->json($jadwal);
+    }
+
+    private function uploadFoto($file)
+    {
+        $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+        $resized = $manager->read($file->getPathname())->toJpeg(60);
+        $imageName = time() . '_' . uniqid() . '.webp'; 
+        $savePath = 'uploads/bukti/' . $imageName;
+        if (!file_exists(public_path('uploads/bukti'))) {
+            mkdir(public_path('uploads/bukti'), 0777, true);
+        }
+        file_put_contents(public_path($savePath), (string) $resized);
+        return $savePath;
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'guru_id' => 'required|exists:gurus,id',
-            'mapel_id' => 'required|exists:mata_pelajarans,id',
-            'jadwal_id' => 'required|exists:jadwals,id',
-            'tanggal' => 'required|date',
-            'jam_absen' => 'required|date_format:H:i',
-            'status' => 'required|in:Hadir,Izin,Sakit,Alfa',
-            'keterangan' => 'nullable|string|max:255',
-        ]);
         try {
+            $validated = $request->validate([
+                'jadwal_id' => 'required|exists:jadwals,id',
+                'mapel_id' => 'required|exists:mata_pelajarans,id',
+                'tanggal' => 'required|date',
+                'jam_absen' => 'required|date_format:H:i',
+                'status' => 'required|in:Hadir,Izin,Sakit,Alfa',
+                'keterangan' => 'nullable|string|max:255',
+                'foto' => 'required|image|max:2048',
+            ]);
+            $validated['user_id'] = auth()->id();
+
+            if ($request->hasFile('foto')) {
+                $validated['foto'] = $this->uploadFoto($request->file('foto'));
+            }
             Absensi::create($validated);
 
             return response()->json([

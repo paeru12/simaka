@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jadwals', function (Blueprint $table) {
+        Schema::create('qr_kelas', function (Blueprint $table) {
             $table->string('id', 36)->primary();
-            $table->string('user_id', 36);
             $table->string('ruangan_id', 36);
-            $table->string('mapel_id', 36);
-            $table->string('kelas_id', 36);
-            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
-            $table->time('jam_mulai');
-            $table->time('jam_selesai');
+            $table->string('token', 100)->unique(); 
+            $table->boolean('aktif')->default(true);
+            $table->string('file')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jadwals');
+        Schema::dropIfExists('qr_kelas');
     }
 };

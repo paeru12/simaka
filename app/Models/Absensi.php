@@ -12,7 +12,7 @@ class Absensi extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'jadwal_id', 'guru_id', 'mapel_id', 'tanggal', 'jam_absen', 'status', 'keterangan'
+        'id', 'jadwal_id', 'mapel_id', 'user_id', 'tanggal', 'jam_absen', 'status', 'keterangan', 'foto'
     ];
  
     protected static function boot()
@@ -30,13 +30,14 @@ class Absensi extends Model
         return $this->belongsTo(Jadwal::class, 'jadwal_id');
     }
 
-    public function guru()
+    public function user()
     {
-        return $this->belongsTo(Guru::class, 'guru_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function mataPelajaran()
     {
         return $this->belongsTo(MataPelajaran::class, 'mapel_id');
     }
+
 }

@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-8">
                     <div class="row needs-validation" novalidate>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <div class="form-floating">
                                 <select class="form-select" id="bulan" aria-label="Floating label select example">
                                     <option value="">-- Pilih Bulan --</option>
@@ -38,7 +38,7 @@
                                 <label for="bulan">Pilih Bulan</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <div class="form-floating">
                                 <select id="tahun" class="form-select">
                                     <option value="">-- Pilih Tahun --</option>
@@ -67,14 +67,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <th></th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -83,11 +76,6 @@
 </section>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    });
     $(document).ready(function() {
         $("#bulan, #tahun").on("change", function() {
             let bulan = $("#bulan").val();
@@ -102,40 +90,34 @@
                         tahun: tahun
                     },
                     success: function(res) {
+                        console.log(res);
                         let tbody = "";
                         if (res.length > 0) {
                             res.forEach((item, index) => {
-                                let gapok = item.gapok ?? 0;
-                                let tunjangan = item.tunjangan ?? 0;
-                                let honorMapel = item.gaji_mengajar ?? (item.total_hadir * 8000);
-                                let totalGaji = item.total_gaji ?? (gapok + tunjangan + honorMapel);
+                                let gapok = Number(item.gapok ?? 0);
+                                let tunjangan = Number(item.tunjangan ?? 0);
+                                let honorMapel = Number(item.gaji ?? (item.total_hadir * 8000));
+                                let totalGaji = Number(item.total_gaji ?? (gapok + tunjangan + honorMapel));
 
                                 tbody += `
                                         <tr>
                                             <th>${index+1}.</th>
-                                            <td>${item.nama}</td>
-                                            <td>${item.jabatan ?? '-'}</td>
-                                            <td>Rp. ${gapok.toLocaleString('id-ID')}</td>
-                                            <td>Rp. ${tunjangan.toLocaleString('id-ID')}</td>
+                                            <td class="text-capitalize">${item.name}</td>
+                                            <td class="text-capitalize">${item.jabatan ?? '-'}</td>
+                                            <td>Rp.${gapok.toLocaleString('id-ID')}</td>
+                                            <td>Rp.${tunjangan.toLocaleString('id-ID')}</td>
                                             <td>${item.total_mapel} Mapel</td>
-                                            <td>${item.total_hadir} </td>
-                                            <td>Rp. ${totalGaji.toLocaleString('id-ID')}</td>
+                                            <td>${item.total_hadir} Kali</td>
+                                            <td>Rp.${totalGaji.toLocaleString('id-ID')}</td>
                                             <td class="aksi">
                                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
                                                     <i class="ri-bar-chart-horizontal-fill"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                                     <li>
-                                                        <a class="dropdown-item d-flex align-items-center" href="#">
+                                                        <a class="dropdown-item d-flex align-items-center" href="/gaji/slip-gaji/${item.user_id}/slip/${bulan}/${tahun}">
                                                             <i class="bi bi-pencil-square"></i>
-                                                            <span>Detail</span>
-                                                        </a>
-                                                    </li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <a class="dropdown-item d-flex align-items-center" href="#">
-                                                            <i class="ri ri-delete-bin-6-fill"></i>
-                                                            <span>Delete</span>
+                                                            <span>Slip Gaji</span>
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -143,8 +125,6 @@
                                         </tr>
                                         `;
                             });
-                        } else {
-                            tbody = `<tr><td colspan="9" class="text-center text-danger">Tidak ada data</td></tr>`;
                         }
                         $("table tbody").html(tbody);
                     },

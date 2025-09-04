@@ -14,12 +14,14 @@ return new class extends Migration
          Schema::create('absensis', function (Blueprint $table) {
             $table->string('id', 36)->primary();
             $table->string('jadwal_id', 36);
-            $table->string('guru_id', 36);
             $table->string('mapel_id', 36);
+            $table->string('user_id', 36);
             $table->date('tanggal');
             $table->time('jam_absen');
             $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpha', 'Terlambat']);
             $table->text('keterangan')->nullable();
+            $table->string('foto')->nullable();
+            $table->unique(['jadwal_id', 'tanggal']);
             $table->timestamps();
         });
     }

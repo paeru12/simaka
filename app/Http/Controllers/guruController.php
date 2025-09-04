@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Guru;
 use App\Models\Jabatan;
 use Illuminate\Http\Request;
@@ -9,11 +10,13 @@ use Intervention\Image\ImageManager;
 
 class guruController extends Controller
 {
-    function index()
+    
+    public function index()
     {
-        $guru = Guru::with('jabatan')->orderBy('created_at', 'desc')->get();
-        $jabatan = Jabatan::orderBy('created_at', 'asc')->get();
-        return response()->view('guru', ['guru' => $guru, 'jabatan' => $jabatan]);
+        return response()->view('guru', [
+            'guru' => User::where('role', 'guru')->latest()->get(),
+            'jabatan' => Jabatan::latest()->get(),
+        ]);
     }
 
     function store(Request $request)
@@ -26,7 +29,7 @@ class guruController extends Controller
             'alamat' => 'required|string|max:255',
             'no_hp' => 'required|string|max:15',
             'foto' => 'required|image|mimes:jpg,png,webp,jfif,jpeg',
-        ]);
+        ]); 
         try {
             if ($request->hasFile('foto')) {
                 $image = $request->file('foto');

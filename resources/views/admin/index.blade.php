@@ -1,5 +1,5 @@
 @extends('layout.layout')
-@section('title', 'Guru')
+@section('title', 'Admin')
 @section('content')
 <style>
     #passwordIcon {
@@ -21,33 +21,41 @@
     }
 </style>
 <div class="pagetitle">
-    <h1 class="text-capitalize">Data Guru</h1>
+    <h1>Admin</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active"><a href="">Guru</a></li>
+            <li class="breadcrumb-item"><a href="">Home</a></li>
+            <li class="breadcrumb-item active">Admin</li>
         </ol>
     </nav>
 </div>
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 <section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title mb-0">Data Guru</h5>
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
-                        Add Guru
+                    <h5 class="card-title mb-0">Datatables</h5>
+                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#basicModal1">
+                        Add Admin
                     </button>
-
-                    {{-- Modal Add Guru --}}
-                    <div class="modal fade" id="verticalycentered" tabindex="-1">
+                    <div class="modal fade" id="basicModal1" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
+                                <form id="formTambahAdmin" class="needs-validation" enctype="multipart/form-data" novalidate>
                                     @csrf
-                                    <input type="hidden" name="role" value="guru">
+                                    <input type="hidden" name="role" value="admin">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Add Guru</h5>
+                                        <h5 class="modal-title">Add Admin</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
 
@@ -159,34 +167,25 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="table-responsive">
-                        <table class="table table-hover datatable">
+                        <table class="table datatable table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">No</th>
                                     <th scope="col">Foto</th>
                                     <th scope="col">Nama</th>
                                     <th scope="col">Email</th>
-                                    <th scope="col">Jabatan</th>
-                                    <th scope="col">JK</th>
-                                    <th scope="col">No HP</th>
                                     <th scope="col">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($guru as $g)
+                                @forelse ($data as $d)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}.</th>
-                                    <td>
-                                        <img src="{{asset($g->foto)}}" class="img-thumbnail p-0 border-none rounded-circle"
-                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy">
-                                    </td>
-                                    <td class="text-capitalize">{{ $g->name }}</td>
-                                    <td>{{ $g->email }}</td>
-                                    <td>{{ $g->jabatan->jabatan }}</td>
-                                    <td>{{ $g->jk }}</td>
-                                    <td>{{ $g->no_hp }}</td>
+                                    <td><img src="{{ asset($d->foto) }}" class="img-thumbnail p-0 border-none rounded-circle"
+                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></td>
+                                    <td>{{ ucfirst($d->name) }}</td>
+                                    <td>{{ $d->email }}</td>
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm"
                                             data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
@@ -195,7 +194,7 @@
 
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                    href="{{ route('admin.edits', ['id' => $g->id]) }}">
+                                                    href="{{ route('admin.edits', ['id' => $d->id]) }}">
                                                     <i class="bi bi-person"></i>
                                                     <span>Profile</span>
                                                 </a>
@@ -206,7 +205,7 @@
                                             <li>
                                                 <a href="javascript:void(0);"
                                                     class="dropdown-item d-flex align-items-center btn-delete"
-                                                    data-id="{{ $g->id }}">
+                                                    data-id="{{ $d->id }}">
                                                     <i class="ri ri-delete-bin-6-fill"></i>
                                                     <span>Delete</span>
                                                 </a>
@@ -215,9 +214,6 @@
                                     </td>
                                 </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="9" class="text-center">No data available</td>
-                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -227,12 +223,11 @@
         </div>
     </div>
 </section>
-
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     $(document).ready(function() {
 
-        $('#formTambahGuru').on('submit', function(e) {
+        $('#formTambahAdmin').on('submit', function(e) {
             e.preventDefault();
 
             const form = this;
@@ -385,5 +380,4 @@
         });
     });
 </script>
-
 @endsection

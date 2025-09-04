@@ -36,11 +36,11 @@
                                     <label>Jabatan</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="gapok" placeholder="Gaji Pokok">
+                                    <input type="text" class="form-control" name="gapok" oninput="convertToCurrency(this)" placeholder="Gaji Pokok">
                                     <label>Gaji Pokok</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="tunjangan" placeholder="Tunjangan">
+                                    <input type="text" class="form-control" name="tunjangan" oninput="convertToCurrency(this)" placeholder="Tunjangan">
                                     <label>Tunjangan</label>
                                 </div>
                             </div>
@@ -71,13 +71,16 @@
                                     <label>Jabatan</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="gapok" id="edit_gapok" placeholder="Gaji Pokok">
+                                    <input type="text" class="form-control" oninput="convertToCurrency(this)"
+                                        name="gapok" id="edit_gapok" placeholder="Gaji Pokok">
                                     <label>Gaji Pokok</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="tunjangan" id="edit_tunjangan" placeholder="Tunjangan">
+                                    <input type="text" class="form-control" oninput="convertToCurrency(this)"
+                                        name="tunjangan" id="edit_tunjangan" placeholder="Tunjangan">
                                     <label>Tunjangan</label>
                                 </div>
+
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -140,14 +143,40 @@
 </section>
 
 <script>
+    function convertToCurrency(input) {
+        let value = input.value.replace(/[^\d]/g, ''); // ambil hanya angka
+        if (value) {
+            input.value = new Intl.NumberFormat('id-ID').format(value); // tampil Rp style (tanpa "Rp" biar lebih aman)
+        } else {
+            input.value = '';
+        }
+    }
+
+    function cleanCurrency(value) {
+        return value.replace(/[^\d]/g, '');
+    }
+
     $(function() {
         // CREATE
         $('#jabatanForm').submit(function(e) {
             e.preventDefault();
+            // Bersihkan nilai sebelum submit
+            let gapok = cleanCurrency($("input[name='gapok']").val());
+            let tunjangan = cleanCurrency($("input[name='tunjangan']").val());
+
+            let formData = $(this).serializeArray();
+            formData.push({
+                name: "gapok",
+                value: gapok
+            });
+            formData.push({
+                name: "tunjangan",
+                value: tunjangan
+            });
             $.ajax({
                 url: "{{ route('jabatan.store') }}",
                 type: "POST",
-                data: $(this).serialize(),
+                data: $.param(formData),
                 beforeSend: function() {
                     Swal.fire({
                         title: 'Processing...',
@@ -157,7 +186,7 @@
                     });
                 },
                 success: function(res) {
-                    Swal.close();
+                    Swal.close(); 
                     if (res.success) {
                         Swal.fire("Berhasil", res.message, "success");
                         $('#jabatanForm')[0].reset();
@@ -166,6 +195,14 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON.message
+                    });
                 }
             });
         });
@@ -186,10 +223,23 @@
         $('#updateJabatanForm').submit(function(e) {
             e.preventDefault();
             let id = $('#edit_id').val();
+            // Bersihkan nilai sebelum submit
+            let gapok = cleanCurrency($("#edit_gapok").val());
+            let tunjangan = cleanCurrency($("#edit_tunjangan").val());
+
+            let formData = $(this).serializeArray();
+            formData.push({
+                name: "gapok",
+                value: gapok
+            });
+            formData.push({
+                name: "tunjangan",
+                value: tunjangan
+            });
             $.ajax({
                 url: "{{ url('jabatan') }}/" + id,
                 type: "POST",
-                data: $(this).serialize(),
+                data: $.param(formData),
                 beforeSend: function() {
                     Swal.fire({
                         title: 'Processing...',

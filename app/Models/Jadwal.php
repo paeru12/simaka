@@ -12,7 +12,7 @@ class Jadwal extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'guru_id', 'mapel_id','kelas_id', 'hari', 'jam_mulai', 'jam_selesai'
+        'id', 'user_id','ruangan_id', 'mapel_id','kelas_id', 'hari', 'jam_mulai', 'jam_selesai'
     ];
 
     protected static function boot()
@@ -25,9 +25,13 @@ class Jadwal extends Model
         });
     }
 
-    public function guru()
+    public function user()
     {
-        return $this->belongsTo(Guru::class, 'guru_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function ruangan()
+    {
+        return $this->belongsTo(Ruangan::class, 'ruangan_id');
     }
     public function kelas()
     {

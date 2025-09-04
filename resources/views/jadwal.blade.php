@@ -17,6 +17,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-0">Data Jadwal</h5>
+                    @if (Auth::user()->role == 'admin')
                     <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addJadwalModal">
                         Add Jadwal
                     </button>
@@ -33,24 +34,26 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="form-floating mb-3">
-                                            <select name="guru_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                            <select name="user_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
                                                 <option selected>Open this select menu</option>
                                                 @foreach ($guru as $g)
-                                                <option value="{{ $g->id }}">{{ $g->nama }}</option>
+                                                <option value="{{ $g->id }}">{{ $g->name }}</option>
                                                 @endforeach
                                             </select>
                                             <label for="floatingSelect">Pilih Guru</label>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <select name="mapel_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                                <option selected>Open this select menu</option>
-                                                @foreach ($mapel as $m)
-                                                <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="floatingSelect">Pilih Mapel</label>
-                                        </div>
                                         <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-floating mb-3">
+                                                    <select name="mapel_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @foreach ($mapel as $m)
+                                                        <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="floatingSelect">Pilih Mapel</label>
+                                                </div>
+                                            </div>
                                             <div class="col-6">
                                                 <div class="form-floating mb-3">
                                                     <select name="hari" class="form-select" id="floatingSelect" aria-label="Floating label select example">
@@ -75,6 +78,19 @@
                                                         @endforelse
                                                     </select>
                                                     <label for="floatingSelect">Pilih Kelas</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-floating mb-3">
+                                                    <select name="ruangan_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @forelse($ruangan as $r)
+                                                        <option value="{{$r->id}}">{{$r->nama}}</option>
+                                                        @empty
+                                                        <option>No Data!!</option>
+                                                        @endforelse
+                                                    </select>
+                                                    <label for="floatingSelect">Pilih Ruangan</label>
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -114,27 +130,29 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="form-floating mb-3">
-                                            <select name="guru_id" id="edit_guru_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                            <select name="user_id" id="edit_user_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
                                                 <option selected>Open this select menu</option>
                                                 @foreach ($guru as $g)
-                                                <option value="{{ $g->id }}">{{ $g->nama }}</option>
+                                                <option value="{{ $g->id }}">{{ $g->name }}</option>
                                                 @endforeach
                                             </select>
                                             <label for="floatingSelect">Pilih Guru</label>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <select name="mapel_id" id="edit_mapel_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                                <option selected>Open this select menu</option>
-                                                @foreach ($mapel as $m)
-                                                <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="floatingSelect">Pilih Mapel</label>
-                                        </div>
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="form-floating mb-3">
-                                                    <select name="hari" id="edit_hari" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                    <select name="mapel_id" id="edit_mapel_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @foreach ($mapel as $m)
+                                                        <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="floatingSelect">Pilih Mapel</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-floating mb-3">
+                                                    <select name="hari" id="edit_hari" class="form-select" aria-label="Floating label select example">
                                                         <option selected>Open this select menu</option>
                                                         <option value="Senin">Senin</option>
                                                         <option value="Selasa">Selasa</option>
@@ -142,13 +160,33 @@
                                                         <option value="Kamis">Kamis</option>
                                                         <option value="Jumat">Jumat</option>
                                                     </select>
-                                                    <label for="floatingSelect">Pilih Hari</label>
+                                                    <label for="edit_hari">Pilih Hari</label>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" id="edit_kelas" class="form-control" name="kelas" placeholder="Kelas">
-                                                    <label>Kelas</label>
+                                                    <select name="kelas_id" class="form-select" id="edit_kelas_id" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @forelse($kelas as $k)
+                                                        <option value="{{$k->id}}">{{$k->kelas}} {{$k->rombel}}</option>
+                                                        @empty
+                                                        <option>No Data!!</option>
+                                                        @endforelse
+                                                    </select>
+                                                    <label for="edit_kelas_id">Pilih Kelas</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-floating mb-3">
+                                                    <select name="ruangan_id" class="form-select" id="edit_ruangan_id" aria-label="Floating label select example">
+                                                        <option selected>Open this select menu</option>
+                                                        @forelse($ruangan as $r)
+                                                        <option value="{{$r->id}}">{{$r->nama}}</option>
+                                                        @empty
+                                                        <option>No Data!!</option>
+                                                        @endforelse
+                                                    </select>
+                                                    <label for="edit_ruangan_id">Pilih Ruangan</label>
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -173,6 +211,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <div class="table-responsive">
                         <table class="table table-hover datatable">
@@ -183,21 +222,26 @@
                                     <th>Mapel</th>
                                     <th>Hari</th>
                                     <th>Kelas</th>
+                                    <th>Ruangan</th>
                                     <th>Jam Mulai</th>
                                     <th>Jam Selesai</th>
+                                    @if (Auth::user()->role == 'admin')
                                     <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-capitalize">
                                 @forelse($jadwal as $j)
                                 <tr>
                                     <th>{{ $loop->iteration }}.</th>
-                                    <td>{{ $j->guru->nama }}</td>
+                                    <td>{{ $j->user->name }}</td>
                                     <td>{{ $j->mataPelajaran->nama_mapel }}</td>
                                     <td>{{ $j->hari }}</td>
-                                    <td>{{ $j->kelas->kelas }} {{ $j->kelas->rombel }}</td>
-                                    <td>{{ $j->jam_mulai }}</td>
-                                    <td>{{ $j->jam_selesai }}</td>
+                                    <td>{{ $j->kelas->kelas }} <span class="text-uppercase">{{$j->kelas->jurusan->nama}}</span> {{ $j->kelas->rombel }}</td>
+                                    <td class="text-uppercase">{{ $j->ruangan->nama }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} WIB</td>
+                                    <td>{{ \Carbon\Carbon::parse($j->jam_selesai)->format('H:i') }} WIB</td>
+                                    @if (Auth::user()->role == 'admin')
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -220,11 +264,10 @@
                                         </ul>
 
                                     </td>
+                                    @endif
                                 </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No Data Available</td>
-                                </tr>
+
                                 @endforelse
                             </tbody>
                         </table>
@@ -271,10 +314,11 @@
             let id = $(this).data('id');
             $.get("{{ url('jadwal') }}/" + id, function(data) {
                 $('#edit_id').val(data.id);
-                $('#edit_guru_id').val(data.guru_id);
+                $('#edit_user_id').val(data.user_id);
+                $('#edit_ruangan_id').val(data.ruangan_id);
                 $('#edit_mapel_id').val(data.mapel_id);
                 $('#edit_hari').val(data.hari);
-                $('#edit_kelas').val(data.kelas);
+                $('#edit_kelas_id').val(data.kelas_id);
                 $('#edit_jam_mulai').val(data.jam_mulai.substring(0, 5));
                 $('#edit_jam_selesai').val(data.jam_selesai.substring(0, 5));
                 $('#editJadwalModal').modal('show');
@@ -310,7 +354,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: res.message
+                            text: res.errors
                         });
                     }
                 }

@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-8">
                     <div class="row needs-validation" novalidate>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <div class="form-floating">
                                 <select class="form-select" id="bulan" aria-label="Floating label select example">
                                     <option value="">-- Pilih Bulan --</option>
@@ -39,7 +39,7 @@
                                 <label for="bulan">Pilih Bulan</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <div class="form-floating">
                                 <select id="tahun" class="form-select">
                                     <option value="">-- Pilih Tahun --</option>
@@ -80,11 +80,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    });
+    
     $(document).ready(function() {
         $("#bulan, #tahun").on("change", function() {
             let bulan = $("#bulan").val();
@@ -104,10 +100,10 @@
                             res.forEach((item, index) => {
                                 tbody += `
                                 <tr>
-                                    <td>${index+1}</td>
-                                    <td>${item.guru.nama}</td>
+                                    <th>${index+1}.</th>
+                                    <td class="text-capitalize">${item.user.name}</td>
                                     <td>${$("#bulan option:selected").text()} ${tahun}</td>
-                                    <td>${item.guru.total_mapel}</td>
+                                    <td>${item.user.total_mapel}</td>
                                     <td>${item.hadir}</td>
                                     <td>${item.izin}</td>
                                     <td>${item.sakit}</td>
@@ -119,17 +115,9 @@
                                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                href="/rekap/${item.guru_id}/detail/${bulan}/${tahun}">
+                                                href="/rekap/${item.user_id}/detail/${bulan}/${tahun}">
                                                     <i class="bi bi-pencil-square"></i>
                                                     <span>Detail</span>
-                                                </a>
-                                            </li>
-
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                                    <i class="ri ri-delete-bin-6-fill"></i>
-                                                    <span>Delete</span>
                                                 </a>
                                             </li>
                                         </ul>
@@ -138,9 +126,12 @@
                             `;
                             });
                         } else {
-                            tbody = `<tr><td colspan="9" class="text-center text-danger">Tidak ada data</td></tr>`;
+                            tbody = `<tr><td colspan="9" class="text-center">No entries found</td></tr>`;
                         }
                         $("table tbody").html(tbody);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr);
                     }
                 });
             }

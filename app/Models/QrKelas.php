@@ -4,20 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-
-class Kelas extends Model
+class QrKelas extends Model
 {
-    protected $table = 'kelass';
+    protected $table = 'qr_kelas';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id',
-        'jurusan_id',
-        'kelas',
-        'rombel'
+        'id', 'ruangan_id', 'token', 'aktif', 'file'
     ];
-
+ 
     protected static function boot()
     {
         parent::boot();
@@ -27,12 +23,9 @@ class Kelas extends Model
             }
         });
     }
-    public function jadwal()
+
+    public function ruangan()
     {
-        return $this->hasMany(Jadwal::class);
-    }
-    public function jurusan()
-    {
-        return $this->belongsTo(Jurusan::class);
+        return $this->hasMany(Ruangan::class, 'ruangan_id');
     }
 }

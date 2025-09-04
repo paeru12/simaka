@@ -4,7 +4,7 @@
 
 <div class="pagetitle">
     <h1>Data Mapel</h1>
-    <nav> 
+    <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item "><a href="/">Home</a></li>
             <li class="breadcrumb-item active">Mata Pelajaran</li>
@@ -40,8 +40,8 @@
                                     <label>Kode Mapel</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="gaji" placeholder="Gaji">
-                                    <label>Gaji</label>
+                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" placeholder="Gaji">
+                                    <label>Honor /Mengajar</label>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -75,8 +75,8 @@
                                     <label>Kode Mapel</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="gaji" id="edit_gaji" placeholder="Gaji">
-                                    <label>Gaji</label>
+                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" id="edit_gaji" placeholder="Gaji">
+                                    <label>Honor /Mengajar</label>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -96,7 +96,7 @@
                             <th>No</th>
                             <th>Nama Mapel</th>
                             <th>Kode Mapel</th>
-                            <th>Gaji</th>
+                            <th>Honor /Mengajar</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -105,8 +105,8 @@
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
                             <td>{{ $m->nama_mapel }}</td>
-                            <td>{{ $m->kode_mapel }}</td>                            
-                            <td>Rp.{{ number_format($m->gaji, 0, ',', '.') }}</td>                           
+                            <td>{{ $m->kode_mapel }}</td>
+                            <td>Rp.{{ number_format($m->gaji, 0, ',', '.') }}</td>
                             <td class="aksi">
                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -144,14 +144,34 @@
 </section>
 
 <script>
+    function convertToCurrency(input) {
+        let value = input.value.replace(/[^\d]/g, ''); // ambil hanya angka
+        if (value) {
+            input.value = new Intl.NumberFormat('id-ID').format(value); // tampil Rp style (tanpa "Rp" biar lebih aman)
+        } else {
+            input.value = '';
+        }
+    }
+
+    function cleanCurrency(value) {
+        return value.replace(/[^\d]/g, '');
+    }
+
     $(function() {
         // CREATE
         $('#mapelForm').submit(function(e) {
             e.preventDefault();
+            let gaji = cleanCurrency($("input[name='gaji']").val());
+
+            let formData = $(this).serializeArray();
+            formData.push({
+                name: "gaji",
+                value: gaji
+            });
             $.ajax({
                 url: "{{ route('mapel.store') }}",
                 type: "POST",
-                data: $(this).serialize(),
+                data: $.param(formData),
                 beforeSend: function() {
                     Swal.fire({
                         title: 'Processing...',
@@ -190,10 +210,17 @@
         $('#updateMapelForm').submit(function(e) {
             e.preventDefault();
             let id = $('#edit_id').val();
+            let gaji = cleanCurrency($("input[id='edit_gaji']").val());
+
+            let formData = $(this).serializeArray();
+            formData.push({
+                name: "gaji",
+                value: gaji
+            });
             $.ajax({
                 url: "{{ url('mapel') }}/" + id,
                 type: "POST",
-                data: $(this).serialize(),
+                data: $.param(formData),
                 beforeSend: function() {
                     Swal.fire({
                         title: 'Processing...',
