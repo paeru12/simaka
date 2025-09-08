@@ -142,7 +142,17 @@
                             <td>{{ $a->jadwal->hari }} - {{ \Carbon\Carbon::parse($a->jadwal->jam_mulai)->format('H:i') }} s/d {{ \Carbon\Carbon::parse($a->jadwal->jam_selesai)->format('H:i') }} WIB</td>
                             <td>{{ \Carbon\Carbon::parse($a->tanggal)->format('d M Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($a->jam_absen)->format('H:i') }} WIB</td>
-                            <td>{{ $a->status }}</td>
+                            <td>
+                                @if($a->status == 'Alpha')
+                                <span class="badge bg-danger">Alpha</span>
+                                @elseif($a->status == 'Izin')
+                                <span class="badge bg-warning text-dark">Izin</span>
+                                @elseif($a->status == 'Sakit')
+                                <span class="badge bg-info text-dark">Sakit</span>
+                                @else
+                                <span class="badge bg-success">Hadir</span>
+                                @endif
+                            </td>
                             <td>
                                 @if($a->keterangan)
                                 <p>{{ $a->keterangan }}</p>

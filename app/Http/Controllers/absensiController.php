@@ -72,7 +72,7 @@ class AbsensiController extends Controller
                 'mapel_id' => 'required|exists:mata_pelajarans,id',
                 'tanggal' => 'required|date',
                 'jam_absen' => 'required|date_format:H:i',
-                'status' => 'required|in:Hadir,Izin,Sakit,Alfa',
+                'status' => 'required|in:Hadir,Izin,Sakit,Alpha',
                 'keterangan' => 'nullable|string|max:255',
                 'foto' => 'required|image|max:2048',
             ]);
