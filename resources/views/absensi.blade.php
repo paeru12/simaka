@@ -193,81 +193,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(function() {
-        $('#hari').on('change', function() {
-            let hari = $(this).val();
-            $('#kelas').empty().append('<option value="">Pilih kelas</option>');
-            $('#mapel_id').empty().append('<option value="">Pilih Mapel</option>');
-
-            if (hari) {
-                $.ajax({
-                    url: "{{ route('absensi.getKelas') }}",
-                    type: "GET",
-                    data: {
-                        hari: hari
-                    },
-                    beforeSend: function() {
-                        // optional: kasih loading kecil
-                        $('#kelas').append('<option disabled>Loading...</option>');
-                    },
-                    success: function(data) {
-                        $('#kelas').empty().append('<option value="">Pilih kelas</option>');
-                        data.forEach(j => {
-                            $('#kelas').append(
-                                `<option value="${j.kelas.id}" data-jadwal="${j.id}">
-                            ${j.kelas.kelas} ${j.kelas.rombel}
-                        </option>`
-                            );
-                        });
-                    },
-                    error: function(xhr) {
-                        console.error(xhr.responseText);
-                        Swal.fire("Error", "Gagal mengambil data kelas", "error");
-                    }
-                });
-            }
-        });
-
-
-        $('#kelas').on('change', function() {
-            let kelasId = $(this).val();
-            $('#mapel_id').empty().append('<option value="">Pilih Mapel</option>');
-
-            if (kelasId) {
-                $.get("{{ route('absensi.getMapel') }}", {
-                    kelas_id: kelasId
-                }, function(data) {
-                    data.forEach(j => {
-                        let jamMulai = formatJam(j.jam_mulai);
-                        let jamSelesai = formatJam(j.jam_selesai);
-
-                        $('#mapel_id').append(
-                            `<option value="${j.mata_pelajaran.id}" data-jadwal="${j.id}">
-                        ${j.mata_pelajaran.nama_mapel} (${jamMulai} s/d ${jamSelesai} WIB)
-                    </option>`
-                        );
-                    });
-                });
-            }
-        });
-
-        // helper untuk format jam dari "08:08:00" -> "08:08"
-        function formatJam(jam) {
-            if (!jam) return '';
-            let [h, m] = jam.split(':'); // ambil jam & menit saja
-            return `${h}:${m}`;
-        }
-
-
-        // simpan jadwal_id otomatis ketika pilih mapel
-        $('#mapel_id').on('change', function() {
-            let jadwalId = $(this).find(':selected').data('jadwal');
-            $('<input>').attr({
-                type: 'hidden',
-                name: 'jadwal_id',
-                value: jadwalId
-            }).appendTo('#absenForm');
-        });
-
         // CREATE
         $('#absenForm').submit(function(e) {
             console.log($(this).serialize());
@@ -300,6 +225,68 @@
                     }
                 }
             });
+        });
+    });
+
+    $(function() {
+        $('#hari').on('change', function() {
+            let hari = $(this).val();
+            $('#kelas').empty().append('<option value="">Pilih kelas</option>');
+            $('#mapel_id').empty().append('<option value="">Pilih Mapel</option>');
+
+            if (hari) {
+                $.get("{{ route('absensi.getKelas') }}", {
+                    hari: hari
+                }, function(data) {
+                    $('#kelas').empty().append('<option value="">Pilih kelas</option>');
+                    data.forEach(j => {
+                        $('#kelas').append(
+                            `<option value="${j.kelas.id}">
+                            ${j.kelas.kelas} ${j.kelas.rombel}
+                        </option>`
+                        );
+                    });
+                });
+            }
+        });
+
+        $('#kelas').on('change', function() {
+            let kelasId = $(this).val();
+            let hari = $('#hari').val();
+            $('#mapel_id').empty().append('<option value="">Pilih Mapel</option>');
+
+            if (kelasId && hari) {
+                $.get("{{ route('absensi.getMapel') }}", {
+                    hari: hari,
+                    kelas_id: kelasId
+                }, function(data) {
+                    data.forEach(j => {
+                        let jamMulai = formatJam(j.jam_mulai);
+                        let jamSelesai = formatJam(j.jam_selesai);
+                        $('#mapel_id').append(
+                            `<option value="${j.mata_pelajaran.id}" data-jadwal="${j.id}">
+                            ${j.mata_pelajaran.nama_mapel} (${jamMulai} s/d ${jamSelesai} WIB)
+                        </option>`
+                        );
+                    });
+                });
+            }
+        });
+
+        function formatJam(jam) {
+            if (!jam) return '';
+            let [h, m] = jam.split(':');
+            return `${h}:${m}`;
+        }
+
+        $('#mapel_id').on('change', function() {
+            let jadwalId = $(this).find(':selected').data('jadwal');
+            $('input[name="jadwal_id"]').remove(); // hindari duplikasi
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'jadwal_id',
+                value: jadwalId
+            }).appendTo('#absenForm');
         });
     });
 </script>

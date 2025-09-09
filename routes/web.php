@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\guruController;
 use App\Http\Controllers\mapelController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\gajiController;
 use App\Http\Controllers\gajiansController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\QrKelasController;
 use App\Http\Controllers\RuanganController;
 
@@ -18,19 +21,18 @@ Route::get('/login', [AdminController::class, 'login'])->name('login');
 Route::post('/login', [AdminController::class, 'loginCheck'])->name('loginCheck');
 Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return view('index');
-    })->name('dashboard');
- 
+    Route::get('/', [IndexController::class, 'index'])->name('dashboard');
+    Route::resource('/setting', SettingController::class);
     Route::resource('/ruangan', RuanganController::class);
     Route::resource('/jabatan', JabatanController::class);
     Route::resource('/absenqr', absenqrController::class);
     Route::resource('/guru', guruController::class);
+    Route::resource('/jurusan', JurusanController::class);
     Route::resource('/kelas', KelasController::class);
     Route::resource('/mapel', mapelController::class);
     Route::resource('/jadwal', jadwalController::class);
     Route::resource('/absensi', AbsensiController::class)->except(['show']);
-    Route::resource('/rekap', gajiController::class);
+    Route::resource('/rekap', gajiController::class); 
     Route::resource('/gaji', gajiansController::class);
     Route::resource('admin', AdminController::class);
     Route::get('/profile/{id}/edit', [AdminController::class, 'edits'])->name('admin.edits');
@@ -46,9 +48,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/absensi/get-kelas', [AbsensiController::class, 'getKelasByHari'])->name('absensi.getKelas');
     Route::get('/absensi/get-mapel', [AbsensiController::class, 'getMapelByKelas'])->name('absensi.getMapel');
     Route::post('/qr-kelas', [QrKelasController::class, 'store'])->name('qrkelas.store');
-    //jurusan
-    Route::get('/showJurusan/{id}', [KelasController::class, 'showJurusan'])->name('kelas.showJurusan');
-    Route::post('/store-jurusan', [KelasController::class, 'storeJurusan'])->name('kelas.storeJurusan');
-    Route::put('/update-jurusan/{id}', [KelasController::class, 'updateJurusan'])->name('kelas.updateJurusan');
-    Route::delete('/destroy-jurusan/{id}', [KelasController::class, 'destroyJurusan'])->name('jurusan.destroy');
 });

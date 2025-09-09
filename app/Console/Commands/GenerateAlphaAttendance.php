@@ -23,9 +23,7 @@ class GenerateAlphaAttendance extends Command
 
         foreach ($jadwals as $jadwal) {
             $jadwalSelesai = Carbon::parse($jadwal->jam_selesai);
-
-            // Alpha setelah 1 jam lewat dari jam_selesai
-            if ($now->lt($jadwalSelesai->copy()->addHour())) {
+            if ($now->lt($jadwalSelesai->copy()->addMinute())) {
                 continue;
             }
 

@@ -25,7 +25,15 @@ class KelasController extends Controller
         ]);
 
         try {
-            Kelas::create($validated);
+            $rombels = explode(',', $validated['rombel']);
+
+            foreach ($rombels as $rombel) {
+                Kelas::create([
+                    'jurusan_id' => $validated['jurusan_id'],
+                    'kelas'      => $validated['kelas'],
+                    'rombel'     => trim($rombel),
+                ]);
+            }
             return response()->json(['success' => true, 'message' => "Kelas berhasil ditambahkan"]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
@@ -71,53 +79,4 @@ class KelasController extends Controller
         }
     }
 
-
-    function storeJurusan(Request $request)
-    {
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-        ]);
-
-        try {
-            Jurusan::create($validated);
-            return response()->json(['success' => true, 'message' => "Jurusan berhasil ditambahkan"]);
-        } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
-    function showJurusan($id)
-    {
-        $jurusan = Jurusan::findOrFail($id);
-        return response()->json($jurusan);
-    }
-    function updateJurusan(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255'
-        ]);
-
-        try {
-            $jurusan = Jurusan::findOrFail($id);
-            $jurusan->update($validated);
-            return response()->json(['success' => true, 'message' => "Jurusan berhasil diupdate"]);
-        } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
-
-    function destroyJurusan($id)
-    {
-        try {
-            $jurusan = Jurusan::findOrFail($id);
-
-            if ($jurusan->kelas()->exists()) {
-                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus jurusan yang masih memiliki kelas.']);
-            }
-
-            $jurusan->delete();
-            return response()->json(['success' => true, 'message' => 'Jurusan berhasil dihapus']);
-        } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
 }

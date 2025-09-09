@@ -1,14 +1,22 @@
+@php
+use App\Models\Setting;
+$setting = Setting::all();
+$logos = $setting->where('key', 'logo')->first();
+$namas = $setting->where('key', 'nama')->first();
+$logo = $logos->value;
+$nama = $namas->value;
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>@yield('title') - SIMAKA</title>
+    <title>@yield('title') - {{ $nama }}</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="{{ asset('assets/img/logo.png') }}" rel="icon">
-    <link href="{{ asset('assets/img/logo.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset($logo) }}" rel="icon">
+    <link href="{{ asset($logo) }}" rel="apple-touch-icon">
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link
         href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
@@ -31,8 +39,8 @@
 
         <div class="d-flex justify-content-between">
             <a href="/" class="logo d-flex align-items-center">
-                <img src="{{ asset('assets/img/logo.png') }}">
-                <span class="d-none d-lg-block fs-5">SIMAKA</span>
+                <img src="{{ asset($logo) }}">
+                <span class="d-none d-lg-block fs-5">{{ $nama }}</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
@@ -121,8 +129,15 @@
             <li class="nav-item">
                 <a class="nav-link {{Request::is('ruangan') ? 'active' : 'collapsed'}}"
                     href="{{route('ruangan.index')}}">
-                    <i class="ri ri-briefcase-4-line"></i>
+                    <i class="ri ri-building-3-fill"></i>
                     <span>Ruangan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{Request::is('jurusan') ? 'active' : 'collapsed'}}"
+                    href="{{route('jurusan.index')}}">
+                    <i class="ri ri-coupon-4-line"></i>
+                    <span>Jurusan</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -173,6 +188,14 @@
                     href="{{ route('admin.edits', ['id' => Auth::user()->id]) }}">
                     <i class="bi bi-person"></i>
                     <span>My Profile</span>
+                </a>
+            </li>
+            <li class="nav-heading">Pengaturan</li>
+            <li class="nav-item">
+                <a class="nav-link {{Request::is('setting') ? 'active' : 'collapsed'}}"
+                    href="{{route('setting.index')}}">
+                    <i class="bi bi-gear"></i>
+                    <span>Pengaturan</span>
                 </a>
             </li>
             <li class="nav-item">

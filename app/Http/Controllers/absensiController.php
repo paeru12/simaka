@@ -28,34 +28,43 @@ class AbsensiController extends Controller
     {
         try {
             $hari = $request->hari;
-            $jadwal = Jadwal::with('kelas')
-                ->where('user_id', auth()->id())
-                ->where('hari', $hari)
-                ->get();
 
-            return response()->json($jadwal);
+            $jadwal = Jadwal::with('kelas')
+                ->where('hari', $hari)
+                ->when(auth()->user()->role != 'admin', function ($query) {
+                    $query->where('user_id', auth()->id());
+                })
+                ->get()
+                ->unique('kelas_id'); // pastikan kelas tidak dobel
+
+            return response()->json($jadwal->values());
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
 
-
     public function getMapelByKelas(Request $request)
     {
+        $hari = $request->hari;
         $kelasId = $request->kelas_id;
+
         $jadwal = Jadwal::with('mataPelajaran')
-            ->where('user_id', auth()->id())
+            ->where('hari', $hari)
             ->where('kelas_id', $kelasId)
+            ->when(auth()->user()->role != 'admin', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
             ->get();
 
         return response()->json($jadwal);
     }
 
+
     private function uploadFoto($file)
     {
         $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
         $resized = $manager->read($file->getPathname())->toJpeg(60);
-        $imageName = time() . '_' . uniqid() . '.webp'; 
+        $imageName = time() . '_' . uniqid() . '.webp';
         $savePath = 'uploads/bukti/' . $imageName;
         if (!file_exists(public_path('uploads/bukti'))) {
             mkdir(public_path('uploads/bukti'), 0777, true);
