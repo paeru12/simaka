@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nik', 50)->unique();
             $table->string('nama', 100);
             $table->enum('jenis_kelamin', ['L', 'P']);
-            $table->text('alamat')->nullable();
             $table->string('no_hp', 20)->nullable();
             $table->boolean('status_aktif')->default(1);
             $table->string('foto')->nullable();

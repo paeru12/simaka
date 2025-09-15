@@ -17,9 +17,17 @@ class mapelController extends Controller
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:255',
-            'kode_mapel' => 'required|string|max:20',
             'gaji' => 'required|string|max:255',
         ]);
+        $exists = MataPelajaran::where('nama_mapel', $validated['nama_mapel'])
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => "Nama Mapel sudah ada."
+            ], 422);
+        }
 
         try {
             MataPelajaran::create($validated);
@@ -33,9 +41,17 @@ class mapelController extends Controller
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:255',
-            'kode_mapel' => 'required|string|max:20',
             'gaji' => 'required|string|max:255',
         ]);
+        $exists = MataPelajaran::where('nama_mapel', $validated['nama_mapel'])
+            ->where('id', '!=', $id)
+            ->exists();
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => "Nama Mapel sudah ada."
+            ], 422);
+        }
 
         try {
             $mapel = MataPelajaran::findOrFail($id);
@@ -50,13 +66,16 @@ class mapelController extends Controller
     {
         try {
             $mapel = MataPelajaran::findOrFail($id);
+            if ($mapel->jadwals()->exists()) {
+                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus mapel yang sudah digunakan di jadwal.']);
+            }
             $mapel->delete();
             return response()->json(['success' => true, 'message' => "Mapel berhasil dihapus"]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
- 
+
     function show($id)
     {
         $mapel = MataPelajaran::findOrFail($id);

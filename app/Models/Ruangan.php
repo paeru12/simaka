@@ -28,4 +28,8 @@ class Ruangan extends Model
     {
         return $this->hasOne(QrKelas::class, 'ruangan_id');
     }
+    public function jadwal()
+    {
+        return $this->hasMany(Jadwal::class, 'ruangan_id');
+    }
 }

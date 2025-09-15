@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2025 at 04:19 PM
+-- Generation Time: Sep 15, 2025 at 04:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,12 +31,12 @@ CREATE TABLE `absensis` (
   `id` varchar(36) NOT NULL,
   `jadwal_id` varchar(36) NOT NULL,
   `mapel_id` varchar(36) NOT NULL,
-  `user_id` varchar(36) NOT NULL,
+  `guru_id` varchar(36) NOT NULL,
   `tanggal` date NOT NULL,
-  `jam_absen` time NOT NULL,
+  `jam_absen` time DEFAULT NULL,
   `status` enum('Hadir','Izin','Sakit','Alpha','Terlambat') NOT NULL,
   `keterangan` text DEFAULT NULL,
-  `foto` varchar(255) NOT NULL,
+  `foto` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -45,8 +45,10 @@ CREATE TABLE `absensis` (
 -- Dumping data for table `absensis`
 --
 
-INSERT INTO `absensis` (`id`, `jadwal_id`, `mapel_id`, `user_id`, `tanggal`, `jam_absen`, `status`, `keterangan`, `foto`, `created_at`, `updated_at`) VALUES
-('bdbe3c8f-00cf-4438-954d-a3eb260fb1e5', '99d07fce-11d7-41dd-8263-6ef979abba43', 'f34db4d8-b226-4213-be63-762dd8794e43', '1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', '2025-09-04', '21:07:00', 'Hadir', NULL, 'uploads/bukti/1756994820_68b99d04e2e6a.webp', '2025-09-04 14:07:00', '2025-09-04 14:07:00');
+INSERT INTO `absensis` (`id`, `jadwal_id`, `mapel_id`, `guru_id`, `tanggal`, `jam_absen`, `status`, `keterangan`, `foto`, `created_at`, `updated_at`) VALUES
+('34157323-a83f-4e85-8c30-a15eef0af979', 'd05218be-a1e9-43b6-9e14-24657e500d58', '72d2e65b-067a-48c0-8e46-5854e0569462', 'a0173faf-74ee-4083-8198-e97dcfe7fe61', '2025-09-21', '18:16:00', 'Izin', 'sakit', 'uploads/bukti/1757848716_68c6a48cd462f.webp', '2025-09-14 11:18:36', '2025-09-14 11:18:36'),
+('a3f16994-5133-43a6-9399-4d7a2588de10', '5473c067-3fe2-4a63-b874-4e5ae8a02a0e', '222b8c19-9689-4dc2-b886-792308c8f950', '6d9f1e2f-9db9-45b7-94e4-a588cdafaad7', '2025-09-15', '19:43:53', 'Hadir', NULL, 'uploads/bukti/1757940233_68c80a099a660.webp', '2025-09-15 12:43:53', '2025-09-15 12:43:53'),
+('dc3787cd-6869-4ae2-b299-b2243c9929b3', 'd05218be-a1e9-43b6-9e14-24657e500d58', '72d2e65b-067a-48c0-8e46-5854e0569462', 'a0173faf-74ee-4083-8198-e97dcfe7fe61', '2025-09-15', '19:20:04', 'Alpha', 'Tidak hadir, otomatis alpha oleh sistem', 'assets/img/blank.jpg', '2025-09-15 12:20:04', '2025-09-15 12:20:04');
 
 -- --------------------------------------------------------
 
@@ -99,14 +101,22 @@ CREATE TABLE `gurus` (
   `jabatan_id` varchar(36) NOT NULL,
   `nik` varchar(50) NOT NULL,
   `nama` varchar(100) NOT NULL,
-  `jenis_kelamin` enum('L','P') NOT NULL,
-  `alamat` text DEFAULT NULL,
+  `jk` enum('L','P') NOT NULL,
   `no_hp` varchar(20) DEFAULT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
   `foto` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `gurus`
+--
+
+INSERT INTO `gurus` (`id`, `jabatan_id`, `nik`, `nama`, `jk`, `no_hp`, `foto`, `created_at`, `updated_at`) VALUES
+('3b67a84e-e773-4983-a042-3091e6f6b8e2', 'ab0c3ddc-5594-4080-81b7-63a44b93e3b5', '535763', 'sekre', 'L', '65653', 'uploads/1757945346_68c81e0232fce.webp', '2025-09-14 12:03:50', '2025-09-15 14:11:27'),
+('59bdfbd6-f911-4118-b84c-a2a3dbc135b1', '2b344078-2a25-4ee8-b539-763391512335', '46574', 'admin', 'L', '0813566565', 'uploads/1757945452_68c81e6c4c0ab.webp', '2025-09-14 03:30:02', '2025-09-15 14:11:00'),
+('6d9f1e2f-9db9-45b7-94e4-a588cdafaad7', 'acbb21cd-2ec6-4a27-ab4f-fa952c4140a5', '3625468567123', 'guru1', 'L', '0813566565', 'uploads/1757945415_68c81e477fdd4.webp', '2025-09-12 15:06:11', '2025-09-15 14:12:20'),
+('a0173faf-74ee-4083-8198-e97dcfe7fe61', 'de25a748-ce98-4e41-9aad-d6fb83552a00', '362546856712', 'bendahara', 'L', '0813566565', 'uploads/1757945429_68c81e55e746b.webp', '2025-09-12 14:29:33', '2025-09-15 14:13:02');
 
 -- --------------------------------------------------------
 
@@ -128,10 +138,11 @@ CREATE TABLE `jabatans` (
 --
 
 INSERT INTO `jabatans` (`id`, `jabatan`, `gapok`, `tunjangan`, `created_at`, `updated_at`) VALUES
-('6f2a0f4a-e08c-4129-8c2c-c23b4d1ee06e', 'Kepala Sekolah', 1000000, '100000', '2025-08-30 01:19:46', '2025-08-30 02:56:24'),
+('2b344078-2a25-4ee8-b539-763391512335', 'admin', 100000, '100000', '2025-09-14 03:27:08', '2025-09-15 05:08:30'),
+('6f2a0f4a-e08c-4129-8c2c-c23b4d1ee06e', 'Kepala Sekolah', 1000000, '100000', '2025-08-30 01:19:46', '2025-09-15 05:37:10'),
 ('ab0c3ddc-5594-4080-81b7-63a44b93e3b5', 'sekretaris', 1000000, '400000', '2025-08-30 03:11:22', '2025-08-30 03:12:05'),
-('de25a748-ce98-4e41-9aad-d6fb83552a00', 'Bendahara', 900000, '200000', '2025-08-30 02:56:46', '2025-08-30 02:56:46'),
-('f65ef857-a886-4c7d-9ea5-47693ce7a9f5', 'Guru', 500000, '200000', '2025-08-30 01:20:39', '2025-08-30 02:46:06');
+('acbb21cd-2ec6-4a27-ab4f-fa952c4140a5', 'guru', 1000000, '200000', '2025-09-15 13:22:05', '2025-09-15 13:22:05'),
+('de25a748-ce98-4e41-9aad-d6fb83552a00', 'Bendahara', 900000, '200000', '2025-08-30 02:56:46', '2025-08-30 02:56:46');
 
 -- --------------------------------------------------------
 
@@ -141,11 +152,11 @@ INSERT INTO `jabatans` (`id`, `jabatan`, `gapok`, `tunjangan`, `created_at`, `up
 
 CREATE TABLE `jadwals` (
   `id` varchar(36) NOT NULL,
-  `user_id` varchar(36) NOT NULL,
+  `guru_id` varchar(36) NOT NULL,
   `ruangan_id` varchar(36) NOT NULL,
   `mapel_id` varchar(36) NOT NULL,
   `kelas_id` varchar(36) NOT NULL,
-  `hari` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu') NOT NULL,
+  `hari` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') NOT NULL,
   `jam_mulai` time NOT NULL,
   `jam_selesai` time NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -156,14 +167,9 @@ CREATE TABLE `jadwals` (
 -- Dumping data for table `jadwals`
 --
 
-INSERT INTO `jadwals` (`id`, `user_id`, `ruangan_id`, `mapel_id`, `kelas_id`, `hari`, `jam_mulai`, `jam_selesai`, `created_at`, `updated_at`) VALUES
-('0d8b50ee-c017-4052-be5b-11598f1efd6a', 'ad75c065-d5f2-4b7a-a2a8-fa75156456fd', 'd4efd910-0c23-4263-82a4-09b43d66f831', '222b8c19-9689-4dc2-b886-792308c8f950', '53c03f6e-4f7e-42ec-b953-79ab2fc00434', 'Senin', '08:08:00', '10:08:00', '2025-08-30 06:08:52', '2025-09-04 08:43:06'),
-('166e789b-346d-4cde-8eaa-6985da12047f', '1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', '01c35dde-8f21-442f-90f7-fe4a341daae3', 'c1891009-1065-41cc-b8e9-f46a86f18066', '1c70bca5-5de3-44c7-b324-23bf7827246a', 'Rabu', '01:00:00', '03:30:00', '2025-09-02 18:35:01', '2025-09-02 18:35:01'),
-('707e0e84-ac5e-41b3-9f87-ea953c841c17', '1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', 'd4efd910-0c23-4263-82a4-09b43d66f831', '72d2e65b-067a-48c0-8e46-5854e0569462', '1c70bca5-5de3-44c7-b324-23bf7827246a', 'Kamis', '16:00:00', '17:00:00', '2025-09-04 09:02:10', '2025-09-04 09:02:28'),
-('99d07fce-11d7-41dd-8263-6ef979abba43', '1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', 'd4efd910-0c23-4263-82a4-09b43d66f831', 'f34db4d8-b226-4213-be63-762dd8794e43', '53c03f6e-4f7e-42ec-b953-79ab2fc00434', 'Kamis', '21:00:00', '22:00:00', '2025-09-04 14:02:34', '2025-09-04 14:02:34'),
-('df257ede-121b-4368-8ea3-2e60e4ea1a40', '1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', '01c35dde-8f21-442f-90f7-fe4a341daae3', '222b8c19-9689-4dc2-b886-792308c8f950', '1c70bca5-5de3-44c7-b324-23bf7827246a', 'Rabu', '15:00:00', '17:00:00', '2025-09-03 08:17:22', '2025-09-03 08:17:22'),
-('fe9276eb-4b40-4b75-a73d-39315dcfd6c6', 'ad75c065-d5f2-4b7a-a2a8-fa75156456fd', '01c35dde-8f21-442f-90f7-fe4a341daae3', '893a4199-7299-4504-a131-edebf50baea4', '1c70bca5-5de3-44c7-b324-23bf7827246a', 'Rabu', '01:00:00', '04:00:00', '2025-09-02 18:03:03', '2025-09-02 18:03:03'),
-('ffed8819-fbd4-40be-b2c8-030d940cb1eb', 'ad75c065-d5f2-4b7a-a2a8-fa75156456fd', '01c35dde-8f21-442f-90f7-fe4a341daae3', '72d2e65b-067a-48c0-8e46-5854e0569462', '6ef91338-9b59-454b-9c23-ceb63c368089', 'Senin', '13:00:00', '14:30:00', '2025-08-30 06:29:56', '2025-09-02 18:30:43');
+INSERT INTO `jadwals` (`id`, `guru_id`, `ruangan_id`, `mapel_id`, `kelas_id`, `hari`, `jam_mulai`, `jam_selesai`, `created_at`, `updated_at`) VALUES
+('5473c067-3fe2-4a63-b874-4e5ae8a02a0e', '6d9f1e2f-9db9-45b7-94e4-a588cdafaad7', '01c35dde-8f21-442f-90f7-fe4a341daae3', '222b8c19-9689-4dc2-b886-792308c8f950', '1c70bca5-5de3-44c7-b324-23bf7827246a', 'Senin', '18:30:00', '20:00:00', '2025-09-14 02:46:59', '2025-09-15 12:43:16'),
+('d05218be-a1e9-43b6-9e14-24657e500d58', 'a0173faf-74ee-4083-8198-e97dcfe7fe61', 'd4efd910-0c23-4263-82a4-09b43d66f831', '72d2e65b-067a-48c0-8e46-5854e0569462', '00e46c4f-c1b4-4d2a-bede-05a4fc5d34e3', 'Senin', '18:44:00', '19:00:00', '2025-09-14 03:44:38', '2025-09-15 11:59:31');
 
 -- --------------------------------------------------------
 
@@ -218,8 +224,10 @@ CREATE TABLE `jurusans` (
 --
 
 INSERT INTO `jurusans` (`id`, `nama`, `created_at`, `updated_at`) VALUES
+('0f301b86-e044-442a-8cee-4461b1618425', 'ips', '2025-09-15 06:14:54', '2025-09-15 06:14:54'),
 ('4868a62c-eca1-4f7b-a99a-8f1065f7887e', 'tkj', '2025-09-04 09:29:57', '2025-09-04 09:29:57'),
-('9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'sija', '2025-09-04 13:10:33', '2025-09-04 13:33:35');
+('9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'sija', '2025-09-04 13:10:33', '2025-09-04 13:33:35'),
+('e3cbca19-3f85-4d95-b125-f653d7679896', 'ipa', '2025-09-15 06:14:54', '2025-09-15 06:14:54');
 
 -- --------------------------------------------------------
 
@@ -241,10 +249,15 @@ CREATE TABLE `kelass` (
 --
 
 INSERT INTO `kelass` (`id`, `jurusan_id`, `kelas`, `rombel`, `created_at`, `updated_at`) VALUES
+('00e46c4f-c1b4-4d2a-bede-05a4fc5d34e3', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'X', 'b', '2025-09-09 12:05:56', '2025-09-09 12:05:56'),
 ('1c70bca5-5de3-44c7-b324-23bf7827246a', '4868a62c-eca1-4f7b-a99a-8f1065f7887e', '1', 's', '2025-08-30 01:18:40', '2025-08-30 01:18:40'),
+('2c10d3dd-ad2e-4446-b8a3-e116cdbb9563', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'x', 'e', '2025-09-15 06:26:57', '2025-09-15 06:26:57'),
 ('53c03f6e-4f7e-42ec-b953-79ab2fc00434', '4868a62c-eca1-4f7b-a99a-8f1065f7887e', '2', 'a', '2025-08-30 01:19:31', '2025-08-30 01:19:31'),
+('575b4336-404c-43f6-8b05-4b1c292d4936', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'X', 'c', '2025-09-09 12:05:56', '2025-09-09 12:05:56'),
 ('6ef91338-9b59-454b-9c23-ceb63c368089', '4868a62c-eca1-4f7b-a99a-8f1065f7887e', '3', 'a', '2025-08-30 04:17:38', '2025-08-30 04:17:38'),
-('77c11486-a0b5-4188-b829-4050677a14c1', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'x', 'a', '2025-09-03 13:23:12', '2025-09-04 13:10:46');
+('77c11486-a0b5-4188-b829-4050677a14c1', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'x', 'a', '2025-09-03 13:23:12', '2025-09-04 13:10:46'),
+('9811c6e9-3b1f-412d-94dd-427e91b5b8a0', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'X', 'd', '2025-09-09 12:05:56', '2025-09-09 12:05:56'),
+('fd16ad7e-28cc-4490-9742-f3d3d201b273', '9f6aa7e2-18e4-4642-9e28-a41b04bf93a4', 'x', 'f', '2025-09-15 06:26:57', '2025-09-15 06:26:57');
 
 -- --------------------------------------------------------
 
@@ -255,7 +268,6 @@ INSERT INTO `kelass` (`id`, `jurusan_id`, `kelas`, `rombel`, `created_at`, `upda
 CREATE TABLE `mata_pelajarans` (
   `id` varchar(36) NOT NULL,
   `nama_mapel` varchar(100) NOT NULL,
-  `kode_mapel` varchar(20) NOT NULL,
   `gaji` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -265,12 +277,13 @@ CREATE TABLE `mata_pelajarans` (
 -- Dumping data for table `mata_pelajarans`
 --
 
-INSERT INTO `mata_pelajarans` (`id`, `nama_mapel`, `kode_mapel`, `gaji`, `created_at`, `updated_at`) VALUES
-('222b8c19-9689-4dc2-b886-792308c8f950', 'jaringan', 'jr-11', 8000, '2025-08-30 06:08:18', '2025-08-30 06:08:18'),
-('72d2e65b-067a-48c0-8e46-5854e0569462', 'desain visual', 'dkv-1', 8000, '2025-08-30 06:29:09', '2025-08-30 06:29:09'),
-('893a4199-7299-4504-a131-edebf50baea4', 'ilustrasi', 'ils123', 8000, '2025-09-02 18:02:24', '2025-09-02 18:02:24'),
-('c1891009-1065-41cc-b8e9-f46a86f18066', 'bahasa jawa', 'bjw123', 8000, '2025-09-02 18:34:18', '2025-09-02 18:34:18'),
-('f34db4d8-b226-4213-be63-762dd8794e43', 'indo', 'idbs', 7000, '2025-08-30 03:34:40', '2025-08-30 03:37:14');
+INSERT INTO `mata_pelajarans` (`id`, `nama_mapel`, `gaji`, `created_at`, `updated_at`) VALUES
+('222b8c19-9689-4dc2-b886-792308c8f950', 'jaringan', 8000, '2025-08-30 06:08:18', '2025-08-30 06:08:18'),
+('34efa3d6-69f3-4807-a240-528609733f4b', 'bahasa indo', 8000, '2025-09-15 10:58:41', '2025-09-15 10:58:41'),
+('72d2e65b-067a-48c0-8e46-5854e0569462', 'desain visual', 8000, '2025-08-30 06:29:09', '2025-08-30 06:29:09'),
+('893a4199-7299-4504-a131-edebf50baea4', 'ilustrasi', 8000, '2025-09-02 18:02:24', '2025-09-02 18:02:24'),
+('c1891009-1065-41cc-b8e9-f46a86f18066', 'bahasa jawa', 8000, '2025-09-02 18:34:18', '2025-09-02 18:34:18'),
+('f34db4d8-b226-4213-be63-762dd8794e43', 'indo', 7000, '2025-08-30 03:34:40', '2025-08-30 03:37:14');
 
 -- --------------------------------------------------------
 
@@ -301,7 +314,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (83, '2025_08_18_093158_create_kelass_table', 1),
 (84, '2025_09_02_110104_create_qr_kelas_table', 2),
 (85, '2025_09_04_133642_create_jurusans_table', 3),
-(86, '2025_09_04_133653_create_ruangans_table', 3);
+(86, '2025_09_04_133653_create_ruangans_table', 3),
+(88, '2025_09_09_121331_create_settings_table', 4);
 
 -- --------------------------------------------------------
 
@@ -361,7 +375,8 @@ CREATE TABLE `qr_kelas` (
 
 INSERT INTO `qr_kelas` (`id`, `ruangan_id`, `token`, `aktif`, `file`, `created_at`, `updated_at`) VALUES
 ('59dbcc0f-d7c6-4832-a61c-fb282ce01074', 'd4efd910-0c23-4263-82a4-09b43d66f831', '52daeda9-9ddf-4715-a14c-93598f6094ba', 1, 'uploads/qr/qrkelas-d4efd910-0c23-4263-82a4-09b43d66f831.svg', '2025-09-04 07:53:52', '2025-09-04 07:53:52'),
-('9f4bfdee-1cc3-4d02-beb5-be8659f3d975', '01c35dde-8f21-442f-90f7-fe4a341daae3', 'af0f7169-7cd1-4371-ac08-9cee7f8e2bcd', 1, 'uploads/qr/qrkelas-01c35dde-8f21-442f-90f7-fe4a341daae3.svg', '2025-09-04 07:59:58', '2025-09-04 07:59:58');
+('9f4bfdee-1cc3-4d02-beb5-be8659f3d975', '01c35dde-8f21-442f-90f7-fe4a341daae3', 'af0f7169-7cd1-4371-ac08-9cee7f8e2bcd', 1, 'uploads/qr/qrkelas-01c35dde-8f21-442f-90f7-fe4a341daae3.svg', '2025-09-04 07:59:58', '2025-09-04 07:59:58'),
+('ff7d77e1-2276-4a02-823f-31c60f2beee2', 'dd8387c4-6e43-45e6-be23-3d0ba0896528', 'bf2e8bf6-ccbe-40b5-a526-d1fc9ac18fc7', 1, 'uploads/qr/qrkelas-dd8387c4-6e43-45e6-be23-3d0ba0896528.svg', '2025-09-14 02:55:03', '2025-09-14 02:55:03');
 
 -- --------------------------------------------------------
 
@@ -402,19 +417,39 @@ CREATE TABLE `sessions` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` varchar(36) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `key`, `value`, `created_at`, `updated_at`) VALUES
+('a174d617-0c8d-4b9d-a7fe-9c65b52ed594', 'logo', 'uploads/1757942776_68c813f8124c1.webp', '2025-09-09 09:04:15', '2025-09-15 13:26:16'),
+('b09c7446-9035-4ab4-b873-68114129bd50', 'nama', 'SIMAKAs', '2025-09-09 08:57:45', '2025-09-09 09:56:58'),
+('e138d7db-9010-4060-ad4d-7ef82095be0b', 'kop_surat', 'uploads/1757412080_68bffaf0075be.webp', '2025-09-09 09:05:58', '2025-09-09 10:01:20');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
   `id` varchar(36) NOT NULL,
+  `guru_id` varchar(36) NOT NULL,
   `jabatan_id` varchar(36) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `no_hp` varchar(255) NOT NULL,
-  `jk` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `foto` varchar(255) DEFAULT NULL,
-  `role` varchar(255) NOT NULL,
+  `status` tinyint(1) NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -425,11 +460,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `jabatan_id`, `name`, `no_hp`, `jk`, `email`, `password`, `foto`, `role`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
-('1cb92c7f-4815-47f4-b8ee-c8b9d3d63c1b', 'de25a748-ce98-4e41-9aad-d6fb83552a00', 'susi pujiastuti s.pd', '064733234', 'Perempuan', 'admin@admin.com', '$2y$12$4C6vJRA2j0JWLjFw9/y/zeWJhksHGZC4/w.RBEdzQpLM8xR20arde', 'uploads/1756904811_68b83d6b30e7d.webp', 'guru', NULL, NULL, '2025-08-30 01:33:50', '2025-09-03 13:06:51'),
-('2bdb3f3e-cf8e-443f-a37d-e8d597dbfa20', 'f65ef857-a886-4c7d-9ea5-47693ce7a9f5', 'admin', '08345636', 'Laki-laki', 'admin@gmail.com', '$2y$12$s5zHm4FgViyDaEcwS3YhR.eYHm5HItqBhPBvmZF1W8jjm48e.BAsa', 'uploads/1756576657_68b33b91dd6e5.webp', 'admin', NULL, NULL, '2025-08-30 10:57:38', '2025-09-04 14:18:06'),
-('ad75c065-d5f2-4b7a-a2a8-fa75156456fd', 'f65ef857-a886-4c7d-9ea5-47693ce7a9f5', 'saya', '078723847', 'Laki-laki', 'saya@gmail.com', '$2y$12$4rpSCKdsRyJuMPZNcUmC.OzysleWD2Zh02dGGYg31aHvINYn8kbbS', 'uploads/1756559268_68b2f7a4c557c.webp', 'guru', NULL, NULL, '2025-08-30 06:07:49', '2025-08-30 06:07:49'),
-('f29e5ebb-a891-433e-97f4-ec9861e86110', '6f2a0f4a-e08c-4129-8c2c-c23b4d1ee06e', 'ahmad s.pd', '0813566565', 'Laki-laki', 'ahmad@gmail.com', '$2y$12$u0oz362TCp4RYq8zq2BaBeFsTS7cdwULGyqLfN7zaJ05p/idmVB2S', 'uploads/1756883254_68b7e936c8f9b.webp', 'guru', NULL, NULL, '2025-09-03 07:07:37', '2025-09-03 07:07:56');
+INSERT INTO `users` (`id`, `guru_id`, `jabatan_id`, `email`, `password`, `status`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
+('34af08e3-b8e3-481a-936e-6dfe46f6fa5d', '59bdfbd6-f911-4118-b84c-a2a3dbc135b1', '2b344078-2a25-4ee8-b539-763391512335', 'admin@gmail.com', '$2y$12$BZhT90MvYZlFn638YV4leuazupCjcwTMeBaNVeGATE.MTdbMEcZ..', 1, NULL, NULL, '2025-09-14 03:30:03', '2025-09-14 03:30:03'),
+('56b7df91-07f6-4288-aea3-4834d8967823', 'a0173faf-74ee-4083-8198-e97dcfe7fe61', 'de25a748-ce98-4e41-9aad-d6fb83552a00', 'bend@gmail.com', '$2y$12$H8AC7KcivTEW6V/vc42IwOZjv86R4xlqqWteR2WHIc1Hd5oo2BsDi', 1, NULL, NULL, '2025-09-12 14:29:34', '2025-09-15 14:13:11'),
+('9a05b6dc-472a-455c-93e0-cfe6146521eb', '6d9f1e2f-9db9-45b7-94e4-a588cdafaad7', 'acbb21cd-2ec6-4a27-ab4f-fa952c4140a5', 'guru1@gmail.com', '$2y$12$ArR7W5OynUZQRxbbeRVtsukw3hokavvrd0mPk2IjN..BthBqeK8EW', 1, NULL, NULL, '2025-09-12 15:06:12', '2025-09-15 14:12:30'),
+('bee95759-401c-4971-97bb-b349b0159460', '3b67a84e-e773-4983-a042-3091e6f6b8e2', 'ab0c3ddc-5594-4080-81b7-63a44b93e3b5', 'sekre@gmail.com', '$2y$12$jCO/EAlfL2bheHk4jiG2dO/gTjjGedLnbKm7RW/l3K4i8sBXSRv.u', 1, NULL, NULL, '2025-09-14 12:03:51', '2025-09-15 14:11:38');
 
 --
 -- Indexes for dumped tables
@@ -508,8 +543,7 @@ ALTER TABLE `kelass`
 -- Indexes for table `mata_pelajarans`
 --
 ALTER TABLE `mata_pelajarans`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `mata_pelajarans_kode_mapel_unique` (`kode_mapel`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `migrations`
@@ -551,6 +585,13 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `settings_key_unique` (`key`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -577,7 +618,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

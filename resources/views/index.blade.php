@@ -3,29 +3,20 @@
 @section('content')
 
 <div class="pagetitle mt-3">
-    <h1 class="text-capitalize">Hi, {{Auth::user()->name}}.</h1>
+    <h1 class="text-capitalize">Hi, {{ Auth::user()->guru->nama}}</h1>
     <p>Welcome to your dashboard. Here you can manage your application.</p>
 </div>
 
 <section class="section dashboard">
     <div class="row">
-        <div class="col-lg-9">
-            <div class="card ">
-                <div class="card-body">
-                    <h5 class="card-title">Welcome to the Dashboard</h5>
-                    <p>This is your dashboard where you can manage your application.</p>
-                    @if(Auth::user()->role != 'admin')
-                    <a href="{{route('absenqr.index')}}" class="btn btn-purple btn-sm"><i class="ri ri-qr-scan-line"></i> Absen QR Code</a>
-                    @endif
-
-
-                </div>
-            </div>
+        <div class="col-md-9">
             <div class="col-12">
                 <div class="card recent-sales">
-
                     <div class="card-body">
-                        <h5 class="card-title">Absensi <span>| Hari Ini</span></h5>                       
+                        <h5 class="card-title mb-0">Absensi <span>| Hari Ini</span></h5>
+                        @if(Auth::user()->jabatan->jabatan != 'admin')
+                        <a href="{{route('absenqr.index')}}" class="btn btn-purple btn-sm mb-3"><i class="ri ri-qr-scan-line"></i> Absen QR Code</a>
+                        @endif
                         <div class="table-responsive">
                             <table class="table table-hover datatable">
                                 <thead>
@@ -41,7 +32,7 @@
                                     @foreach($data as $a)
                                     <tr>
                                         <th scope="row">{{$loop->iteration}}.</th>
-                                        <td>{{ $a->user->name }}</td>
+                                        <td>{{ $a->guru->nama }}</td>
                                         <td>{{ $a->mataPelajaran->nama_mapel }}</td>
                                         <td class="text-uppercase">{{ $a->jadwal->kelas->kelas }} {{ $a->jadwal->kelas->jurusan->nama }} {{ $a->jadwal->kelas->rombel }}</td>
                                         <td>
@@ -66,7 +57,7 @@
             </div><!-- End Recent Sales -->
 
         </div>
-        <div class="col-lg-3">
+        <div class="col-md-3 d-none d-md-block">
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="card">

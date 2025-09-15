@@ -6,21 +6,22 @@ use Illuminate\Http\Request;
 use App\Models\Absensi;
 use App\Models\MataPelajaran;
 use App\Models\Jadwal;
+use Carbon\Carbon;
 use Intervention\Image\ImageManager;
 
 class AbsensiController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role == 'admin') {
-            $absensi = Absensi::with(['user', 'mataPelajaran', 'jadwal.kelas'])->orderBy('created_at', 'desc')->get();
+        $guruid = auth()->user()->guru_id;
+        if (auth()->user()->jabatan->jabatan == 'admin') {
+            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas'])->orderBy('created_at', 'desc')->get();
         } else {
-            $absensi = Absensi::with(['user', 'mataPelajaran', 'jadwal.kelas'])->where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
+            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas'])->where('guru_id', $guruid)->orderBy('created_at', 'desc')->get();
         }
         $mapel = MataPelajaran::all();
-        $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('user_id', auth()->id())->get();
-        $hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-        // dd( $jadwal);
+        $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', auth()->id())->get();
+        $hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
         return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari'));
     }
 
@@ -28,14 +29,14 @@ class AbsensiController extends Controller
     {
         try {
             $hari = $request->hari;
-
+            $guruid = auth()->user()->guru_id;
             $jadwal = Jadwal::with('kelas')
                 ->where('hari', $hari)
-                ->when(auth()->user()->role != 'admin', function ($query) {
-                    $query->where('user_id', auth()->id());
+                ->when(auth()->user()->jabatan->jabatan != 'admin', function ($query) use ($guruid) {
+                    $query->where('guru_id', $guruid);
                 })
                 ->get()
-                ->unique('kelas_id'); // pastikan kelas tidak dobel
+                ->unique('kelas_id');
 
             return response()->json($jadwal->values());
         } catch (\Throwable $th) {
@@ -47,12 +48,12 @@ class AbsensiController extends Controller
     {
         $hari = $request->hari;
         $kelasId = $request->kelas_id;
-
+        $guruid = auth()->user()->guru_id;
         $jadwal = Jadwal::with('mataPelajaran')
             ->where('hari', $hari)
             ->where('kelas_id', $kelasId)
-            ->when(auth()->user()->role != 'admin', function ($query) {
-                $query->where('user_id', auth()->id());
+            ->when(auth()->user()->role != 'admin', function ($query) use ($guruid) {
+                $query->where('guru_id', $guruid);
             })
             ->get();
 
@@ -80,13 +81,24 @@ class AbsensiController extends Controller
                 'jadwal_id' => 'required|exists:jadwals,id',
                 'mapel_id' => 'required|exists:mata_pelajarans,id',
                 'tanggal' => 'required|date',
-                'jam_absen' => 'required|date_format:H:i',
                 'status' => 'required|in:Hadir,Izin,Sakit,Alpha',
                 'keterangan' => 'nullable|string|max:255',
                 'foto' => 'required|image|max:2048',
             ]);
-            $validated['user_id'] = auth()->id();
+            $validated['guru_id'] = auth()->user()->guru_id;
+            $validated['jam_absen'] = Carbon::now('Asia/Jakarta')->format('H:i');
+            $alreadyExists = Absensi::where('guru_id', $validated['guru_id'])
+                ->where('mapel_id', $validated['mapel_id'])
+                ->where('jadwal_id', $validated['jadwal_id'])
+                ->whereDate('tanggal', $validated['tanggal'])
+                ->exists();
 
+            if ($alreadyExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Anda sudah mengisi absensi untuk mata pelajaran ini pada tanggal {$validated['tanggal']}.",
+                ], 409);
+            }
             if ($request->hasFile('foto')) {
                 $validated['foto'] = $this->uploadFoto($request->file('foto'));
             }
@@ -100,6 +112,26 @@ class AbsensiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => "Error creating absensi: " . $th->getMessage(),
+            ]);
+        }
+    }
+
+    function destroy($id) {
+        try {
+            $absensi = Absensi::findOrFail($id);
+            if ($absensi->foto && file_exists(public_path($absensi->foto))) {
+                unlink(public_path($absensi->foto));
+            }
+            $absensi->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Absensi deleted successfully",
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => "Error deleting absensi: " . $th->getMessage(),
             ]);
         }
     }

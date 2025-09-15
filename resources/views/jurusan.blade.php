@@ -171,6 +171,14 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian!!',
+                        text: xhr.responseJSON.message
+                    });
+                    setTimeout(() => location.reload(), 2000);
                 }
             });
         });
@@ -254,6 +262,14 @@
                             } else {
                                 Swal.fire("Gagal", res.message, "error");
                             }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.message
+                            });
                         }
                     });
                 }

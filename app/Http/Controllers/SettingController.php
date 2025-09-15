@@ -16,7 +16,6 @@ class SettingController extends Controller
 
     function store(Request $request)
     {
-        // Validasi
         $validated = $request->validate([
             'key' => 'required|in:logo,nama,kop_surat|unique:settings,key',
             'value' => 'nullable',
@@ -24,12 +23,9 @@ class SettingController extends Controller
 
         try {
             $value = null;
-
-            // Jika upload file
             if ($request->hasFile('value')) {
                 $validated['value'] = $this->uploadFoto($request->file('value'));
             } else {
-                // jika input text
                 $validated['value'] = $request->input('value');
             }
             Setting::create($validated);
@@ -59,7 +55,6 @@ class SettingController extends Controller
                 }
                 $validated['value'] = $this->uploadFoto($request->file('value'));
             } else {
-                // jika input text
                 $validated['value'] = $request->input('value');
             }
 

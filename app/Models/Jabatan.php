@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class Jabatan extends Model
 {
     protected $table = 'jabatans';
-    public $incrementing = false; // non-integer ID
+    public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [

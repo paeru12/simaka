@@ -80,7 +80,6 @@
                                         name="tunjangan" id="edit_tunjangan" placeholder="Tunjangan">
                                     <label>Tunjangan</label>
                                 </div>
-
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -106,7 +105,7 @@
                         @forelse ($data as $jabatan)
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
-                            <td>{{ $jabatan->jabatan }}</td>
+                            <td class="text-capitalize">{{ $jabatan->jabatan }}</td>
                             <td>Rp.{{ number_format($jabatan->gapok, 0, ',', '.') }}</td>
                             <td>Rp.{{ number_format($jabatan->tunjangan, 0, ',', '.') }}</td>
                             <td class="aksi">
@@ -118,6 +117,7 @@
                                             <span>Update</span>
                                         </button>
                                     </li>
+                                    @if (strtolower($jabatan->jabatan) !== 'admin')
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
@@ -127,6 +127,7 @@
                                             <span>Delete</span>
                                         </button>
                                     </li>
+                                    @endif
                                 </ul>
                             </td>
                         </tr>
@@ -144,9 +145,9 @@
 
 <script>
     function convertToCurrency(input) {
-        let value = input.value.replace(/[^\d]/g, ''); // ambil hanya angka
+        let value = input.value.replace(/[^\d]/g, '');
         if (value) {
-            input.value = new Intl.NumberFormat('id-ID').format(value); // tampil Rp style (tanpa "Rp" biar lebih aman)
+            input.value = new Intl.NumberFormat('id-ID').format(value);
         } else {
             input.value = '';
         }
@@ -157,10 +158,8 @@
     }
 
     $(function() {
-        // CREATE
         $('#jabatanForm').submit(function(e) {
             e.preventDefault();
-            // Bersihkan nilai sebelum submit
             let gapok = cleanCurrency($("input[name='gapok']").val());
             let tunjangan = cleanCurrency($("input[name='tunjangan']").val());
 
@@ -186,7 +185,7 @@
                     });
                 },
                 success: function(res) {
-                    Swal.close(); 
+                    Swal.close();
                     if (res.success) {
                         Swal.fire("Berhasil", res.message, "success");
                         $('#jabatanForm')[0].reset();
@@ -197,7 +196,6 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -207,7 +205,6 @@
             });
         });
 
-        // SHOW UPDATE FORM
         $('.editBtn').click(function() {
             let id = $(this).data('id');
             $.get("{{ url('jabatan') }}/" + id, function(data) {
@@ -215,15 +212,18 @@
                 $('#edit_jabatan').val(data.jabatan);
                 $('#edit_gapok').val(data.gapok);
                 $('#edit_tunjangan').val(data.tunjangan);
+                if (data.jabatan.toLowerCase() === 'admin') {
+                    $('#edit_jabatan').prop('disabled', true);
+                } else {
+                    $('#edit_jabatan').prop('disabled', false);
+                }
                 $('#editJabatanModal').modal('show');
             });
         });
 
-        // UPDATE
         $('#updateJabatanForm').submit(function(e) {
             e.preventDefault();
             let id = $('#edit_id').val();
-            // Bersihkan nilai sebelum submit
             let gapok = cleanCurrency($("#edit_gapok").val());
             let tunjangan = cleanCurrency($("#edit_tunjangan").val());
 
@@ -255,14 +255,53 @@
                         $('#updateJabatanForm')[0].reset();
                         $('#editJabatanModal').modal('hide');
                         setTimeout(() => location.reload(), 800);
-                    } else {
-                        Swal.fire("Gagal", res.message, "error");
                     }
-                }
+                },
+                error: function(response) {
+                    let errors = response.responseJSON?.errors;
+                    let errorMessages = "";
+
+                    const fieldTranslations = {
+                        jabatan: {
+                            required: "Field Jabatan wajib diisi.",
+                            string: "Field Jabatan harus berupa teks.",
+                            max: "Field Jabatan maksimal 255 karakter.",
+                        },
+                        gapok: {
+                            required: "Field Gaji Pokok wajib diisi.",
+                            string: "Field Gaji Pokok harus berupa teks.",
+                            max: "Field Gaji Pokok maksimal 255 karakter.",
+                        },
+                        tunjangan: {
+                            required: "Field Tunjangan wajib diisi.",
+                            string: "Field Tunjangan harus berupa teks.",
+                            max: "Field Tunjangan maksimal 255 karakter.",
+                        },
+                    };
+
+                    if (errors && Object.keys(errors).length > 0) {
+                        errorMessages = Object.entries(errors)
+                            .map(([field, messages]) => {
+                                return messages.map(msgKey => {
+                                    return fieldTranslations[field]?.[msgKey] ?? msgKey;
+                                }).join('\n');
+                            })
+                            .join('\n');
+                    } else if (response.responseJSON?.message) {
+                        errorMessages = response.responseJSON.message;
+                    } else {
+                        errorMessages = "Terjadi kesalahan tidak diketahui.";
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: errorMessages
+                    });
+                },
             });
         });
 
-        // DELETE
         $('.deleteBtn').click(function() {
             let id = $(this).data('id');
             Swal.fire({

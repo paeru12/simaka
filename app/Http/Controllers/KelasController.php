@@ -26,19 +26,47 @@ class KelasController extends Controller
 
         try {
             $rombels = explode(',', $validated['rombel']);
+            $duplikat = [];
 
             foreach ($rombels as $rombel) {
+                $rombel = trim($rombel);
+
+                $exists = Kelas::where('jurusan_id', $validated['jurusan_id'])
+                    ->where('kelas', $validated['kelas'])
+                    ->where('rombel', $rombel)
+                    ->exists();
+
+                if ($exists) {
+                    $duplikat[] = $rombel;
+                    continue;
+                }
+
                 Kelas::create([
                     'jurusan_id' => $validated['jurusan_id'],
                     'kelas'      => $validated['kelas'],
-                    'rombel'     => trim($rombel),
+                    'rombel'     => $rombel,
                 ]);
             }
-            return response()->json(['success' => true, 'message' => "Kelas berhasil ditambahkan"]);
+
+            if (!empty($duplikat)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Beberapa rombel tidak ditambahkan karena sudah ada: ' . implode(', ', $duplikat)
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kelas berhasil ditambahkan'
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
+
 
     function show($id)
     {
@@ -53,7 +81,18 @@ class KelasController extends Controller
             'kelas' => 'required|string|max:255',
             'rombel' => 'required|string|max:255'
         ]);
+        $exists = Kelas::where('jurusan_id', $validated['jurusan_id'])
+            ->where('kelas', $validated['kelas'])
+            ->where('rombel', $validated['rombel'])
+            ->where('id', '!=', $id)
+            ->exists();
 
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => "Data kelas dengan kombinasi tersebut sudah ada."
+            ], 422);
+        }
         try {
             $kelas = Kelas::findOrFail($id);
             $kelas->update($validated);
@@ -78,5 +117,4 @@ class KelasController extends Controller
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
-
 }

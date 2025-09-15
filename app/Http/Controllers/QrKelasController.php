@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\QrKelas;
+use App\Models\Ruangan;
 
 class QrKelasController extends Controller
 {
@@ -18,7 +19,6 @@ class QrKelasController extends Controller
                 'ruangan_id' => 'required|string|exists:ruangans,id'
             ]);
 
-            // cek apakah sudah ada qr untuk ruangan ini
             $qrKelas = QrKelas::where('ruangan_id', $validated['ruangan_id'])->first();
             if ($qrKelas) {
                 return response()->json([
@@ -30,18 +30,14 @@ class QrKelasController extends Controller
 
             $validated['token'] = Str::uuid()->toString();
 
-
-            // path simpan file
-            $fileName = 'qrkelas-' . $validated['ruangan_id'] . '.svg';
+            $ruangan = Ruangan::find($validated['ruangan_id']);
+            $fileName = 'qrruangan-' . $ruangan->nama . '.svg';
             $savePath = 'uploads/qr/' . $fileName;
             $path = public_path($savePath);
-
-            // pastikan folder ada
             if (!File::exists(public_path('uploads/qr'))) {
                 File::makeDirectory(public_path('uploads/qr'), 0777, true);
             }
 
-            // generate QR dan simpan
             $image = QrCode::format('svg')
                 ->size(300)
                 ->errorCorrection('H')
@@ -61,7 +57,7 @@ class QrKelasController extends Controller
                 ]
             ], 201);
         } catch (\Exception $e) {
-            \Log::error("QRKelas store error: " . $e->getMessage());
+            Log::error("QRKelas store error: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal membuat QR Code ruangan',

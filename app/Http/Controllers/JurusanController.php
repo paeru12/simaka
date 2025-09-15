@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Jurusan;
 use Illuminate\Http\Request;
 
@@ -12,25 +13,42 @@ class JurusanController extends Controller
         return view('jurusan', compact('jurusan'));
     }
 
-    function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
         ]);
 
         try {
             $namas = explode(',', $validated['nama']);
+            $namaSudahAda = [];
 
             foreach ($namas as $n) {
-                Jurusan::create([
-                    'nama'     => trim($n),
-                ]);
+                $n = trim($n);
+                $exists = Jurusan::where('nama', $n)->exists();
+                if ($exists) {$namaSudahAda[] = $n; continue;}
+                Jurusan::create(['nama' => $n]);
             }
 
-            return response()->json(['success' => true, 'message' => "Jurusan berhasil ditambahkan"]);
+            if (!empty($namaSudahAda)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Beberapa jurusan tidak ditambahkan karena sudah ada: ' . implode(', ', $namaSudahAda),
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Jurusan berhasil ditambahkan"
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
+
 
     function show($id)
     {
@@ -43,6 +61,14 @@ class JurusanController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255'
         ]);
+
+        $exists = Jurusan::where('nama', $validated['nama'])->where('id', '!=', $id)->exists();
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => "Jurusan '{$validated['nama']}' sudah ada, tidak bisa ditambahkan lagi."
+            ], 422);
+        }
 
         try {
             $jurusan = Jurusan::findOrFail($id);

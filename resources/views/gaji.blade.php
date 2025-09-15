@@ -73,6 +73,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </section>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -90,7 +91,6 @@
                         tahun: tahun
                     },
                     success: function(res) {
-                        console.log(res);
                         let tbody = "";
                         if (res.length > 0) {
                             res.forEach((item, index) => {
@@ -102,7 +102,7 @@
                                 tbody += `
                                         <tr>
                                             <th>${index+1}.</th>
-                                            <td class="text-capitalize">${item.name}</td>
+                                            <td class="text-capitalize">${item.nama}</td>
                                             <td class="text-capitalize">${item.jabatan ?? '-'}</td>
                                             <td>Rp.${gapok.toLocaleString('id-ID')}</td>
                                             <td>Rp.${tunjangan.toLocaleString('id-ID')}</td>
@@ -115,7 +115,7 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                                     <li>
-                                                        <a class="dropdown-item d-flex align-items-center" href="/gaji/slip-gaji/${item.user_id}/slip/${bulan}/${tahun}">
+                                                        <a class="dropdown-item d-flex align-items-center" href="/gaji/slip-gaji/${item.guru_id}/slip/${bulan}/${tahun}">
                                                             <i class="bi bi-pencil-square"></i>
                                                             <span>Slip Gaji</span>
                                                         </a>
@@ -130,7 +130,11 @@
                     },
 
                     error: function(xhr) {
-                        console.log("Error:", xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseText
+                        });
                     }
                 });
             }

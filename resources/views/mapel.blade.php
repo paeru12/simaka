@@ -36,10 +36,6 @@
                                     <label>Nama Mapel</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="kode_mapel" placeholder="Kode Mapel">
-                                    <label>Kode Mapel</label>
-                                </div>
-                                <div class="form-floating mb-3">
                                     <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" placeholder="Gaji">
                                     <label>Honor /Mengajar</label>
                                 </div>
@@ -71,10 +67,6 @@
                                     <label>Nama Mapel</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="kode_mapel" id="edit_kode_mapel" placeholder="Kode Mapel">
-                                    <label>Kode Mapel</label>
-                                </div>
-                                <div class="form-floating mb-3">
                                     <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" id="edit_gaji" placeholder="Gaji">
                                     <label>Honor /Mengajar</label>
                                 </div>
@@ -95,7 +87,6 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Mapel</th>
-                            <th>Kode Mapel</th>
                             <th>Honor /Mengajar</th>
                             <th>Aksi</th>
                         </tr>
@@ -105,7 +96,6 @@
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
                             <td>{{ $m->nama_mapel }}</td>
-                            <td>{{ $m->kode_mapel }}</td>
                             <td>Rp.{{ number_format($m->gaji, 0, ',', '.') }}</td>
                             <td class="aksi">
                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
@@ -190,6 +180,14 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON.message
+                    });
+                    setTimeout(() => location.reload(), 1500);
                 }
             });
         });
@@ -200,7 +198,6 @@
             $.get("{{ url('mapel') }}/" + id, function(data) {
                 $('#edit_id').val(data.id);
                 $('#edit_nama_mapel').val(data.nama_mapel);
-                $('#edit_kode_mapel').val(data.kode_mapel);
                 $('#edit_gaji').val(data.gaji);
                 $('#editMapelModal').modal('show');
             });
@@ -239,6 +236,14 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON.message
+                    });
+                    setTimeout(() => location.reload(), 1500);
                 }
             });
         });
@@ -276,6 +281,14 @@
                             } else {
                                 Swal.fire("Gagal", res.message, "error");
                             }
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: xhr.responseJSON.message
+                            });
+                            setTimeout(() => location.reload(), 1500);
                         }
                     });
                 }

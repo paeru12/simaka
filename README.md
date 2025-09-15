@@ -1,4 +1,19 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><a href="#" ><img src="/public/assets/img/yukti.png" width="300" alt="Yukti"></a></p>
 
 <h1><bold>SIMAKA</bold></h1>
-Absensi guru
+<h2><bold>Absensi guru</bold></h2>
+
+<h2><bold>Jalankan Server</bold></h2>
+<p>php artisan serve:with-scheduler</p>
+
+<h2><bold>Username / Password</bold></h2>
+
+# Admin
+1. admin@gmail.com / asdfghjk
+
+# Guru
+1. sekre@gmail.com / asdfghjk
+2. bend@gmail.com / asdfghjk
+3. guru1@gmail.com / asdfghjk 
+
+Import DB simaka.sql

@@ -7,12 +7,18 @@ use Illuminate\Support\Str;
 
 class Guru extends Model
 {
-    protected $table = 'gurus'; 
-    public $incrementing = false; // non-integer ID
+    protected $table = 'gurus';
+    public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id','jabatan_id', 'nik', 'nama', 'jenis_kelamin', 'alamat', 'no_hp', 'status_aktif', 'foto'
+        'id',
+        'jabatan_id',
+        'nik',
+        'nama',
+        'jk',
+        'no_hp',
+        'foto'
     ];
 
     protected static function boot()
@@ -24,11 +30,9 @@ class Guru extends Model
             }
         });
     }
-
-    // Relasi ke Jadwal
-    public function jadwals()
+    public function users() 
     {
-        return $this->hasMany(Jadwal::class, 'guru_id');
+        return $this->hasOne(User::class, 'guru_id');
     }
 
     public function jabatan()
@@ -36,13 +40,16 @@ class Guru extends Model
         return $this->belongsTo(Jabatan::class, 'jabatan_id');
     }
 
-    // Relasi ke Absensi
+    public function jadwals()
+    {
+        return $this->hasMany(Jadwal::class, 'guru_id');
+    }
+
     public function absensis()
     {
         return $this->hasMany(Absensi::class, 'guru_id');
     }
 
-    // Relasi ke Penggajian
     public function penggajians()
     {
         return $this->hasMany(Penggajian::class, 'guru_id');

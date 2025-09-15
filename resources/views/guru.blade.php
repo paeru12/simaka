@@ -53,19 +53,23 @@
 
                                     <div class="modal-body">
                                         <div class="row">
-                                            <!-- Nama -->
                                             <div class="col-lg-6">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" name="name" class="form-control" id="name" placeholder="Nama" required>
+                                                    <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
                                                     <label for="name">Nama</label>
                                                 </div>
                                             </div>
 
-                                            <!-- Email -->
                                             <div class="col-lg-6">
                                                 <div class="form-floating mb-3">
                                                     <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
                                                     <label for="email">Email</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK" required>
+                                                    <label for="nik">NIK</label>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
@@ -85,8 +89,18 @@
                                                     <label for="jk">Jenis Kelamin</label>
                                                 </div>
                                             </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-floating mb-3">
+                                                    <select name="jabatan_id" class="form-select text-capitalize" id="floatingSelect" aria-label="Floating label select example">
+                                                        <option selected disabled>Open this select menu</option>
+                                                        @foreach ($jabatan as $j)
+                                                        <option value="{{ $j->id }}" class="text-capitalize">{{ $j->jabatan }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="floatingSelect">Pilih Jabatan</label>
+                                                </div>
+                                            </div>
 
-                                            <!-- Password -->
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <div class="input-group">
@@ -102,7 +116,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Konfirmasi Password -->
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <div class="input-group">
@@ -118,16 +131,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <select name="jabatan_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                                <option selected disabled>Open this select menu</option>
-                                                @foreach ($jabatan as $j)
-                                                <option value="{{ $j->id }}">{{ $j->jabatan }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="floatingSelect">Pilih Jabatan</label>
-                                        </div>
-                                        <!-- Upload Gambar -->
+
                                         <div class="mb-3">
                                             <div class="row align-items-center">
                                                 <div class="col-3">
@@ -146,7 +150,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Footer -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="submit" class="btn btn-purple" id="button-add">
@@ -155,7 +158,6 @@
                                         </button>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
                     </div>
@@ -182,9 +184,9 @@
                                         <img src="{{asset($g->foto)}}" class="img-thumbnail p-0 border-none rounded-circle"
                                             style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy">
                                     </td>
-                                    <td class="text-capitalize">{{ $g->name }}</td>
-                                    <td>{{ $g->email }}</td>
-                                    <td>{{ $g->jabatan->jabatan }}</td>
+                                    <td class="text-capitalize">{{ $g->nama }}</td>
+                                    <td>{{ $g->users->email }}</td>
+                                    <td class="text-capitalize">{{ $g->users->jabatan->jabatan }}</td>
                                     <td>{{ $g->jk }}</td>
                                     <td>{{ $g->no_hp }}</td>
                                     <td class="aksi">
@@ -227,7 +229,9 @@
         </div>
     </div>
 </section>
-
+@push('scripts')
+<script src="{{ asset('assets/js/main2.js') }}"></script>
+@endpush
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -247,16 +251,14 @@
                     title: 'Password Tidak Cocok',
                     text: 'Password dan Konfirmasi Password harus sama!'
                 });
-                return; // stop pengiriman
+                return;
             }
 
-            // Tampilkan loading spinner
             $('#button-add').prop('disabled', true);
             $('#button-loader').removeClass('d-none');
 
-            // Kirim data ke server via AJAX
             $.ajax({
-                url: "{{ route('admin.store') }}",
+                url: "{{ route('guru.store') }}",
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -279,17 +281,48 @@
                             title: 'Error',
                             text: response.message,
                             showConfirmButton: false,
-                            timer: 2000
                         });
+                        $('#button-add').prop('disabled', false);
+                        $('#button-loader').addClass('d-none');
                     }
 
                 },
-                error: function(xhr) {
+                error: function(response) {
+                    let errors = response.responseJSON?.errors;
+                    let errorMessages = "";
+                    const fieldTranslations = {
+                        nik: {
+                            "validation.unique": "NIK sudah digunakan",
+                            "validation.required": "NIK wajib diisi"
+                        },
+                        email: {
+                            "validation.unique": "Email sudah digunakan",
+                            "validation.required": "Email wajib diisi",
+                            "validation.email": "Format email tidak valid"
+                        },
+                    };
+
+                    if (errors && Object.keys(errors).length > 0) {
+                        errorMessages = Object.entries(errors)
+                            .map(([field, messages]) => {
+                                return messages.map(msgKey => {
+                                    return fieldTranslations[field]?.[msgKey] ?? msgKey;
+                                }).join('\n');
+                            })
+                            .join('\n');
+                    } else if (response.responseJSON?.message) {
+                        errorMessages = response.responseJSON.message;
+                    } else {
+                        errorMessages = "Terjadi kesalahan tidak diketahui.";
+                    }
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: message
+                        text: errorMessages
                     });
+                    $('#button-add').prop('disabled', false);
+                    $('#button-loader').addClass('d-none');
                 },
                 complete: function() {
                     $('#button-add').prop('disabled', false);
@@ -300,9 +333,7 @@
 
         $(document).on('click', '.btn-delete', function(e) {
             e.preventDefault();
-
             const id = $(this).data('id');
-
             Swal.fire({
                 title: 'Yakin ingin menghapus?',
                 text: 'Data yang dihapus tidak bisa dikembalikan!',
@@ -315,7 +346,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/admin/${id}`, // route resource
+                        url: `/guru/${id}`,
                         type: 'POST',
                         data: {
                             _method: 'DELETE',
@@ -352,8 +383,6 @@
             });
         });
     });
-
-
 
     document.addEventListener("DOMContentLoaded", function() {
         const passwordInput = document.getElementById("yourPassword");

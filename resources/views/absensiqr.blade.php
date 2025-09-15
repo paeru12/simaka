@@ -71,7 +71,6 @@
         });
     }
 
-    // ✅ Scan QR realtime
     function scanQRCode() {
         if (!scanning) return;
 
@@ -88,7 +87,6 @@
             if (code) {
                 qrToken = code.data;
                 validJadwal = false;
-                // ganti fetch dengan jQuery AJAX
                 $.ajax({
                     url: "{{ route('absensi.validate') }}",
                     method: "POST",
@@ -166,7 +164,6 @@
         requestAnimationFrame(scanQRCode);
     }
 
-    // ✅ Ambil foto & kirim absensi
     captureBtn.addEventListener('click', function() {
         if (!qrToken || !validJadwal) {
             Swal.fire({
@@ -188,34 +185,6 @@
         const formData = new FormData();
         formData.append("token", qrToken);
         formData.append("foto", dataURLtoFile(dataURL, "bukti.png"));
-
-        // fetch("{{ route('absensi.scan') }}", {
-        //         method: "POST",
-        //         headers: {
-        //             "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        //         },
-        //         body: formData
-        //     })
-        //     .then(res => res.json())
-        //     .then(res => {
-        //         if (res.message) {
-        //             Swal.fire({
-        //                 icon: 'success',
-        //                 title: 'Absensi Berhasil',
-        //                 text: res.message,
-        //                 timer: 1000
-        //             }).then(() => {
-        //                 location.href = "{{ route('absensi.index') }}";
-        //             });
-        //         }
-        //     })
-        //     .catch(err => {
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'Gagal Kirim Absensi',
-        //             text: err.message
-        //         });
-        //     });
 
         $.ajax({
             url: "{{ route('absensi.scan') }}",
@@ -255,7 +224,6 @@
 
     });
 
-    // helper: base64 → File
     function dataURLtoFile(dataurl, filename) {
         const arr = dataurl.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];

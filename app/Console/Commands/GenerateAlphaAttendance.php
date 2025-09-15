@@ -28,7 +28,7 @@ class GenerateAlphaAttendance extends Command
             }
 
             $absensiExists = Absensi::where('jadwal_id', $jadwal->id)
-                ->where('user_id', $jadwal->user_id)
+                ->where('guru_id', $jadwal->guru_id)
                 ->whereDate('tanggal', $today)
                 ->exists();
 
@@ -36,7 +36,7 @@ class GenerateAlphaAttendance extends Command
                 Absensi::create([
                     'jadwal_id' => $jadwal->id,
                     'mapel_id'  => $jadwal->mapel_id,
-                    'user_id'   => $jadwal->user_id,
+                    'guru_id'   => $jadwal->guru_id,
                     'tanggal'   => $today,
                     'jam_absen' => $now->format('H:i:s'),
                     'status'    => 'Alpha',

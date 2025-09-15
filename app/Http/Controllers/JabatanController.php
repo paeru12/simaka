@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Jabatan;
+
 class JabatanController extends Controller
 {
-    function index() {
+    function index()
+    {
         $data = Jabatan::orderBy('created_at', 'asc')->get();
         return view('jabatan', compact('data'));
-    } 
+    }
 
     function store(Request $request)
     {
@@ -20,6 +22,13 @@ class JabatanController extends Controller
         ]);
 
         try {
+            $exists = Jabatan::where('jabatan', $validated['jabatan'])->exists();
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Jabatan '{$validated['jabatan']}' sudah ada, tidak bisa ditambahkan lagi."
+                ], 422);
+            }
             Jabatan::create($validated);
             return response()->json(['success' => true, 'message' => "Jabatan berhasil ditambahkan"]);
         } catch (\Throwable $th) {
@@ -33,17 +42,34 @@ class JabatanController extends Controller
         return response()->json($jabatan);
     }
 
-     function update(Request $request, $id)
+    function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'jabatan' => 'required|string|max:255',
+            'jabatan' => 'nullable|string|max:255',
             'gapok' => 'required|string|max:255',
             'tunjangan' => 'required|string|max:255',
         ]);
 
-        try {
+        try { 
+            $exists = Jabatan::where('jabatan', $validated['jabatan'])->where('id', '!=', $id)->exists();
+            if ($exists && strtolower($validated['jabatan']) !== 'admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Jabatan '{$validated['jabatan']}' sudah ada, tidak bisa ditambahkan lagi."
+                ], 422);
+            }
             $jabatan = Jabatan::findOrFail($id);
-            $jabatan->update($validated);
+
+            if (strtolower($jabatan->jabatan) === 'admin') {
+                $jabatan->gapok = $request->gapok;
+                $jabatan->tunjangan = $request->tunjangan;
+            } else {
+                $jabatan->jabatan = $request->jabatan;
+                $jabatan->gapok = $request->gapok;
+                $jabatan->tunjangan = $request->tunjangan;
+            }
+
+            $jabatan->save();
             return response()->json(['success' => true, 'message' => "Jabatan berhasil diperbarui"]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
@@ -54,6 +80,17 @@ class JabatanController extends Controller
     {
         try {
             $jabatan = Jabatan::findOrFail($id);
+            if (strtolower($jabatan->jabatan) === 'admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Jabatan 'admin' tidak bisa dihapus."
+                ], 422);
+            }
+
+            if ($jabatan->gurus()->exists()) {
+                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus jabatan yang masih digunakan guru.']);
+            }
+
             $jabatan->delete();
             return response()->json(['success' => true, 'message' => "Jabatan berhasil dihapus"]);
         } catch (\Throwable $th) {

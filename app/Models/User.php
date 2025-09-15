@@ -22,14 +22,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'id',
+        'guru_id',
         'jabatan_id',
-        'name',
-        'no_hp',
-        'jk',
         'email',
         'password',
-        'foto',
-        'role',
+        'status',
     ];
     protected static function boot()
     { 
@@ -63,12 +60,12 @@ class User extends Authenticatable
         ];
     }
 
+    public function guru()
+    {
+        return $this->belongsTo(Guru::class, 'guru_id');
+    }
     public function jabatan()
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_id');
-    }
-    public function jadwals()
-    {
-        return $this->hasMany(Jadwal::class, 'user_id');
     }
 }

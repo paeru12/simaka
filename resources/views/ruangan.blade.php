@@ -100,7 +100,7 @@
                                 {{-- Modal QR --}}
                                 <div class="modal fade" id="qrModal{{$ruangan->id}}" tabindex="-1">
                                     <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">                                            
+                                        <div class="modal-content">
                                             <div class="modal-body" id="qrContent{{$ruangan->id}}">
                                                 <div class="row justify-content-center align-items-center">
                                                     <h5 class="card-title text-center text-uppercase fw-bold fs-3">{{ $ruangan->nama }}</h5>
@@ -118,7 +118,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick="downloadPDF(<?= json_encode($ruangan->id) ?>)">Download</button>
+                                                <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick='downloadPDF(@json($ruangan->id), "{{ $ruangan->nama }}")'>Download</button>
                                             </div>
                                         </div>
                                     </div>
@@ -246,6 +246,13 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON.message
+                    });
                 }
             });
         });
@@ -283,12 +290,20 @@
                             } else {
                                 Swal.fire("Gagal", res.message, "error");
                             }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.message
+                            });
                         }
                     });
                 }
             });
         });
-    
+
         // CETAK QR KELAS
         $('.btn-generate').on('click', function() {
             let kelasId = $(this).data('id');
@@ -326,11 +341,11 @@
         });
     });
 
-    function downloadPDF(id) {
+    function downloadPDF(id, nama) {
         const element = document.getElementById("qrContent" + id);
         const opt = {
             margin: [15, 0, 0, 0],
-            filename: "qr-ruangan-" + id + ".pdf",
+            filename: "qr-ruangan-" + nama + "-" + id + ".pdf",
             image: {
                 type: 'jpeg',
                 quality: 1

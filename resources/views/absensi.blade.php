@@ -16,12 +16,12 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title mb-0">Data Absensi</h5>
-            @if(Auth::user()->role != 'admin')
+            @if(Auth::user()->jabatan->jabatan != 'admin')
             <a href="{{route('absenqr.index')}}" class="btn btn-purple btn-sm"><i class="ri ri-qr-scan-line"></i>
                 <span>Absen QR Code</span>
             </a>
             <button type="button" class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#addJadwalModal">
-                Absensi
+                Absensi Izin/Sakit
             </button>
             <div class="modal fade" id="addJadwalModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
@@ -69,16 +69,12 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="form-floating mb-3">
-                                            <input type="time" name="jam_absen" id="jam_absen" class="form-control" placeholder="Jam Absen" value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
-                                            <label for="jam_absen">Jam Absen</label>
+                                            <select name="status" id="status" class="form-select" required>
+                                                <option value="Izin">Izin</option>
+                                                <option value="Sakit">Sakit</option>
+                                            </select>
+                                            <label for="status">Status</label>
                                         </div>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <select name="status" id="status" class="form-select" required>
-                                            <option value="Izin">Izin</option>
-                                            <option value="Sakit">Sakit</option>
-                                        </select>
-                                        <label for="status">Status</label>
                                     </div>
 
                                     <div class="form-floating mb-3">
@@ -129,13 +125,16 @@
                             <th>Status</th>
                             <th>Keterangan</th>
                             <th>Foto</th>
+                            @if(Auth::user()->jabatan->jabatan == 'admin')
+                            <th>Hapus</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($absensi as $a)
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
-                            <td class="text-capitalize">{{ $a->user->name }}</td>
+                            <td class="text-capitalize">{{ $a->guru->nama }}</td>
                             <td class="text-capitalize">{{ $a->jadwal->kelas->kelas }} {{ $a->jadwal->kelas->rombel }}</td>
                             <td class="text-capitalize">{{ $a->jadwal->ruangan->nama }}</td>
                             <td class="text-capitalize">{{ $a->mataPelajaran->nama_mapel }}</td>
@@ -181,6 +180,13 @@
                                     </div>
                                 </div>
                             </td>
+                            @if(Auth::user()->jabatan->jabatan == 'admin')
+                            <td>
+                                <button class="btn btn-danger btn-sm deleteBtn" data-id="{{ $a->id }}">
+                                    <i class="ri ri-delete-bin-3-line"></i>
+                                </button>
+                            </td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>
@@ -190,12 +196,13 @@
         </div>
     </div>
 </section>
+@push('scripts')
+<script src="{{ asset('assets/js/main2.js') }}"></script>
+@endpush
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(function() {
-        // CREATE
         $('#absenForm').submit(function(e) {
-            console.log($(this).serialize());
             e.preventDefault();
             const form = this;
             const formData = new FormData(form);
@@ -223,6 +230,51 @@
                     } else {
                         Swal.fire("Gagal", res.message, "error");
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON.message
+                    });
+                }
+            });
+        });
+
+        $('.deleteBtn').click(function() {
+            let id = $(this).data('id');
+            Swal.fire({
+                title: 'Hapus Data Absensi?',
+                text: 'Data yang dihapus tidak bisa dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('absensi') }}/" + id,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        beforeSend: function() {
+                            Swal.fire({
+                                title: 'Processing...',
+                                text: 'Menghapus data absensi',
+                                didOpen: () => Swal.showLoading(),
+                                allowOutsideClick: false
+                            });
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire("Berhasil", res.message, "success");
+                                setTimeout(() => location.reload(), 800);
+                            } else {
+                                Swal.fire("Gagal", res.message, "error");
+                            }
+                        }
+                    });
                 }
             });
         });

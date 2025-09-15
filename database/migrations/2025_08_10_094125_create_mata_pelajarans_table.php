@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('mata_pelajarans', function (Blueprint $table) {
             $table->string('id', 36)->primary();
             $table->string('nama_mapel', 100);
-            $table->string('kode_mapel', 20)->unique();
             $table->integer('gaji');
             $table->timestamps();
         });

@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('jadwals', function (Blueprint $table) {
             $table->string('id', 36)->primary();
-            $table->string('user_id', 36);
+            $table->string('guru_id', 36);
             $table->string('ruangan_id', 36);
             $table->string('mapel_id', 36);
             $table->string('kelas_id', 36);
-            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
+            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
             $table->time('jam_mulai');
             $table->time('jam_selesai');
             $table->timestamps();

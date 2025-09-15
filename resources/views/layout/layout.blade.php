@@ -30,13 +30,11 @@ $nama = $namas->value;
     <script src="{{ asset('assets/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/dist/sweetalert2.all.min.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </head>
 
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <div class="d-flex justify-content-between">
             <a href="/" class="logo d-flex align-items-center">
                 <img src="{{ asset($logo) }}">
@@ -44,28 +42,26 @@ $nama = $namas->value;
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
-
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
                 <li class="nav-item dropdown pe-3">
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
                         data-bs-toggle="dropdown">
-                        <img src="{{asset(Auth::user()->foto)}}" alt="Profile" class="rounded-circle" style="aspect-ratio: 1/1; object-fit: cover;">
-                        <span class="d-none d-md-block dropdown-toggle ps-2 text-capitalize">Hi,
-                            {{Auth::user()->name}}.</span>
+                        <img src="{{ asset(Auth::user()->guru->foto) }}" style="width: 30px; aspect-ratio: 1/1; object-fit: cover;" alt="Profile" class="rounded-circle">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">Hi,
+                            {{ ucfirst(Auth::user()->guru->nama) }}.</span>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-                            <h6 class="text-capitalize">{{Auth::user()->name}}</h6>
-                            <p>{{Auth::user()->jabatan->jabatan}}</p>
+                            <h6 class="text-capitalize">{{ Auth::user()->guru->nama }}</h6>
+                            <span>Guru & Staff</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center"
-                                href="{{ route('admin.edits', ['id' => Auth::user()->id]) }}">
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.edits', Auth::user()->guru_id) }}">
                                 <i class="bi bi-person"></i>
                                 <span>My Profile</span>
                             </a>
@@ -83,11 +79,9 @@ $nama = $namas->value;
                 </li>
             </ul>
         </nav>
-
     </header>
-
     <!-- ======= Sidebar ======= -->
-    @if (Auth::user()->role == 'admin')
+    @if(Auth::user()->jabatan->jabatan == 'admin')
     <aside id="sidebar" class="sidebar">
 
         <ul class="sidebar-nav" id="sidebar-nav">
@@ -183,11 +177,10 @@ $nama = $namas->value;
                     <span>Administrator</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{Request::is('profile/'.Auth::user()->id .'/edit') ? 'active' : 'collapsed'}}"
-                    href="{{ route('admin.edits', ['id' => Auth::user()->id]) }}">
+            <li class="nav-item ">
+                <a class="nav-link {{ Request::is('profile/*') ? 'active' : 'collapsed' }}" href="{{ route('admin.edits', Auth::user()->guru_id) }}">
                     <i class="bi bi-person"></i>
-                    <span>My Profile</span>
+                    <span>Profile</span>
                 </a>
             </li>
             <li class="nav-heading">Pengaturan</li>
@@ -206,7 +199,7 @@ $nama = $namas->value;
             </li>
         </ul>
     </aside>
-    @elseif (Auth::user()->role == 'guru')
+    @else
     <aside id="sidebar" class="sidebar">
 
         <ul class="sidebar-nav" id="sidebar-nav">
@@ -250,14 +243,12 @@ $nama = $namas->value;
                     <span>Laporan Gaji</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{Request::is('profile/'.Auth::user()->id .'/edit') ? 'active' : 'collapsed'}}"
-                    href="{{ route('admin.edits', ['id' => Auth::user()->id]) }}">
+            <li class="nav-item ">
+                <a class="nav-link {{ Request::is('profile/*') ? 'active' : 'collapsed' }}" href="{{route('admin.edits', Auth::user()->guru_id)}}">
                     <i class="bi bi-person"></i>
-                    <span>My Profile</span>
+                    <span>Profile</span>
                 </a>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link collapsed logout" href="{{route('logout')}}">
                     <i class="bi bi-box-arrow-right"></i>
@@ -267,8 +258,7 @@ $nama = $namas->value;
         </ul>
     </aside>
     @endif
-
-
+    <!-- End Sidebar-->
     <main id="main" class="main">
         @yield('content')
     </main>
@@ -286,9 +276,8 @@ $nama = $namas->value;
             class="bi bi-arrow-up-short"></i></a>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
-    <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
-    <script src="{{ asset('assets/js/main2.js') }}"></script>
+
     <script>
         $.ajaxSetup({
             headers: {

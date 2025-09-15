@@ -37,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('admin', AdminController::class);
     Route::get('/profile/{id}/edit', [AdminController::class, 'edits'])->name('admin.edits');
     Route::put('/admin/{id}/update-profile', [AdminController::class, 'updateProfile'])->name('admin.update-profile');
+    Route::put('/admin/{id}/update-akun', [AdminController::class, 'updateAkun'])->name('admin.update-akun');
     Route::post('/admin/{id}/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
     Route::get('/gaji/slip-gaji/{guru_id}/slip/{bulan}/{tahun}', [gajiansController::class, 'getDataGuru'])->name('gaji.getDataGuru');
     Route::post('/rekap/filter', [gajiController::class, 'filter'])->name('rekap.filter');

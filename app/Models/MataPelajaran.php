@@ -12,7 +12,7 @@ class MataPelajaran extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'nama_mapel', 'kode_mapel', 'gaji'
+        'id', 'nama_mapel', 'gaji'
     ];
  
     protected static function boot()
@@ -25,13 +25,11 @@ class MataPelajaran extends Model
         });
     }
 
-    // Relasi ke Jadwal
     public function jadwals()
     {
         return $this->hasMany(Jadwal::class, 'mapel_id');
     }
 
-    // Relasi ke Absensi
     public function absensis()
     {
         return $this->hasMany(Absensi::class, 'mapel_id');

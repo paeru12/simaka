@@ -1,5 +1,5 @@
 @extends('layout.layout')
-@section('title', 'Admin')
+@section('title', 'Administrator')
 @section('content')
 <style>
     #passwordIcon {
@@ -21,59 +21,52 @@
     }
 </style>
 <div class="pagetitle">
-    <h1>Admin</h1>
+    <h1 class="text-capitalize">Administrator</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item active">Admin</li>
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active"><a href="">Administrator</a></li>
         </ol>
     </nav>
 </div>
-@if ($errors->any())
-<div class="alert alert-danger">
-    <ul>
-        @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
 <section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title mb-0">Datatables</h5>
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#basicModal1">
+                    <h5 class="card-title mb-0">Data Admin</h5>
+                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
                         Add Admin
                     </button>
-                    <div class="modal fade" id="basicModal1" tabindex="-1">
+
+                    <div class="modal fade" id="verticalycentered" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <form id="formTambahAdmin" class="needs-validation" enctype="multipart/form-data" novalidate>
+                                <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
                                     @csrf
-                                    <input type="hidden" name="role" value="admin">
+                                    <input type="hidden" name="role" value="guru">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Add Admin</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-
                                     <div class="modal-body">
                                         <div class="row">
-                                            <!-- Nama -->
-                                            <div class="col-lg-6">
+                                            <div class="col-12">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" name="name" class="form-control" id="name" placeholder="Nama" required>
+                                                    <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
                                                     <label for="name">Nama</label>
                                                 </div>
                                             </div>
-
-                                            <!-- Email -->
                                             <div class="col-lg-6">
                                                 <div class="form-floating mb-3">
                                                     <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
                                                     <label for="email">Email</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK" required>
+                                                    <label for="nik">NIK</label>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
@@ -93,8 +86,6 @@
                                                     <label for="jk">Jenis Kelamin</label>
                                                 </div>
                                             </div>
-
-                                            <!-- Password -->
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <div class="input-group">
@@ -109,8 +100,6 @@
                                                     <div class="invalid-feedback">Please enter your password!</div>
                                                 </div>
                                             </div>
-
-                                            <!-- Konfirmasi Password -->
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <div class="input-group">
@@ -126,16 +115,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <select name="jabatan_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                                <option selected disabled>Open this select menu</option>
-                                                @foreach ($jabatan as $j)
-                                                <option value="{{ $j->id }}">{{ $j->jabatan }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="floatingSelect">Pilih Jabatan</label>
-                                        </div>
-                                        <!-- Upload Gambar -->
                                         <div class="mb-3">
                                             <div class="row align-items-center">
                                                 <div class="col-3">
@@ -153,8 +132,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Footer -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="submit" class="btn btn-purple" id="button-add">
@@ -167,25 +144,32 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="table-responsive">
-                        <table class="table datatable table-hover">
+                        <table class="table table-hover datatable">
                             <thead>
                                 <tr>
                                     <th scope="col">No</th>
                                     <th scope="col">Foto</th>
                                     <th scope="col">Nama</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">JK</th>
+                                    <th scope="col">No HP</th>
                                     <th scope="col">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($data as $d)
+                                @forelse($data as $d)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}.</th>
-                                    <td><img src="{{ asset($d->foto) }}" class="img-thumbnail p-0 border-none rounded-circle"
-                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></td>
-                                    <td>{{ ucfirst($d->name) }}</td>
+                                    <td>
+                                        <img src="{{asset($d->guru->foto)}}" class="img-thumbnail p-0 border-none rounded-circle"
+                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy">
+                                    </td>
+                                    <td class="text-capitalize">{{ $d->guru->nama }}</td>
                                     <td>{{ $d->email }}</td>
+                                    <td>{{ $d->guru->jk }}</td>
+                                    <td>{{ $d->guru->no_hp }}</td>
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm"
                                             data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
@@ -194,7 +178,7 @@
 
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                    href="{{ route('admin.edits', ['id' => $d->id]) }}">
+                                                    href="{{ route('admin.edits', ['id' => $d->guru_id]) }}">
                                                     <i class="bi bi-person"></i>
                                                     <span>Profile</span>
                                                 </a>
@@ -205,7 +189,7 @@
                                             <li>
                                                 <a href="javascript:void(0);"
                                                     class="dropdown-item d-flex align-items-center btn-delete"
-                                                    data-id="{{ $d->id }}">
+                                                    data-id="{{ $d->guru_id }}">
                                                     <i class="ri ri-delete-bin-6-fill"></i>
                                                     <span>Delete</span>
                                                 </a>
@@ -214,6 +198,9 @@
                                     </td>
                                 </tr>
                                 @empty
+                                <tr>
+                                    <td colspan="9" class="text-center">No data available</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -223,33 +210,29 @@
         </div>
     </div>
 </section>
+@push('scripts')
+<script src="{{ asset('assets/js/main2.js') }}"></script>
+@endpush
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     $(document).ready(function() {
 
-        $('#formTambahAdmin').on('submit', function(e) {
+        $('#formTambahGuru').on('submit', function(e) {
             e.preventDefault();
-
             const form = this;
             const formData = new FormData(form);
-
             const password = formData.get('password');
             const confirmPassword = formData.get('kpassword');
-
             if (password !== confirmPassword) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Password Tidak Cocok',
                     text: 'Password dan Konfirmasi Password harus sama!'
                 });
-                return; // stop pengiriman
+                return;
             }
-
-            // Tampilkan loading spinner
             $('#button-add').prop('disabled', true);
             $('#button-loader').removeClass('d-none');
-
-            // Kirim data ke server via AJAX
             $.ajax({
                 url: "{{ route('admin.store') }}",
                 method: "POST",
@@ -274,17 +257,49 @@
                             title: 'Error',
                             text: response.message,
                             showConfirmButton: false,
-                            timer: 2000
                         });
+                        $('#button-add').prop('disabled', false);
+                        $('#button-loader').addClass('d-none');
                     }
 
                 },
-                error: function(xhr) {
+                error: function(response) {
+                    console.log(response);
+                    let errors = response.responseJSON?.errors;
+                    let errorMessages = "";
+                    const fieldTranslations = {
+                        nik: {
+                            "validation.unique": "NIK sudah digunakan",
+                            "validation.required": "NIK wajib diisi"
+                        },
+                        email: {
+                            "validation.unique": "Email sudah digunakan",
+                            "validation.required": "Email wajib diisi",
+                            "validation.email": "Format email tidak valid"
+                        },
+                    };
+
+                    if (errors && Object.keys(errors).length > 0) {
+                        errorMessages = Object.entries(errors)
+                            .map(([field, messages]) => {
+                                return messages.map(msgKey => {
+                                    return fieldTranslations[field]?.[msgKey] ?? msgKey;
+                                }).join('\n');
+                            })
+                            .join('\n');
+                    } else if (response.responseJSON?.message) {
+                        errorMessages = response.responseJSON.message;
+                    } else {
+                        errorMessages = "Terjadi kesalahan tidak diketahui.";
+                    }
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: message
+                        text: errorMessages
                     });
+                    $('#button-add').prop('disabled', false);
+                    $('#button-loader').addClass('d-none');
                 },
                 complete: function() {
                     $('#button-add').prop('disabled', false);
@@ -295,9 +310,7 @@
 
         $(document).on('click', '.btn-delete', function(e) {
             e.preventDefault();
-
             const id = $(this).data('id');
-
             Swal.fire({
                 title: 'Yakin ingin menghapus?',
                 text: 'Data yang dihapus tidak bisa dikembalikan!',
@@ -310,7 +323,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/admin/${id}`, // route resource
+                        url: `/admin/${id}`,
                         type: 'POST',
                         data: {
                             _method: 'DELETE',
@@ -335,11 +348,19 @@
                                 });
                             }
                         },
-                        error: function(xhr) {
+                        error: function(response) {
+
+                            let errors = response.responseJSON?.errors;
+                            let errorMessages = "";
+                            if (response.responseJSON?.message) {
+                                errorMessages = response.responseJSON.message;
+                            } else {
+                                errorMessages = "Terjadi kesalahan tidak diketahui.";
+                            }
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error',
-                                text: 'Gagal menghapus data.'
+                                title: 'Gagal',
+                                text: errorMessages
                             });
                         }
                     });
@@ -347,8 +368,6 @@
             });
         });
     });
-
-
 
     document.addEventListener("DOMContentLoaded", function() {
         const passwordInput = document.getElementById("yourPassword");

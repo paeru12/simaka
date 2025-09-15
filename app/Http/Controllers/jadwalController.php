@@ -7,20 +7,23 @@ use App\Models\MataPelajaran;
 use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\Ruangan;
-use App\Models\User;
+use App\Models\Guru;
 
 class jadwalController extends Controller
 {
     function index()
     {
+        $auth = auth()->user();
         $mapel = MataPelajaran::all();
-        $guru = User::where('role', 'guru')->latest()->get();
-        $kelas = Kelas::all();
+        $guru = Guru::whereHas('jabatan', function ($query) {
+            $query->where('jabatan', '!=', 'admin');
+        })->latest()->get();
+        $kelas = Kelas::orderBy('kelas', 'asc')->get();
         $ruangan = Ruangan::all();
-        if (auth()->user()->role == 'admin') {
-            $jadwal = Jadwal::with(['user', 'mataPelajaran'])->orderby('hari', 'asc')->get();
-        }else{
-            $jadwal = Jadwal::with(['user', 'mataPelajaran'])->where('user_id', auth()->user()->id)->orderby('hari', 'asc')->get();
+        if ($auth->jabatan->jabatan == 'admin') {
+            $jadwal = Jadwal::with(['guru', 'mataPelajaran'])->orderby('hari', 'asc')->get();
+        } else {
+            $jadwal = Jadwal::with(['guru', 'mataPelajaran'])->where('guru_id', $auth->guru_id)->orderby('hari', 'asc')->get();
         }
         return view('jadwal', compact('mapel', 'guru', 'jadwal', 'kelas', 'ruangan'));
     }
@@ -28,7 +31,7 @@ class jadwalController extends Controller
     function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'guru_id' => 'required|exists:gurus,id',
             'ruangan_id' => 'required|exists:ruangans,id',
             'mapel_id' => 'required|exists:mata_pelajarans,id',
             'kelas_id' => 'required|exists:kelass,id',
@@ -36,6 +39,44 @@ class jadwalController extends Controller
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai'
         ]);
+
+        $bentrokGuru = Jadwal::where('guru_id', $validated['guru_id'])
+            ->where('hari', $validated['hari'])
+            ->where(function ($q) use ($validated) {
+                $q->whereBetween('jam_mulai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                    ->orWhereBetween('jam_selesai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                    ->orWhere(function ($q2) use ($validated) {
+                        $q2->where('jam_mulai', '<', $validated['jam_mulai'])
+                            ->where('jam_selesai', '>', $validated['jam_selesai']);
+                    });
+            })
+            ->exists();
+
+        if ($bentrokGuru) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Guru ini sudah memiliki jadwal pada jam tersebut.'
+            ], 422);
+        }
+
+        $bentrokRuangan = Jadwal::where('ruangan_id', $validated['ruangan_id'])
+            ->where('hari', $validated['hari'])
+            ->where(function ($q) use ($validated) {
+                $q->whereBetween('jam_mulai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                    ->orWhereBetween('jam_selesai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                    ->orWhere(function ($q2) use ($validated) {
+                        $q2->where('jam_mulai', '<', $validated['jam_mulai'])
+                            ->where('jam_selesai', '>', $validated['jam_selesai']);
+                    });
+            })
+            ->exists();
+
+        if ($bentrokRuangan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ruangan ini sudah dipakai untuk jadwal lain di jam tersebut.'
+            ], 422);
+        }
 
         try {
             Jadwal::create($validated);
@@ -55,7 +96,7 @@ class jadwalController extends Controller
     {
         try {
             $validated = $request->validate([
-                'user_id' => 'required|exists:users,id',
+                'guru_id' => 'required|exists:gurus,id',
                 'ruangan_id' => 'required|exists:ruangans,id',
                 'mapel_id' => 'required|exists:mata_pelajarans,id',
                 'kelas_id' => 'required|exists:kelass,id',
@@ -63,6 +104,44 @@ class jadwalController extends Controller
                 'jam_mulai' => 'required|date_format:H:i',
                 'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             ]);
+
+            $bentrokGuru = Jadwal::where('id', '!=', $id)->where('guru_id', $validated['guru_id'])
+                ->where('hari', $validated['hari'])
+                ->where(function ($q) use ($validated) {
+                    $q->whereBetween('jam_mulai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                        ->orWhereBetween('jam_selesai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                        ->orWhere(function ($q2) use ($validated) {
+                            $q2->where('jam_mulai', '<', $validated['jam_mulai'])
+                                ->where('jam_selesai', '>', $validated['jam_selesai']);
+                        });
+                })
+                ->exists();
+
+            if ($bentrokGuru) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru ini sudah memiliki jadwal pada jam tersebut.'
+                ], 422);
+            }
+
+            $bentrokRuangan = Jadwal::where('id', '!=', $id)->where('ruangan_id', $validated['ruangan_id'])
+                ->where('hari', $validated['hari'])
+                ->where(function ($q) use ($validated) {
+                    $q->whereBetween('jam_mulai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                        ->orWhereBetween('jam_selesai', [$validated['jam_mulai'], $validated['jam_selesai']])
+                        ->orWhere(function ($q2) use ($validated) {
+                            $q2->where('jam_mulai', '<', $validated['jam_mulai'])
+                                ->where('jam_selesai', '>', $validated['jam_selesai']);
+                        });
+                })
+                ->exists();
+
+            if ($bentrokRuangan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ruangan ini sudah dipakai untuk jadwal lain di jam tersebut.'
+                ], 422);
+            }
 
             $jadwal = Jadwal::findOrFail($id);
             $jadwal->update($validated);
@@ -77,6 +156,12 @@ class jadwalController extends Controller
     {
         try {
             $jadwal = Jadwal::findOrFail($id);
+            if (method_exists($jadwal, 'absensis') && $jadwal->absensis()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jadwal tidak dapat dihapus karena sudah dipakai pada absensi.'
+                ], 422);
+            }
             $jadwal->delete();
             return response()->json(['success' => true, 'message' => "Jadwal berhasil dihapus"]);
         } catch (\Throwable $th) {

@@ -101,13 +101,13 @@
                                 tbody += `
                                 <tr>
                                     <th>${index+1}.</th>
-                                    <td class="text-capitalize">${item.user.name}</td>
+                                    <td class="text-capitalize">${item.guru.nama}</td>
                                     <td>${$("#bulan option:selected").text()} ${tahun}</td>
-                                    <td>${item.user.total_mapel}</td>
+                                    <td>${item.guru.total_mapel}</td>
                                     <td>${item.hadir}</td>
                                     <td>${item.izin}</td>
                                     <td>${item.sakit}</td>
-                                    <td>${item.alfa}</td>
+                                    <td>${item.alfa}</td> 
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
                                             <i class="ri-bar-chart-horizontal-fill"></i>
@@ -115,7 +115,7 @@
                                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center"
-                                                href="/rekap/${item.user_id}/detail/${bulan}/${tahun}">
+                                                href="/rekap/${item.guru_id}/detail/${bulan}/${tahun}">
                                                     <i class="bi bi-pencil-square"></i>
                                                     <span>Detail</span>
                                                 </a>

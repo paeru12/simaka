@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('id', 36)->primary();
             $table->string('jadwal_id', 36);
             $table->string('mapel_id', 36);
-            $table->string('user_id', 36);
+            $table->string('guru_id', 36);
             $table->date('tanggal');
             $table->time('jam_absen');
             $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpha', 'Terlambat']);
