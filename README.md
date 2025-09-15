@@ -3,6 +3,8 @@
 <h1><bold>SIMAKA</bold></h1>
 <h2><bold>Absensi guru</bold></h2>
 
+<h4>Import DB simaka.sql</h4>
+
 <h2><bold>Jalankan Server</bold></h2>
 <p>php artisan serve:with-scheduler</p>
 
@@ -15,5 +17,3 @@
 1. sekre@gmail.com / asdfghjk
 2. bend@gmail.com / asdfghjk
 3. guru1@gmail.com / asdfghjk 
-
-Import DB simaka.sql
