@@ -204,6 +204,20 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Status</label>
+                                    <div class=" col-md-8 col-lg-9 text-capitalize">
+                                        <input class="form-check-input" type="checkbox" id="gridCheck2" name="status" value="1" {{ $data->users->status == '1' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="gridCheck2">
+                                            @if ($data->users->status == '1')
+                                            Aktif
+                                            @else
+                                            Non-Aktif
+                                            @endif
+                                        </label>
+                                    </div>
+                                </div>
                                 @endif
 
                                 <div class="text-center">
@@ -280,6 +294,39 @@
 @endpush
 <script>
     $(document).ready(function() {
+
+        const statusCheckbox = $('#gridCheck2');
+        const statusLabel = statusCheckbox.next('label');
+
+        // Simpan status awal supaya bisa dibandingkan
+        const initialStatus = statusCheckbox.prop('checked');
+
+        statusCheckbox.on('change', function(e) {
+            e.preventDefault();
+
+            let isChecked = $(this).prop('checked');
+            let message = isChecked ?
+                "Apakah Anda yakin ingin mengaktifkan akun ini?" :
+                "Apakah Anda yakin ingin menonaktifkan akun ini?";
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: message,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, lanjutkan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Update label sesuai status baru
+                    statusLabel.text(isChecked ? 'Aktif' : 'Non-Aktif');
+                    $('#formUpdateAkun').submit();
+                } else {
+                    // Kembalikan checkbox ke status awal jika batal
+                    statusCheckbox.prop('checked', !isChecked);
+                }
+            });
+        });
 
         $('#formUpdateProfile').on('submit', function(e) {
             e.preventDefault();

@@ -154,21 +154,25 @@ class AdminController extends Controller
         $validated = $request->validate([
             'jabatan_id' => 'nullable|exists:jabatans,id',
             'email' => 'required|string|max:50|unique:users,email,' . $id . ',id',
+            'status' => 'nullable|in:1',
         ]);
 
+        DB::beginTransaction();
         try {
             $user = User::findOrFail($id);
             $guru = Guru::findOrFail($user->guru_id);
-            if ($request->jabatan_id) {
+            if ($request->filled('jabatan_id')) {
                 $user->jabatan_id = $request->jabatan_id;
                 $guru->jabatan_id = $request->jabatan_id;
                 $guru->save();
             }
-
-            $user->update($validated);
-
+            $user->email = $validated['email'];
+            $user->status = $request->has('status') ? 1 : 0;
+            $user->save();
+            DB::commit();
             return response()->json(['success' => true, 'message' => 'Akun berhasil diperbarui.']);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => "Error Update Akun: " . $th->getMessage()]);
         }
     }

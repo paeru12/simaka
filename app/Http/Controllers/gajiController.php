@@ -30,7 +30,7 @@ class GajiController extends Controller
                 SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
                 SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
                 SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
-                SUM(CASE WHEN status = "Alfa" THEN 1 ELSE 0 END) as alfa')
+                SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa')
                     ->whereMonth('tanggal', $bulan)
                     ->whereYear('tanggal', $tahun)
                     ->groupBy('guru_id')
@@ -45,7 +45,7 @@ class GajiController extends Controller
                 SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
                 SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
                 SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
-                SUM(CASE WHEN status = "Alfa" THEN 1 ELSE 0 END) as alfa')
+                SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa')
                     ->where('guru_id', auth()->user()->guru->id)
                     ->whereMonth('tanggal', $bulan)
                     ->whereYear('tanggal', $tahun)
@@ -67,7 +67,7 @@ class GajiController extends Controller
             SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
             SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
             SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
-            SUM(CASE WHEN status = "Alfa" THEN 1 ELSE 0 END) as alfa')
+            SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa')
             ->where('guru_id', $guru_id)
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
