@@ -38,7 +38,7 @@ $nama = $namas->value;
         <div class="d-flex justify-content-between">
             <a href="/" class="logo d-flex align-items-center">
                 <img src="{{ asset($logo) }}">
-                <span class="d-none d-lg-block fs-5">{{ $nama }}</span>
+                <span class="d-none d-lg-block text-purple fs-5">{{ $nama }}</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>

@@ -22,9 +22,12 @@ class IndexController extends Controller
                 ->whereDate('created_at', $now->toDateString())
                 ->get();
         } else {
+            $startOfWeek = $now->copy()->startOfWeek(); // Senin
+            $endOfWeek = $now->copy()->endOfWeek();     // Minggu
+
             $data = Absensi::orderBy('created_at', 'desc')
                 ->where('guru_id', auth()->user()->guru->id)
-                ->whereDate('created_at', $now->toDateString())
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                 ->get();
         }
         return view('index', compact('guru', 'kelas', 'ruangan', 'mapel', 'data'));

@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\QrKelas;
 use Illuminate\Http\Request;
 use App\Models\Ruangan;
+use App\Models\Setting;
 
 class RuanganController extends Controller
 {
     function index()
     {
+        $setting = Setting::all();
+        $logos = $setting->where('key', 'logo')->first();
+        $namas = $setting->where('key', 'nama')->first();
+        $logo = $logos->value;
+        $nama = $namas->value;
         $data = Ruangan::orderBy('created_at', 'asc')->get();
-        return view('ruangan', compact('data'));
+        return view('ruangan', compact('data', 'logo', 'nama'));
     }
 
     function store(Request $request)

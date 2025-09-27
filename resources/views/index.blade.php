@@ -13,7 +13,13 @@
             <div class="col-12">
                 <div class="card recent-sales">
                     <div class="card-body">
-                        <h5 class="card-title mb-0">Absensi <span>| Hari Ini</span></h5>
+                        <h5 class="card-title mb-0">Absensi 
+                            @if(Auth::user()->jabatan->jabatan == 'admin')
+                            <span>| Hari Ini</span>
+                            @else
+                            <span>| Minggu Ini</span>
+                            @endif
+                        </h5>
                         @if(Auth::user()->jabatan->jabatan != 'admin')
                         <a href="{{route('absenqr.index')}}" class="btn btn-purple btn-sm mb-3"><i class="ri ri-qr-scan-line"></i> Absen QR Code</a>
                         @endif
@@ -22,7 +28,11 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">No</th>
+                                        @if(Auth::user()->jabatan->jabatan == 'admin')
                                         <th scope="col">Guru</th>
+                                        @else
+                                        <th scope="col">Hari</th>
+                                        @endif
                                         <th scope="col">Mata Pelajaran</th>
                                         <th scope="col">Kelas</th>
                                         <th scope="col">Status</th>
@@ -32,7 +42,11 @@
                                     @foreach($data as $a)
                                     <tr>
                                         <th scope="row">{{$loop->iteration}}.</th>
+                                        @if(Auth::user()->jabatan->jabatan == 'admin')
                                         <td>{{ $a->guru->nama }}</td>
+                                        @else
+                                        <td>{{ $a->jadwal->hari }}</td>
+                                        @endif
                                         <td>{{ $a->mataPelajaran->nama_mapel }}</td>
                                         <td class="text-uppercase">{{ $a->jadwal->kelas->kelas }} {{ $a->jadwal->kelas->jurusan->nama }} {{ $a->jadwal->kelas->rombel }}</td>
                                         <td>

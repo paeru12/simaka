@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use App\Models\Jabatan;
-use Illuminate\Http\Request;
-use Intervention\Image\ImageManager;
 use App\Models\User;
+use App\Models\Setting;
+use Intervention\Image\ImageManager;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-
 class AdminController extends Controller
 {
     function login()
@@ -19,7 +19,12 @@ class AdminController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
-        return response()->view('login');
+        $setting = Setting::all();
+        $logos = $setting->where('key', 'logo')->first();
+        $namas = $setting->where('key', 'nama')->first();
+        $logo = $logos->value;
+        $nama = $namas->value;
+        return response()->view('login', compact('logo', 'nama'));
     }
 
     function loginCheck(Request $request)

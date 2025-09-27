@@ -388,7 +388,7 @@ h6 {
 .logo span {
   font-size: 20px;
   font-weight: 600;
-  color: #424242;
+  /* color: #424242; */
   font-family: "inter", sans-serif;
 }
 

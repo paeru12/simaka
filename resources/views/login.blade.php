@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Login - SIMAKA</title>
-    <link href="{{ asset('assets/img/logo.png')}}" rel="icon">
-    <link href="{{ asset('assets/img/logo.png')}}" rel="apple-touch-icon">
+    <title>Login - {{ $nama }}</title>
+    <link href="{{ asset($logo)}}" rel="icon">
+    <link href="{{ asset($logo)}}" rel="apple-touch-icon">
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" rel="stylesheet">
     <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -39,11 +39,12 @@
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="card mb-3">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-center pt-4">
-                                        <a href="" class="logo d-flex align-items-center w-auto">
-                                            <img src="{{asset('assets/img/logo.png')}}" class="w-100">
+                                    <div class="d-flex justify-content-center pt-4 ">
+                                        <a href="" class="d-flex align-items-center mb-2 w-auto">
+                                            <img src="{{asset($logo)}}" class="w-100" style="max-height: 60px;">
                                         </a>
                                     </div>
+                                    <h5 class="text-uppercase text-center fw-bold text-purple mb-0">{{ $nama }}</h5>
                                     <div class="pb-2">
                                         <p class="text-center small">Enter your Email & Password to login</p>
                                         @if (session('errorLogin'))

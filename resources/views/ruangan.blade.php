@@ -103,15 +103,17 @@
                                         <div class="modal-content">
                                             <div class="modal-body" id="qrContent{{$ruangan->id}}">
                                                 <div class="row justify-content-center align-items-center">
-                                                    <h5 class="card-title text-center text-uppercase fw-bold fs-3">{{ $ruangan->nama }}</h5>
+                                                    <h5 class="card-title text-center text-uppercase fw-bold fs-3 mb-0">{{ $ruangan->nama }}</h5>
+                                                    <p class="card-title fw-semibold text-center py-0" style="font-size: 14px;">Scan untuk absensi</p>
                                                     <div class="d-flex justify-content-center align-items-center">
                                                         <img src="{{ asset($ruangan->qrKelas->file) }}" class="w-75" alt="">
                                                     </div>
                                                     <div class="row justify-content-center align-items-center mt-2">
                                                         <div class="col-8 text-center">
-                                                            <p class="card-title fw-semibold mb-0 py-0" style="font-size: 14px;">Design & Development By:</p>
-                                                            <p class="card-text text-purple m-0">https://yukti.id</p>
-                                                            <img src="{{asset('assets/img/yukti.png')}}" class="w-75" alt="">
+                                                            <div class="d-flex justify-content-center align-items-center">
+                                                                <img src="{{asset($logo)}}" class="w-25" alt="">
+                                                                <p class="card-title text-purple fw-bold">{{$nama}}</p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

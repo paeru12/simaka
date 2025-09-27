@@ -104,20 +104,10 @@
                                                 @method('PUT')
                                                 <input type="hidden" name="edit_id" value="{{$s->id}}">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Update Data</h5>
+                                                    <h5 class="modal-title">Update <span class="text-capitalize">{{$s->key}}</span></h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <div class="form-floating mb-3">
-                                                        <select name="key" class="form-select text-capitalize">
-                                                            <option disabled>Pilih Opsi</option>
-                                                            <option value="logo" {{ $s->key == 'logo' ? 'selected':'' }}>Logo</option>
-                                                            <option value="nama" {{ $s->key == 'nama' ? 'selected':'' }}>Nama</option>
-                                                            <option value="kop_surat" {{ $s->key == 'kop_surat' ? 'selected':'' }}>Kop Surat</option>
-                                                        </select>
-                                                        <label>Pilih Jenis</label>
-                                                    </div>
-
+                                                <div class="modal-body">                                                   
                                                     {{-- input file --}}
                                                     <div class="mb-3 {{ in_array($s->key, ['logo','kop_surat']) ? '' : 'd-none' }}">
                                                         <div class="row align-items-center">
