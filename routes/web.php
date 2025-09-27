@@ -25,14 +25,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/setting', SettingController::class);
     Route::resource('/ruangan', RuanganController::class);
     Route::resource('/jabatan', JabatanController::class);
-    Route::resource('/absenqr', absenqrController::class);
+    Route::resource('/absenqr', absenqrController::class); 
     Route::resource('/guru', guruController::class);
     Route::resource('/jurusan', JurusanController::class);
     Route::resource('/kelas', KelasController::class);
     Route::resource('/mapel', mapelController::class);
     Route::resource('/jadwal', jadwalController::class);
     Route::resource('/absensi', AbsensiController::class)->except(['show']);
-    Route::resource('/rekap', gajiController::class); 
+    Route::resource('/rekap', gajiController::class)->except(['show']); 
     Route::resource('/gaji', gajiansController::class);
     Route::resource('admin', AdminController::class);
     Route::get('/profile/{id}/edit', [AdminController::class, 'edits'])->name('admin.edits');
@@ -41,6 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/{id}/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
     Route::get('/gaji/slip-gaji/{guru_id}/slip/{bulan}/{tahun}', [gajiansController::class, 'getDataGuru'])->name('gaji.getDataGuru');
     Route::post('/rekap/filter', [gajiController::class, 'filter'])->name('rekap.filter');
+    Route::get('/rekap/guru', [gajiController::class, 'dindex'])->name('rekap.dindex');
+    Route::post('/rekap/detail', [gajiController::class, 'detailf'])->name('rekap.detailf');
     Route::post('/gajians/filter', [gajiansController::class, 'filter'])->name('gajians.filter');
     Route::get('/rekap/{guru_id}/detail/{bulan}/{tahun}', [gajiController::class, 'detail'])->name('rekap.detail');
 

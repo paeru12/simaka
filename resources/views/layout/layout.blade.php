@@ -230,8 +230,8 @@ $nama = $namas->value;
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{Request::is('rekap') ? 'active' : 'collapsed'}}"
-                    href="{{route('rekap.index')}}">
+                <a class="nav-link {{Request::is('rekap/guru') ? 'active' : 'collapsed'}}"
+                    href="{{route('rekap.dindex')}}">
                     <i class="ri ri-file-list-3-line"></i>
                     <span>Rekapitulasi Absensi</span>
                 </a>

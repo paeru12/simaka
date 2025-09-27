@@ -75,4 +75,36 @@ class GajiController extends Controller
             ->get();
         return view('dabsen', compact('guru', 'absensi', 'bulan', 'tahun'));
     }
+
+    public function dindex()
+    {
+        $guru = auth()->user()->guru;
+        return view('dabrek', compact('guru'));
+    }
+
+    public function detailf(Request $request)
+    {
+        $request->validate([
+            'bulan' => 'required|integer|min:1|max:12',
+            'tahun' => 'required|integer|min:2020|max:' . date('Y'),
+        ]);
+
+        $guru_id = auth()->user()->guru->id;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        $absensi = Absensi::with('mataPelajaran:id,nama_mapel')
+            ->selectRaw('mapel_id,
+                SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
+                SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
+                SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
+                SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa')
+            ->where('guru_id', $guru_id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->groupBy('mapel_id')
+            ->get();
+
+        return response()->json($absensi);
+    }
 }
