@@ -17,8 +17,7 @@ class JabatanController extends Controller
     {
         $validated = $request->validate([
             'jabatan' => 'required|string|max:255',
-            'gapok' => 'required|string|max:255',
-            'tunjangan' => 'required|string|max:255',
+            'nominal_gaji' => 'required|integer',
         ]);
 
         try {
@@ -46,8 +45,7 @@ class JabatanController extends Controller
     {
         $validated = $request->validate([
             'jabatan' => 'nullable|string|max:255',
-            'gapok' => 'required|string|max:255',
-            'tunjangan' => 'required|string|max:255',
+            'nominal_gaji' => 'required|integer',
         ]);
 
         try { 
@@ -60,13 +58,11 @@ class JabatanController extends Controller
             }
             $jabatan = Jabatan::findOrFail($id);
 
-            if (strtolower($jabatan->jabatan) === 'admin') {
-                $jabatan->gapok = $request->gapok;
-                $jabatan->tunjangan = $request->tunjangan;
+            if (strtolower($jabatan->jabatan) == 'admin') {
+                $jabatan->nominal_gaji = $request->nominal_gaji;
             } else {
                 $jabatan->jabatan = $request->jabatan;
-                $jabatan->gapok = $request->gapok;
-                $jabatan->tunjangan = $request->tunjangan;
+                $jabatan->nominal_gaji = $request->nominal_gaji;
             }
 
             $jabatan->save();

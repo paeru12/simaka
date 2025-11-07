@@ -7,5 +7,5 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('absensi:generate-alpha')->everyTenMinutes()->timezone('Asia/Jakarta');
 
 Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
+    $this->comment(Inspiring::quote()); 
 })->purpose('Display an inspiring quote');

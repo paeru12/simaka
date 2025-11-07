@@ -14,7 +14,7 @@
 <section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
-            <div class="card">
+            <div class="card recent-sales">
                 <div class="card-body">
                     <h5 class="card-title mb-0">Data Jadwal</h5>
                     @if(Auth::user()->jabatan->jabatan == 'admin')
@@ -95,16 +95,22 @@
                                                     <label for="floatingSelect">Pilih Ruangan</label>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="form-floating mb-3">
                                                     <input type="time" class="form-control" name="jam_mulai" placeholder="Jam Mulai">
                                                     <label>Jam Mulai</label>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="form-floating mb-3">
                                                     <input type="time" class="form-control" name="jam_selesai" placeholder="Jam Selesai">
                                                     <label>Jam Selesai</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="form-floating mb-3">
+                                                    <input type="number" class="form-control" name="total_jam" placeholder="Total Jam Mengajar">
+                                                    <label>Total Jam</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -193,16 +199,22 @@
                                                     <label for="edit_ruangan_id">Pilih Ruangan</label>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="form-floating mb-3">
                                                     <input type="time" id="edit_jam_mulai" class="form-control" name="jam_mulai" placeholder="Jam Mulai">
                                                     <label>Jam Mulai</label>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="form-floating mb-3">
                                                     <input type="time" id="edit_jam_selesai" class="form-control" name="jam_selesai" placeholder="Jam Selesai">
                                                     <label>Jam Selesai</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="form-floating mb-3">
+                                                    <input type="number" id="edit_total_jam" class="form-control" name="total_jam" placeholder="Total Jam Mengajar">
+                                                    <label>Total Jam</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -229,6 +241,7 @@
                                     <th>Ruangan</th>
                                     <th>Jam Mulai</th>
                                     <th>Jam Selesai</th>
+                                    <th>Total Jam</th>
                                     @if(Auth::user()->jabatan->jabatan == 'admin')
                                     <th>Aksi</th>
                                     @endif
@@ -245,6 +258,7 @@
                                     <td class="text-uppercase">{{ $j->ruangan->nama }}</td>
                                     <td>{{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} WIB</td>
                                     <td>{{ \Carbon\Carbon::parse($j->jam_selesai)->format('H:i') }} WIB</td>
+                                    <td>{{ $j->total_jam }}</td>
                                     @if(Auth::user()->jabatan->jabatan == 'admin')
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
@@ -329,6 +343,7 @@
                 $('#edit_kelas_id').val(data.kelas_id);
                 $('#edit_jam_mulai').val(data.jam_mulai.substring(0, 5));
                 $('#edit_jam_selesai').val(data.jam_selesai.substring(0, 5));
+                $('#edit_total_jam').val(data.total_jam);
                 $('#editJadwalModal').modal('show');
             });
         });

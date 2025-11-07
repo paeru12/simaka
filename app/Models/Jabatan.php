@@ -14,8 +14,7 @@ class Jabatan extends Model
     protected $fillable = [
         'id',
         'jabatan',
-        'gapok',
-        'tunjangan'
+        'nominal_gaji',
     ];
 
     protected static function boot()

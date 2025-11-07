@@ -39,6 +39,10 @@ class Guru extends Model
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_id');
     }
+    public function qrguru()
+    {
+        return $this->hasOne(QrGuru::class, 'guru_id');
+    }
 
     public function jadwals()
     {
@@ -48,10 +52,5 @@ class Guru extends Model
     public function absensis()
     {
         return $this->hasMany(Absensi::class, 'guru_id');
-    }
-
-    public function penggajians()
-    {
-        return $this->hasMany(Penggajian::class, 'guru_id');
     }
 }

@@ -17,7 +17,7 @@ class SettingController extends Controller
     function store(Request $request)
     {
         $validated = $request->validate([
-            'key' => 'required|in:logo,nama,kop_surat|unique:settings,key',
+            'key' => 'required|in:logo,nama,kop_surat,gaji_mengajar,minggu,jp|unique:settings,key',
             'value' => 'nullable',
         ]);
 
@@ -44,9 +44,10 @@ class SettingController extends Controller
     {
         $setting = Setting::findOrFail($id);
         $validated = $request->validate([
-            'key'   => 'required|in:logo,nama,kop_surat',
+            'key' => 'required|in:logo,nama,kop_surat,gaji_mengajar,minggu,jp|unique:settings,key,' . $id,
             'value' => 'nullable',
         ]);
+
 
         try {
             if ($request->hasFile('value')) {

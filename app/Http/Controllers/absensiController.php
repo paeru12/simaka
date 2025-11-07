@@ -8,31 +8,67 @@ use App\Models\MataPelajaran;
 use App\Models\Jadwal;
 use Carbon\Carbon;
 use Intervention\Image\ImageManager;
-
+use Illuminate\Support\Facades\Auth;
 class AbsensiController extends Controller
 {
     public function index()
     {
-        $guruid = auth()->user()->guru_id;
-        if (auth()->user()->jabatan->jabatan == 'admin') {
-            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas'])->orderBy('created_at', 'desc')->get();
+        $guruid = Auth::user()->guru_id;
+
+        if (Auth::user()->jabatan->jabatan == 'admin') {
+            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
+                ->orderBy('created_at', 'desc')
+                ->get();
         } else {
-            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas'])->where('guru_id', $guruid)->orderBy('created_at', 'desc')->get();
+            $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
+                ->where('guru_id', $guruid)
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
+
         $mapel = MataPelajaran::all();
-        $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', auth()->id())->get();
+        $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', Auth::id())->get();
         $hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
         return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari'));
+    }
+
+    public function filter(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $guruid = Auth::user()->guru_id;
+
+        if (!$bulan || !$tahun) {
+            return response()->json([]);
+        }
+
+        if (Auth::user()->jabatan->jabatan == 'admin') {
+            $data = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
+                ->whereMonth('tanggal', $bulan)
+                ->whereYear('tanggal', $tahun)
+                ->orderBy('tanggal', 'desc')
+                ->get();
+        } else {
+            $data = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
+                ->where('guru_id', $guruid)
+                ->whereMonth('tanggal', $bulan)
+                ->whereYear('tanggal', $tahun)
+                ->orderBy('tanggal', 'desc')
+                ->get();
+        }
+
+        return response()->json($data);
     }
 
     public function getKelasByHari(Request $request)
     {
         try {
             $hari = $request->hari;
-            $guruid = auth()->user()->guru_id;
+            $guruid = Auth::user()->guru_id;
             $jadwal = Jadwal::with('kelas')
                 ->where('hari', $hari)
-                ->when(auth()->user()->jabatan->jabatan != 'admin', function ($query) use ($guruid) {
+                ->when(Auth::user()->jabatan->jabatan != 'admin', function ($query) use ($guruid) {
                     $query->where('guru_id', $guruid);
                 })
                 ->get()
@@ -48,11 +84,11 @@ class AbsensiController extends Controller
     {
         $hari = $request->hari;
         $kelasId = $request->kelas_id;
-        $guruid = auth()->user()->guru_id;
+        $guruid = Auth::user()->guru_id;
         $jadwal = Jadwal::with('mataPelajaran')
             ->where('hari', $hari)
             ->where('kelas_id', $kelasId)
-            ->when(auth()->user()->role != 'admin', function ($query) use ($guruid) {
+            ->when(Auth::user()->role != 'admin', function ($query) use ($guruid) {
                 $query->where('guru_id', $guruid);
             })
             ->get();
@@ -85,7 +121,7 @@ class AbsensiController extends Controller
                 'keterangan' => 'nullable|string|max:255',
                 'foto' => 'required|image|max:2048',
             ]);
-            $validated['guru_id'] = auth()->user()->guru_id;
+            $validated['guru_id'] = Auth::user()->guru_id;
             $validated['jam_absen'] = Carbon::now('Asia/Jakarta')->format('H:i');
             $alreadyExists = Absensi::where('guru_id', $validated['guru_id'])
                 ->where('mapel_id', $validated['mapel_id'])

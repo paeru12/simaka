@@ -17,7 +17,6 @@ class mapelController extends Controller
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:255',
-            'gaji' => 'required|string|max:255',
         ]);
         $exists = MataPelajaran::where('nama_mapel', $validated['nama_mapel'])
             ->exists();
@@ -41,12 +40,11 @@ class mapelController extends Controller
     {
         $validated = $request->validate([
             'nama_mapel' => 'required|string|max:255',
-            'gaji' => 'required|string|max:255',
         ]);
         $exists = MataPelajaran::where('nama_mapel', $validated['nama_mapel'])
             ->where('id', '!=', $id)
             ->exists();
-        if ($exists) {
+        if ($exists) { 
             return response()->json([
                 'success' => false,
                 'message' => "Nama Mapel sudah ada."

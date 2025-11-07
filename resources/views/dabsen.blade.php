@@ -28,7 +28,7 @@
                                 <th>Hadir</th>
                                 <th>Izin</th>
                                 <th>Sakit</th>
-                                <th>Alfa</th>
+                                <th>Alpha</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -12,7 +12,7 @@ class Jadwal extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'guru_id','ruangan_id', 'mapel_id','kelas_id', 'hari', 'jam_mulai', 'jam_selesai'
+        'id', 'guru_id','ruangan_id', 'mapel_id','kelas_id', 'hari', 'jam_mulai', 'jam_selesai', 'total_jam'
     ];
 
     protected static function boot()

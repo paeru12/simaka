@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('jabatans', function (Blueprint $table) {
             $table->string('id', 36)->primary();
             $table->string('jabatan', 255);
-            $table->integer('gapok');
-            $table->string('tunjangan');
+            $table->integer('nominal_gaji');
             $table->timestamps();
         });
     }

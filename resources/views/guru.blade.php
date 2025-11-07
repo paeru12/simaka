@@ -173,6 +173,7 @@
                                     <th scope="col">Jabatan</th>
                                     <th scope="col">JK</th>
                                     <th scope="col">No HP</th>
+                                    <th scope="col">ID Card</th>
                                     <th scope="col">Aksi</th>
                                 </tr>
                             </thead>
@@ -189,6 +190,44 @@
                                     <td class="text-capitalize">{{ $g->users->jabatan->jabatan }}</td>
                                     <td>{{ $g->jk }}</td>
                                     <td>{{ $g->no_hp }}</td>
+                                    <td>
+                                        @if(!$g->qrguru)
+                                        <button class="btn btn-primary btn-generate" data-id="{{ $g->id }}">
+                                            Generate
+                                        </button>
+                                        @else
+                                        <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#idcard{{ $g->id }}">
+                                            Download
+                                        </button>
+
+                                        {{-- Modal ID Card --}}
+                                        <div class="modal fade" id="idcard{{ $g->id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <form id="jabatanForm" novalidate>
+                                                        @csrf
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Download ID Card {{ ucfirst($g->nama) }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body align-items-center" id="qrContent{{$g->id}}">
+                                                            <div class="text-center border-2">
+                                                                <img src="{{ asset($g->foto) }}" alt="ID Card" class="w-25 rounded-circle mb-2" style="aspect-ratio: 1/1; object-fit: cover;">
+                                                                <p class="text-capitalize mb-0 mt-0 fw-bold">{{ $g->nama }}</p>
+                                                                <p class="text-capitalize mb-0">{{ $g->users->jabatan->jabatan }}</p>
+                                                                <img src="{{asset($g->qrguru->file)}}" class="w-75">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick='downloadPDF(@json($g->id), "{{ $g->nama }}")'>Download</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </td>
                                     <td class="aksi">
                                         <button class="btn btn-purple btn-sm"
                                             data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
@@ -232,9 +271,46 @@
 @push('scripts')
 <script src="{{ asset('assets/js/main2.js') }}"></script>
 @endpush
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     $(document).ready(function() {
+        // CETAK QR GURU
+        $('.btn-generate').on('click', function() {
+            let guruId = $(this).data('id');
+
+            $.ajax({
+                url: "{{ route('qrguru.store') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    guru_id: guruId
+                },
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Membuat QR Code Guru',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    if (res.success) {
+                        Swal.close();
+                        Swal.fire("Berhasil", res.message, "success");
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                    Swal.close();
+                    Swal.fire("Error", err.responseJSON.message, "error");
+                }
+            });
+        });
 
         $('#formTambahGuru').on('submit', function(e) {
             e.preventDefault();
@@ -413,6 +489,27 @@
             }
         });
     });
+
+    function downloadPDF(id, nama) {
+        const element = document.getElementById("qrContent" + id);
+        const opt = {
+            margin: [8, 0, 0, 0],
+            filename: "id-card-" + nama + ".pdf",
+            image: {
+                type: 'jpeg',
+                quality: 1
+            },
+            html2canvas: {
+                scale: 2
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: [85.6, 54],
+                orientation: 'portrait'
+            }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
 </script>
 
 @endsection

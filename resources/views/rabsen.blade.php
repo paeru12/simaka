@@ -64,7 +64,7 @@
                                 <th>Total Hadir</th>
                                 <th>Total Izin</th>
                                 <th>Total Sakit</th>
-                                <th>Total Alfa</th>
+                                <th>Total Alpha</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -75,12 +75,11 @@
                 </div>
             </div>
         </div>
-
+    </div>
 </section>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    
     $(document).ready(function() {
         $("#bulan, #tahun").on("change", function() {
             let bulan = $("#bulan").val();

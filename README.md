@@ -17,3 +17,9 @@
 1. sekre@gmail.com / asdfghjk
 2. bend@gmail.com / asdfghjk
 3. guru1@gmail.com / asdfghjk 
+
+# Staff
+1. pito@gmail.com / asdfghjk 
+
+absen lokasi
+alpha harian otomatis

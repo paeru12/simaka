@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon; 
 use Illuminate\Database\QueryException;
 use App\Models\Absensi;
 use App\Models\Jadwal;
 use App\Models\QrKelas;
 use Intervention\Image\ImageManager;
-
+use Illuminate\Support\Facades\Auth;
 class absenqrController extends Controller
 {
     function index()
@@ -27,7 +27,7 @@ class absenqrController extends Controller
             'lng'   => 'nullable|numeric',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $now = Carbon::now('Asia/Jakarta');
         $tanggal = $now->toDateString();
         $time = $now->format('H:i:s');
@@ -113,7 +113,7 @@ class absenqrController extends Controller
             'token' => 'required|string',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $now = Carbon::now('Asia/Jakarta');
         $tanggal = $now->toDateString();
         $time = $now->format('H:i:s');
@@ -142,16 +142,18 @@ class absenqrController extends Controller
         if ($exists) {
             return response()->json(['status' => 'warning', 'message' => 'Absensi untuk jadwal ini sudah tercatat.'], 409);
         }
+        $jam_mulai = Carbon::parse($jadwal->jam_mulai)->format('H:i');
+        $jam_selesai = Carbon::parse($jadwal->jam_selesai)->format('H:i');
 
         return response()->json([
             'status' => 'ok',
             'message' => 'Jadwal valid',
             'jadwal' => [
                 'mapel' => $jadwal->mataPelajaran->nama_mapel,
-                'kelas' => $jadwal->kelas->kelas . $jadwal->kelas->rombel,
+                'kelas' => $jadwal->kelas->kelas .' '. $jadwal->kelas->jurusan->nama.' '. $jadwal->kelas->rombel,
                 'ruangan' => $jadwal->ruangan->nama,
-                'jam_mulai' => $jadwal->jam_mulai,
-                'jam_selesai' => $jadwal->jam_selesai,
+                'jam_mulai' => $jam_mulai,
+                'jam_selesai' => $jam_selesai,
             ]
         ]);
     }

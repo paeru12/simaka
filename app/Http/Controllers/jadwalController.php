@@ -8,12 +8,13 @@ use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\Ruangan;
 use App\Models\Guru;
+use Illuminate\Support\Facades\Auth;
 
 class jadwalController extends Controller
 {
     function index()
     {
-        $auth = auth()->user();
+        $auth = Auth::user();
         $mapel = MataPelajaran::all();
         $guru = Guru::whereHas('jabatan', function ($query) {
             $query->where('jabatan', '!=', 'admin');
@@ -36,6 +37,7 @@ class jadwalController extends Controller
             'mapel_id' => 'required|exists:mata_pelajarans,id',
             'kelas_id' => 'required|exists:kelass,id',
             'hari' => 'required|string|max:10',
+            'total_jam' => 'required|string|max:10',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai'
         ]);
@@ -101,6 +103,7 @@ class jadwalController extends Controller
                 'mapel_id' => 'required|exists:mata_pelajarans,id',
                 'kelas_id' => 'required|exists:kelass,id',
                 'hari' => 'required|string|max:10',
+                'total_jam' => 'required|string|max:10',
                 'jam_mulai' => 'required|date_format:H:i',
                 'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             ]);

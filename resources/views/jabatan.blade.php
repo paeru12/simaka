@@ -32,16 +32,15 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="jabatan" placeholder="Jabatan">
-                                    <label>Jabatan</label>
+                                    <input type="text" class="form-control" name="jabatan" placeholder="Nama Jabatan">
+                                    <label>Nama Jabatan</label>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="gapok" oninput="convertToCurrency(this)" placeholder="Gaji Pokok">
-                                    <label>Gaji Pokok</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="tunjangan" oninput="convertToCurrency(this)" placeholder="Tunjangan">
-                                    <label>Tunjangan</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Rp.</span>
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nominal_gaji" name="nominal_gaji" oninput="convertToCurrency(this)" placeholder="Nominal Gaji /JP">
+                                        <label for="nominal_gaji">Nominal Gaji /JP</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -72,14 +71,10 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" oninput="convertToCurrency(this)"
-                                        name="gapok" id="edit_gapok" placeholder="Gaji Pokok">
-                                    <label>Gaji Pokok</label>
+                                        name="nominal_gaji" id="edit_nominal_gaji" placeholder="Nominal Gaji">
+                                    <label>Nominal Gaji /JP</label>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" oninput="convertToCurrency(this)"
-                                        name="tunjangan" id="edit_tunjangan" placeholder="Tunjangan">
-                                    <label>Tunjangan</label>
-                                </div>
+                                
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -96,8 +91,7 @@
                         <tr>
                             <th>No</th>
                             <th>Jabatan</th>
-                            <th>Gapok</th>
-                            <th>Tunjangan</th>
+                            <th>Nominal Gaji /JP</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -106,8 +100,7 @@
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
                             <td class="text-capitalize">{{ $jabatan->jabatan }}</td>
-                            <td>Rp.{{ number_format($jabatan->gapok, 0, ',', '.') }}</td>
-                            <td>Rp.{{ number_format($jabatan->tunjangan, 0, ',', '.') }}</td>
+                            <td>Rp.{{ number_format($jabatan->nominal_gaji, 0, ',', '.') }}</td>
                             <td class="aksi">
                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -160,17 +153,12 @@
     $(function() {
         $('#jabatanForm').submit(function(e) {
             e.preventDefault();
-            let gapok = cleanCurrency($("input[name='gapok']").val());
-            let tunjangan = cleanCurrency($("input[name='tunjangan']").val());
+            let nominal_gaji = cleanCurrency($("input[name='nominal_gaji']").val());
 
             let formData = $(this).serializeArray();
             formData.push({
-                name: "gapok",
-                value: gapok
-            });
-            formData.push({
-                name: "tunjangan",
-                value: tunjangan
+                name: "nominal_gaji",
+                value: nominal_gaji
             });
             $.ajax({
                 url: "{{ route('jabatan.store') }}",
@@ -210,12 +198,11 @@
             $.get("{{ url('jabatan') }}/" + id, function(data) {
                 $('#edit_id').val(data.id);
                 $('#edit_jabatan').val(data.jabatan);
-                $('#edit_gapok').val(data.gapok);
-                $('#edit_tunjangan').val(data.tunjangan);
+                $('#edit_nominal_gaji').val(data.nominal_gaji);
                 if (data.jabatan.toLowerCase() === 'admin') {
-                    $('#edit_jabatan').prop('disabled', true);
+                    $('#edit_jabatan').prop('readonly', true);
                 } else {
-                    $('#edit_jabatan').prop('disabled', false);
+                    $('#edit_jabatan').prop('readonly', false);
                 }
                 $('#editJabatanModal').modal('show');
             });
@@ -224,17 +211,12 @@
         $('#updateJabatanForm').submit(function(e) {
             e.preventDefault();
             let id = $('#edit_id').val();
-            let gapok = cleanCurrency($("#edit_gapok").val());
-            let tunjangan = cleanCurrency($("#edit_tunjangan").val());
+            let nominal_gaji = cleanCurrency($("#edit_nominal_gaji").val());
 
             let formData = $(this).serializeArray();
             formData.push({
-                name: "gapok",
-                value: gapok
-            });
-            formData.push({
-                name: "tunjangan",
-                value: tunjangan
+                name: "nominal_gaji",
+                value: nominal_gaji
             });
             $.ajax({
                 url: "{{ url('jabatan') }}/" + id,
@@ -255,9 +237,12 @@
                         $('#updateJabatanForm')[0].reset();
                         $('#editJabatanModal').modal('hide');
                         setTimeout(() => location.reload(), 800);
+                    }else{
+                        console.log(res);
                     }
                 },
                 error: function(response) {
+                    console.log(response);  
                     let errors = response.responseJSON?.errors;
                     let errorMessages = "";
 
@@ -267,15 +252,10 @@
                             string: "Field Jabatan harus berupa teks.",
                             max: "Field Jabatan maksimal 255 karakter.",
                         },
-                        gapok: {
+                        nominal_gaji: {
                             required: "Field Gaji Pokok wajib diisi.",
                             string: "Field Gaji Pokok harus berupa teks.",
                             max: "Field Gaji Pokok maksimal 255 karakter.",
-                        },
-                        tunjangan: {
-                            required: "Field Tunjangan wajib diisi.",
-                            string: "Field Tunjangan harus berupa teks.",
-                            max: "Field Tunjangan maksimal 255 karakter.",
                         },
                     };
 

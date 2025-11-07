@@ -1,20 +1,20 @@
 @extends('layout.layout')
-@section('title', 'Gaji Guru')
+@section('title', 'Gaji Guru & Staff')
 @section('content')
 
 <div class="pagetitle">
-    <h1>Gaji Guru</h1>
+    <h1>Gaji Guru & Staff</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active">Gaji Guru</li>
+            <li class="breadcrumb-item active">Gaji Guru & Staff</li>
         </ol>
     </nav>
 </div>
 <section class="section">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title mb-0">Gaji Guru</h5>
+            <h5 class="card-title mb-0">Gaji Guru & Staff</h5>
             <div class="row">
                 <div class="col-8">
                     <div class="row needs-validation" novalidate>
@@ -59,7 +59,6 @@
                                 <th>Nama</th>
                                 <th>Jabatan</th>
                                 <th>Gapok</th>
-                                <th>Tunjangan</th>
                                 <th>Total Mapel</th>
                                 <th>Total Masuk</th>
                                 <th>Total Gaji</th>
@@ -91,44 +90,30 @@
                         tahun: tahun
                     },
                     success: function(res) {
+                        console.log(res);
                         let tbody = "";
                         if (res.length > 0) {
                             res.forEach((item, index) => {
-                                let gapok = Number(item.gapok ?? 0);
-                                let tunjangan = Number(item.tunjangan ?? 0);
-                                let honorMapel = Number(item.gaji ?? (item.total_hadir * 8000));
-                                let totalGaji = Number(item.total_gaji ?? (gapok + tunjangan + honorMapel));
-
                                 tbody += `
-                                        <tr>
-                                            <th>${index+1}.</th>
-                                            <td class="text-capitalize">${item.nama}</td>
-                                            <td class="text-capitalize">${item.jabatan ?? '-'}</td>
-                                            <td>Rp.${gapok.toLocaleString('id-ID')}</td>
-                                            <td>Rp.${tunjangan.toLocaleString('id-ID')}</td>
-                                            <td>${item.total_mapel} Mapel</td>
-                                            <td>${item.total_hadir} Kali</td>
-                                            <td>Rp.${totalGaji.toLocaleString('id-ID')}</td>
-                                            <td class="aksi">
-                                                <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
-                                                    <i class="ri-bar-chart-horizontal-fill"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                                                    <li>
-                                                        <a class="dropdown-item d-flex align-items-center" href="/gaji/slip-gaji/${item.guru_id}/slip/${bulan}/${tahun}">
-                                                            <i class="bi bi-pencil-square"></i>
-                                                            <span>Slip Gaji</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        `;
+                                <tr>
+                                    <th>${index+1}.</th>
+                                    <td class="text-capitalize">${item.nama}</td>
+                                    <td class="text-capitalize">${item.jabatan ?? '-'}</td>
+                                    <td>Rp.${item.gapok.toLocaleString('id-ID')}</td>
+                                    <td>${item.total_mapel} Mapel</td>
+                                    <td>${item.total_hadir} Kali</td>
+                                    <td>Rp.${item.total_gaji.toLocaleString('id-ID')}</td>
+                                    <td class="aksi">
+                                        <a href="/gaji/slip-gaji/${item.guru_id}/slip/${bulan}/${tahun}" 
+                                        class="btn btn-sm btn-purple">
+                                        <i class="ri-bar-chart-horizontal-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>`;
                             });
                         }
                         $("table tbody").html(tbody);
                     },
-
                     error: function(xhr) {
                         Swal.fire({
                             icon: 'error',
@@ -139,6 +124,10 @@
                 });
             }
         });
+        let tahunSekarang = new Date().getFullYear();
+        let bulanSekarang = new Date().getMonth() + 1;
+        $("#tahun").val(tahunSekarang).trigger("change");
+        $("#bulan").val(bulanSekarang).trigger("change");
     });
 </script>
 @endsection

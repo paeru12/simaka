@@ -11,7 +11,7 @@
             <video id="preview" class="border border-2 rounded w-100" style="max-height: 300px;" autoplay playsinline></video>
             <canvas id="canvas" class="d-none"></canvas>
 
-            <button id="captureBtn" class="btn btn-primary mt-3">Ambil Foto Bukti</button>
+            <button id="captureBtn" class="btn btn-purple mt-3">Ambil Foto Bukti</button>
 
             <div id="photoPreview" class="mt-3 d-none">
                 <h6>Foto Bukti</h6>
@@ -107,9 +107,9 @@
                                 title: 'Konfirmasi Jadwal',
                                 html: `
                                 <b>Mapel:</b> <span class="text-capitalize">${res.jadwal.mapel}</span><br>
-                                <b>Kelas:</b> <span class="text-capitalize">${res.jadwal.kelas}</span><br>
-                                <b>Ruangan:</b> <span class="text-capitalize">${res.jadwal.ruangan}</span><br>
-                                <b>Jam:</b> <span class="text-capitalize">${res.jadwal.jam_mulai} - ${res.jadwal.jam_selesai}</span><br><br>
+                                <b>Kelas:</b> <span class="text-uppercase">${res.jadwal.kelas}</span><br>
+                                <b>Ruangan:</b> <span class="text-uppercase">${res.jadwal.ruangan}</span><br>
+                                <b>Jam:</b> <span class="text-capitalize">${res.jadwal.jam_mulai} - ${res.jadwal.jam_selesai} WIB</span><br><br>
                                 Lanjut absen untuk jadwal ini?
                             `,
                                 showCancelButton: true,
@@ -135,7 +135,7 @@
                             }).then(() => {
                                 scanning = true;
                                 requestAnimationFrame(scanQRCode);
-                            });
+                            }); 
                         }
                     },
                     error: function(xhr) {

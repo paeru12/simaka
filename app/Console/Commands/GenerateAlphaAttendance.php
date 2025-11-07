@@ -16,7 +16,7 @@ class GenerateAlphaAttendance extends Command
     {
         $today = Carbon::today();
         $now = Carbon::now();
-
+ 
         $jadwals = Jadwal::where('hari', $today->locale('id')->dayName)->get();
 
         $count = 0;

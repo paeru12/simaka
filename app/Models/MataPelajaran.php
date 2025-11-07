@@ -12,7 +12,7 @@ class MataPelajaran extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'nama_mapel', 'gaji'
+        'id', 'nama_mapel'
     ];
  
     protected static function boot()

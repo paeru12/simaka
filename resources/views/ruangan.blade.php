@@ -90,11 +90,11 @@
                                 <!-- Tombol -->
                                 @if(!$ruangan->qrKelas)
                                 <button class="btn btn-primary btn-generate" data-id="{{ $ruangan->id }}">
-                                    Generate QR Code
+                                    Generate
                                 </button>
                                 @else
                                 <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#qrModal{{$ruangan->id}}">
-                                    Download QR Code
+                                    Download
                                 </button>
 
                                 {{-- Modal QR --}}

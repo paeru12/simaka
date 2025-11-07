@@ -19,8 +19,7 @@
             <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addDataModal">
                 Add Data
             </button>
-
-            {{-- Modal Add --}}
+ 
             <div class="modal fade" id="addDataModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -37,6 +36,9 @@
                                         <option value="logo">Logo</option>
                                         <option value="nama">Nama</option>
                                         <option value="kop_surat">Kop Surat</option>
+                                        <option value="gaji_mengajar">Gaji Mengajar</option>
+                                        <option value="minggu">Minggu</option>
+                                        <option value="jp">Jam Pelajaran</option>
                                     </select>
                                     <label for="floatingSelect">Pilih Jenis</label>
                                 </div>
@@ -78,6 +80,7 @@
                     <thead>
                         <tr>
                             <th scope="col">No</th>
+                            <th scope="col">Nama</th>
                             <th scope="col">Value</th>
                             <th scope="col">Aksi</th>
                         </tr>
@@ -86,11 +89,16 @@
                         @foreach($settings as $s)
                         <tr>
                             <th scope="row">{{$loop->iteration}}.</th>
+                            <td>{{ ucwords(str_replace('_', ' ', $s->key)) }}</td>
                             <td>
                                 @if(in_array($s->key, ['logo','kop_surat']))
                                 <img src="{{ asset($s->value) }}" alt="" class="img-fluid mt-2" style="max-height: 50px;">
                                 @else
+                                @if($s->key == 'gaji_mengajar')
+                                Rp.{{ number_format($s->value , 0, ',', '.') }}
+                                @else
                                 {{ $s->value }}
+                                @endif
                                 @endif
                             </td>
                             <td>
@@ -103,12 +111,14 @@
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="hidden" name="edit_id" value="{{$s->id}}">
+                                                <input type="hidden" name="key" value="{{$s->key}}">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Update <span class="text-capitalize">{{$s->key}}</span></h5>
+                                                    <h5 class="modal-title">Update <span class="text-capitalize">{{ ucwords(str_replace('_', ' ', $s->key)) }}</span></h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body">                                                   
                                                     {{-- input file --}}
+                                                    @if(in_array($s->key, ['logo','kop_surat']))
                                                     <div class="mb-3 {{ in_array($s->key, ['logo','kop_surat']) ? '' : 'd-none' }}">
                                                         <div class="row align-items-center">
                                                             <div class="col-3">
@@ -124,9 +134,10 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    @endif
 
                                                     {{-- input text --}}
-                                                    <div class="form-floating mb-3 {{ $s->key == 'nama' ? '' : 'd-none' }}">
+                                                    <div class="form-floating mb-3 {{ in_array($s->key, ['nama','gaji_mengajar','minggu','jp']) ? '' : 'd-none' }}">
                                                         <input type="text" class="form-control" name="value" value="{{ $s->value }}" placeholder="Value">
                                                         <label>Value</label>
                                                     </div>
@@ -161,7 +172,7 @@
         fileInputContainer.classList.add('d-none');
         textInputContainer.classList.add('d-none');
 
-        if (value === 'nama') {
+        if (value === 'nama' || value === 'gaji_mengajar' || value === 'minggu' || value === 'jp') {
             textInputContainer.classList.remove('d-none');
         } else if (value === 'logo' || value === 'kop_surat') {
             fileInputContainer.classList.remove('d-none');

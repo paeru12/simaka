@@ -35,10 +35,6 @@
                                     <input type="text" class="form-control" name="nama_mapel" placeholder="Nama Mapel">
                                     <label>Nama Mapel</label>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" placeholder="Gaji">
-                                    <label>Honor /Mengajar</label>
-                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -66,10 +62,6 @@
                                     <input type="text" class="form-control" name="nama_mapel" id="edit_nama_mapel" placeholder="Nama Mapel">
                                     <label>Nama Mapel</label>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="gaji" id="edit_gaji" placeholder="Gaji">
-                                    <label>Honor /Mengajar</label>
-                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -83,11 +75,10 @@
 
             <div class="table-responsive">
                 <table class="table table-hover datatable">
-                    <thead>
+                    <thead> 
                         <tr>
                             <th>No</th>
                             <th>Nama Mapel</th>
-                            <th>Honor /Mengajar</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -95,8 +86,7 @@
                         @forelse($mapel as $m)
                         <tr>
                             <th>{{ $loop->iteration }}.</th>
-                            <td>{{ $m->nama_mapel }}</td>
-                            <td>Rp.{{ number_format($m->gaji, 0, ',', '.') }}</td>
+                            <td class="text-capitalize">{{ $m->nama_mapel }}</td>
                             <td class="aksi">
                                 <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -134,29 +124,14 @@
 </section>
 
 <script>
-    function convertToCurrency(input) {
-        let value = input.value.replace(/[^\d]/g, ''); // ambil hanya angka
-        if (value) {
-            input.value = new Intl.NumberFormat('id-ID').format(value); // tampil Rp style (tanpa "Rp" biar lebih aman)
-        } else {
-            input.value = '';
-        }
-    }
-
-    function cleanCurrency(value) {
-        return value.replace(/[^\d]/g, '');
-    }
-
     $(function() {
         // CREATE
         $('#mapelForm').submit(function(e) {
             e.preventDefault();
-            let gaji = cleanCurrency($("input[name='gaji']").val());
 
             let formData = $(this).serializeArray();
             formData.push({
                 name: "gaji",
-                value: gaji
             });
             $.ajax({
                 url: "{{ route('mapel.store') }}",
@@ -198,7 +173,6 @@
             $.get("{{ url('mapel') }}/" + id, function(data) {
                 $('#edit_id').val(data.id);
                 $('#edit_nama_mapel').val(data.nama_mapel);
-                $('#edit_gaji').val(data.gaji);
                 $('#editMapelModal').modal('show');
             });
         });
@@ -207,12 +181,10 @@
         $('#updateMapelForm').submit(function(e) {
             e.preventDefault();
             let id = $('#edit_id').val();
-            let gaji = cleanCurrency($("input[id='edit_gaji']").val());
 
             let formData = $(this).serializeArray();
             formData.push({
                 name: "gaji",
-                value: gaji
             });
             $.ajax({
                 url: "{{ url('mapel') }}/" + id,
