@@ -220,7 +220,6 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -264,7 +263,6 @@
                             }
                         },
                         error: function(xhr) {
-                            console.log(xhr);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',

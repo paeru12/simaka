@@ -196,36 +196,10 @@
                                             Generate
                                         </button>
                                         @else
-                                        <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#idcard{{ $g->id }}">
+                                        <a href="{{ route('qr.guru.download', $g->id) }}"
+                                            class="btn btn-purple btn-sm">
                                             Download
-                                        </button>
-
-                                        {{-- Modal ID Card --}}
-                                        <div class="modal fade" id="idcard{{ $g->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <form id="jabatanForm" novalidate>
-                                                        @csrf
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Download ID Card {{ ucfirst($g->nama) }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <div class="modal-body align-items-center" id="qrContent{{$g->id}}">
-                                                            <div class="text-center border-2">
-                                                                <img src="{{ asset($g->foto) }}" alt="ID Card" class="w-25 rounded-circle mb-2" style="aspect-ratio: 1/1; object-fit: cover;">
-                                                                <p class="text-capitalize mb-0 mt-0 fw-bold">{{ $g->nama }}</p>
-                                                                <p class="text-capitalize mb-0">{{ $g->users->jabatan->jabatan }}</p>
-                                                                <img src="{{asset($g->qrguru->file)}}" class="w-75">
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                                            <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick='downloadPDF(@json($g->id), "{{ $g->nama }}")'>Download</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </a>
                                         @endif
                                     </td>
                                     <td class="aksi">
@@ -490,26 +464,6 @@
         });
     });
 
-    function downloadPDF(id, nama) {
-        const element = document.getElementById("qrContent" + id);
-        const opt = {
-            margin: [8, 0, 0, 0],
-            filename: "id-card-" + nama + ".pdf",
-            image: {
-                type: 'jpeg',
-                quality: 1
-            },
-            html2canvas: {
-                scale: 2
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: [85.6, 54],
-                orientation: 'portrait'
-            }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
 </script>
 
 @endsection

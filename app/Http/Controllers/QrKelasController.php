@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\QrKelas;
-use App\Models\Ruangan;
+use App\Models\Ruangan; 
+use App\Models\Setting; 
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class QrKelasController extends Controller
 {
@@ -64,5 +66,21 @@ class QrKelasController extends Controller
                 'error'   => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function downloadQR($id)
+    {
+        $data = Ruangan::findOrFail($id);
+        $setting = Setting::all();
+        $logos = $setting->where('key', 'logo')->first();
+        $namas = $setting->where('key', 'nama')->first();
+        $pdf = Pdf::loadView('pdf.qr-kelas', [
+            'nama' => $data->nama,
+            'qrPath' => $data->qrKelas->file,
+            'logo' => $logos->value,
+            'appName' => $namas->value
+        ])->setPaper('a5', 'portrait');
+
+        return $pdf->download("qr-kelas-{$data->nama}.pdf");
     }
 }

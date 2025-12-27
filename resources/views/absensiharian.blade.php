@@ -195,7 +195,6 @@
                     text: res.message,
                 });
                 if (res.status === "success") setTimeout(() => location.reload(), 800);
-                console.log(res);
             },
             error: xhr => {
                 Swal.close();

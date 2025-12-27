@@ -8,10 +8,10 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\guruController;
 use App\Http\Controllers\mapelController;
 use App\Http\Controllers\jadwalController;
-use App\Http\Controllers\absensiController;
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\absenqrController;
 use App\Http\Controllers\AbsensiHarianController;
-use App\Http\Controllers\gajiController;
+use App\Http\Controllers\GajiController;
 use App\Http\Controllers\gajiansController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\AdminController;
@@ -20,7 +20,7 @@ use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\PotonganController;
 use App\Http\Controllers\QrGuruController;
 use App\Http\Controllers\QrKelasController;
-use App\Http\Controllers\rekapController;
+use App\Http\Controllers\rekapController; 
 use App\Http\Controllers\RuanganController;
 
 Route::get('/login', [AdminController::class, 'login'])->name('login');
@@ -29,6 +29,7 @@ Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [IndexController::class, 'index'])->name('dashboard');
     Route::get('/absensih', [AbsensiHarianController::class, 'index'])->name('absensih.index');
+    Route::delete('/absensih/{id}', [AbsensiHarianController::class, 'destroy'])->name('absensih.destroy');
     Route::post('/absensi-harian/filter', [AbsensiHarianController::class, 'filter'])->name('absensi.harian.filter');
     Route::resource('/setting', SettingController::class);
     Route::resource('/ruangan', RuanganController::class);
@@ -41,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/jadwal', jadwalController::class);
     Route::resource('/absensi', AbsensiController::class)->except(['show']);
     Route::post('/absensi/filter', [AbsensiController::class, 'filter'])->name('absensi.filter');
-    Route::resource('/rekap', gajiController::class)->except(['show']);
+    Route::resource('/rekap', GajiController::class)->except(['show']);
     Route::resource('/gaji', gajiansController::class);
     Route::resource('/gaji-guru', gajianguruController::class)->except(['show']);
     Route::resource('admin', AdminController::class);
@@ -54,12 +55,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/{id}/update-akun', [AdminController::class, 'updateAkun'])->name('admin.update-akun');
     Route::post('/admin/{id}/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
     Route::get('/gaji/slip-gaji/{guru_id}/slip/{bulan}/{tahun}', [gajiansController::class, 'getDataGuru'])->name('gaji.getDataGuru');
-    Route::post('/rekap/filter', [gajiController::class, 'filter'])->name('rekap.filter');
-    Route::get('/rekap/guru', [gajiController::class, 'dindex'])->name('rekap.dindex');
-    Route::post('/rekap/detail', [gajiController::class, 'detailf'])->name('rekap.detailf');
-    Route::post('/rekap/total', [gajiController::class, 'rekapTotal'])->name('rekap.total');
+    Route::post('/rekap/filter', [GajiController::class, 'filter'])->name('rekap.filter');
+    Route::get('/rekap/guru', [GajiController::class, 'dindex'])->name('rekap.dindex');
+    Route::post('/rekap/detail', [GajiController::class, 'detailf'])->name('rekap.detailf');
+    Route::post('/rekap/total', [GajiController::class, 'rekapTotal'])->name('rekap.total');
     Route::post('/gajians/filter', [gajiansController::class, 'filter'])->name('gajians.filter');
-    Route::get('/rekap/{guru_id}/detail/{bulan}/{tahun}', [gajiController::class, 'detail'])->name('rekap.detail');
+    Route::get('/rekap/{guru_id}/detail/{bulan}/{tahun}', [GajiController::class, 'detail'])->name('rekap.detail');
 
     Route::post('/absensi/scan', [absenqrController::class, 'scanKelas'])->name('absensi.scan');
     Route::post('/absensi/validate', [absenqrController::class, 'validateScan'])->name('absensi.validate');
@@ -77,4 +78,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('rekapp/filter', [rekapController::class, 'filter'])->name('rekap-filter');
     Route::get('rekapp/staff', [rekapController::class, 'indexAll'])->name('rekap.indexAll');
     Route::post('rekapp/filterAll', [rekapController::class, 'filterAll'])->name('rekap.filterAll');
+
+    Route::get('/qr-guru/{id}/download', [QrGuruController::class, 'downloadQR'])
+    ->name('qr.guru.download');
+    Route::get('/qr-kelas/{id}/download', [QrKelasController::class, 'downloadQR'])
+    ->name('qr.kelas.download');
 });

@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\File;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\QrGuru;
 use App\Models\Guru;
-
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 class QrGuruController extends Controller
 {
     public function store(Request $request)
@@ -64,5 +65,21 @@ class QrGuruController extends Controller
                 'error'   => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function downloadQR($id)
+    {
+        $data = Guru::findOrFail($id);
+        $setting = Setting::all();
+        $logos = $setting->where('key', 'logo')->first();
+        $namas = $setting->where('key', 'nama')->first();
+        $pdf = Pdf::loadView('pdf.qr-guru', [
+            'nama' => $data->nama,
+            'qrPath' => $data->qrguru->file,
+            'logo' => $logos->value,
+            'appName' => $namas->value
+        ])->setPaper('a5', 'portrait');
+
+        return $pdf->download("qr-guru-{$data->nama}.pdf");
     }
 }

@@ -93,38 +93,10 @@
                                     Generate
                                 </button>
                                 @else
-                                <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#qrModal{{$ruangan->id}}">
+                                <a href="{{ route('qr.kelas.download', $ruangan->id) }}"
+                                    class="btn btn-purple btn-sm">
                                     Download
-                                </button>
-
-                                {{-- Modal QR --}}
-                                <div class="modal fade" id="qrModal{{$ruangan->id}}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-body" id="qrContent{{$ruangan->id}}">
-                                                <div class="row justify-content-center align-items-center">
-                                                    <h5 class="card-title text-center text-uppercase fw-bold fs-3 mb-0">{{ $ruangan->nama }}</h5>
-                                                    <p class="card-title fw-semibold text-center py-0" style="font-size: 14px;">Scan untuk absensi</p>
-                                                    <div class="d-flex justify-content-center align-items-center">
-                                                        <img src="{{ asset($ruangan->qrKelas->file) }}" class="w-75" alt="">
-                                                    </div>
-                                                    <div class="row justify-content-center align-items-center mt-2">
-                                                        <div class="col-8 text-center">
-                                                            <div class="d-flex justify-content-center align-items-center">
-                                                                <img src="{{asset($logo)}}" class="w-25" alt="">
-                                                                <p class="card-title text-purple fw-bold">{{$nama}}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick='downloadPDF(@json($ruangan->id), "{{ $ruangan->nama }}")'>Download</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </a>
                                 @endif
                             </td>
                             <td class="aksi">
@@ -194,7 +166,6 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -294,7 +265,6 @@
                             }
                         },
                         error: function(xhr) {
-                            console.log(xhr);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -335,33 +305,11 @@
                     }
                 },
                 error: function(err) {
-                    console.log(err);
                     Swal.close();
                     Swal.fire("Error", err.responseJSON.message, "error");
                 }
             });
         });
     });
-
-    function downloadPDF(id, nama) {
-        const element = document.getElementById("qrContent" + id);
-        const opt = {
-            margin: [15, 0, 0, 0],
-            filename: "qr-ruangan-" + nama + "-" + id + ".pdf",
-            image: {
-                type: 'jpeg',
-                quality: 1
-            },
-            html2canvas: {
-                scale: 2
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: 'a5',
-                orientation: 'portrait'
-            }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
 </script>
 @endsection

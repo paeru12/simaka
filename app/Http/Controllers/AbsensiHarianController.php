@@ -278,4 +278,25 @@ class AbsensiHarianController extends Controller
         file_put_contents(public_path($savePath), (string) $resized);
         return $savePath;
     }
+
+    function destroy($id)
+    {
+        try {
+            $absensi = AbsensiHarian::findOrFail($id);
+            if ($absensi->foto && file_exists(public_path($absensi->foto))) {
+                unlink(public_path($absensi->foto));
+            }
+            $absensi->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Absensi deleted successfully",
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => "Error deleting absensi: " . $th->getMessage(),
+            ]);
+        }
+    }
 }

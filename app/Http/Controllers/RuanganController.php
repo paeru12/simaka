@@ -9,7 +9,7 @@ use App\Models\Setting;
 
 class RuanganController extends Controller
 {
-    function index()
+    function index() 
     {
         $setting = Setting::all();
         $logos = $setting->where('key', 'logo')->first();

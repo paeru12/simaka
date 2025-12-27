@@ -87,7 +87,7 @@
             <div class="card recent-sales">
                 <div class="card-body">
                     <h5 class="card-title mb-0">Absensi Harian</h5>
-                    
+
                     @php
                     $statusNonHadir = ['Izin', 'Sakit', 'Alpha'];
                     @endphp
@@ -144,6 +144,7 @@
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Foto</th>
+                                <th>Aksi</th>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -154,46 +155,53 @@
     </div>
 </section>
 <script>
-$(document).ready(function() {
+    /* =========================
+   LOAD DATA (GLOBAL)
+========================= */
+    function loadData(bulan, tahun) {
+        $.ajax({
+            url: "{{ route('absensi.harian.filter') }}",
+            method: "POST",
+            data: {
+                bulan: bulan,
+                tahun: tahun,
+                _token: "{{ csrf_token() }}"
+            },
+            beforeSend: function() {
+                $("table tbody").html(`
+                <tr>
+                    <td colspan="10" class="text-center">Memuat data...</td>
+                </tr>
+            `);
+            },
+            success: function(res) {
+                let tbody = "";
 
-    // Trigger filter otomatis saat user pilih bulan atau tahun
-    $('#bulan, #tahun').on('change', function() {
-        let bulan = $('#bulan').val();
-        let tahun = $('#tahun').val();
+                if (res.length > 0) {
+                    res.forEach((absen, index) => {
+                        let jamPulang = absen.jam_pulang ?
+                            `${new Date('1970-01-01T' + absen.jam_pulang).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB` :
+                            '-';
+                        let jamDatang = absen.jam_datang ?
+                            `${new Date('1970-01-01T' + absen.jam_datang).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB` :
+                            '-';
 
-        if (bulan && tahun) {
-            $.ajax({
-                url: "{{ route('absensi.harian.filter') }}",
-                method: "POST",
-                data: {
-                    bulan: bulan,
-                    tahun: tahun,
-                    _token: "{{ csrf_token() }}"
-                },
-                beforeSend: function() {
-                    $("table tbody").html(`<tr><td colspan="9" class="text-center">Memuat data...</td></tr>`);
-                },
-                success: function(res) {
-                    let tbody = "";
+                        let badge = '';
+                        switch (absen.status) {
+                            case 'Alpha':
+                                badge = `<span class="badge bg-danger">Alpha</span>`;
+                                break;
+                            case 'Izin':
+                                badge = `<span class="badge bg-warning text-dark">Izin</span>`;
+                                break;
+                            case 'Sakit':
+                                badge = `<span class="badge bg-info text-dark">Sakit</span>`;
+                                break;
+                            default:
+                                badge = `<span class="badge bg-success">Hadir</span>`;
+                        }
 
-                    if (res.length > 0) {
-                        res.forEach((absen, index) => {
-                            let jamPulang = absen.jam_pulang ? 
-                                `${new Date('1970-01-01T' + absen.jam_pulang).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB`
-                                : '-';
-                            let jamDatang = absen.jam_datang ? 
-                                `${new Date('1970-01-01T' + absen.jam_datang).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB`
-                                : '-';
-
-                            let badge = '';
-                            switch(absen.status){
-                                case 'Alpha': badge = `<span class="badge bg-danger">Alpha</span>`; break;
-                                case 'Izin': badge = `<span class="badge bg-warning text-dark">Izin</span>`; break;
-                                case 'Sakit': badge = `<span class="badge bg-info text-dark">Sakit</span>`; break;
-                                default: badge = `<span class="badge bg-success">Hadir</span>`;
-                            }
-
-                            tbody += `
+                        tbody += `
                                 <tr>
                                     <th>${index + 1}.</th>
                                     <td class="text-capitalize">${absen.guru?.nama ?? '-'}</td>
@@ -224,28 +232,99 @@ $(document).ready(function() {
                                             </div>
                                         </div>
                                     </td>
+                                    <td>
+                                    <button class="btn btn-danger btn-sm deleteBtn" data-id="${absen.id}">
+                                        <i class="ri ri-delete-bin-3-line"></i>
+                                    </button>
+                                </td>
                                 </tr>
                             `;
-                        });
-                    } else {
-                        tbody = `<tr><td colspan="9" class="text-center">Tidak ada data absensi</td></tr>`;
-                    }
+                    });
+                } else {
+                    tbody = `<tr><td colspan="9" class="text-center">Tidak ada data absensi</td></tr>`;
+                }
 
-                    $("table tbody").html(tbody);
-                },
-                error: function(xhr) {
-                    $("table tbody").html(`<tr><td colspan="9" class="text-center text-danger">Terjadi kesalahan memuat data</td></tr>`);
+                $("table tbody").html(tbody);
+            },
+            error: function() {
+                $("table tbody").html(`
+                <tr>
+                    <td colspan="10" class="text-center text-danger">
+                        Gagal memuat data
+                    </td>
+                </tr>
+            `);
+            }
+        });
+    }
+
+    /* =========================
+       DOCUMENT READY
+    ========================= */
+    $(document).ready(function() {
+
+        // set bulan & tahun sekarang
+        let bulanSekarang = new Date().getMonth() + 1;
+        let tahunSekarang = new Date().getFullYear();
+
+        $('#bulan').val(bulanSekarang);
+        $('#tahun').val(tahunSekarang);
+
+        // load awal
+        loadData(bulanSekarang, tahunSekarang);
+
+        /* =========================
+           FILTER BULAN & TAHUN
+        ========================= */
+        $('#bulan, #tahun').on('change', function() {
+            let bulan = $('#bulan').val();
+            let tahun = $('#tahun').val();
+
+            if (bulan && tahun) {
+                loadData(bulan, tahun);
+            }
+        });
+
+        /* =========================
+           DELETE ABSENSI
+        ========================= */
+        $(document).on('click', '.deleteBtn', function() {
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Hapus Data Absensi?',
+                text: 'Data yang dihapus tidak bisa dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('absensih') }}/" + id,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire('Berhasil', res.message, 'success');
+
+                                // 🔥 refresh tabel TANPA reload
+                                loadData($('#bulan').val(), $('#tahun').val());
+                            } else {
+                                Swal.fire('Gagal', res.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Gagal menghapus data', 'error');
+                        }
+                    });
                 }
             });
-        }
-    });
+        });
 
-    // otomatis set bulan dan tahun sekarang
-    let bulanSekarang = new Date().getMonth() + 1;
-    let tahunSekarang = new Date().getFullYear();
-    $('#bulan').val(bulanSekarang);
-    $('#tahun').val(tahunSekarang).trigger('change');
-});
+    });
 
     $('#btnAbsenPulang').on('click', function(e) {
         e.preventDefault();

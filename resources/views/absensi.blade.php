@@ -17,9 +17,17 @@
         <div class="card-body">
             <h5 class="card-title mb-0">Data Absensi</h5>
             @if(Auth::user()->jabatan->jabatan != 'admin')
-            <a href="{{route('absenqr.index')}}" class="btn btn-purple mb-2 btn-sm"><i class="ri ri-qr-scan-line"></i>
-                <span>Absen QR Code</span>
-            </a>
+            
+            @if($absen)
+            <a href="{{route('absenqr.index')}}" class="btn btn-purple mb-2"> Absen QR Code</a>
+            @else
+            <button type="button" class="btn btn-purple mb-2"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="Silahkan Absensi Harian"
+                data-bs-custom-class="tooltip-ungu">Absen QR Code
+            </button>
+            @endif
             <button type="button" class="btn btn-purple mb-2" data-bs-toggle="modal" data-bs-target="#addJadwalModal">
                 Absensi Izin/Sakit
             </button>
@@ -206,13 +214,11 @@
                                     </div>
                                 </div>
                             </td>
-                            @if(Auth::user()->jabatan->jabatan == 'admin')
                             <td>
                                 <button class="btn btn-danger btn-sm deleteBtn" data-id="{{ $a->id }}">
                                     <i class="ri ri-delete-bin-3-line"></i>
                                 </button>
                             </td>
-                            @endif
                         </tr>
                         @endforeach
                     </tbody>
@@ -227,25 +233,6 @@
 @endpush
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Otomatis isi bulan & tahun sekarang
-    let bulanSekarang = new Date().getMonth() + 1;
-    let tahunSekarang = new Date().getFullYear();
-    $('#bulan').val(bulanSekarang);
-    $('#tahun').val(tahunSekarang);
-
-    // Jalankan filter pertama kali
-    loadData(bulanSekarang, tahunSekarang);
-
-    $('#bulan, #tahun').on('change', function() {
-        let bulan = $('#bulan').val();
-        let tahun = $('#tahun').val();
-
-        if (bulan && tahun) {
-            loadData(bulan, tahun);
-        }
-    });
-
     function loadData(bulan, tahun) {
         $.ajax({
             url: "{{ route('absensi.filter') }}",
@@ -263,18 +250,32 @@ $(document).ready(function() {
 
                 if (res.length > 0) {
                     res.forEach((a, index) => {
-                        let tanggal = new Date(a.tanggal).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
-                        let jamAbsen = a.jam_absen ? new Date('1970-01-01T' + a.jam_absen).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + ' WIB' : '-';
+                        let tanggal = new Date(a.tanggal).toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                        let jamAbsen = a.jam_absen ? new Date('1970-01-01T' + a.jam_absen).toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + ' WIB' : '-';
                         let badge = '';
 
                         switch (a.status) {
-                            case 'Alpha': badge = `<span class="badge bg-danger">Alpha</span>`; break;
-                            case 'Izin': badge = `<span class="badge bg-warning text-dark">Izin</span>`; break;
-                            case 'Sakit': badge = `<span class="badge bg-info text-dark">Sakit</span>`; break;
-                            default: badge = `<span class="badge bg-success">Hadir</span>`;
+                            case 'Alpha':
+                                badge = `<span class="badge bg-danger">Alpha</span>`;
+                                break;
+                            case 'Izin':
+                                badge = `<span class="badge bg-warning text-dark">Izin</span>`;
+                                break;
+                            case 'Sakit':
+                                badge = `<span class="badge bg-info text-dark">Sakit</span>`;
+                                break;
+                            default:
+                                badge = `<span class="badge bg-success">Hadir</span>`;
                         }
 
-                        tbody += `
+                        tbody += ` 
                             <tr>
                                 <th>${index + 1}.</th>
                                 <td class="text-capitalize">${a.guru?.nama ?? '-'}</td>
@@ -307,13 +308,11 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                 </td>
-                                @if(Auth::user()->jabatan->jabatan == 'admin')
                                 <td>
                                     <button class="btn btn-danger btn-sm deleteBtn" data-id="${a.id}">
-                                        <i class="ri ri-delete-bin-3-line"></i>
-                                    </button>
+                                    <i class="ri ri-delete-bin-3-line"></i>
+                                </button>
                                 </td>
-                                @endif
                             </tr>
                         `;
                     });
@@ -328,7 +327,59 @@ $(document).ready(function() {
             }
         });
     }
-});
+
+    $(document).ready(function() {
+
+        $(document).on('click', '.deleteBtn', function() {
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Hapus Data Absensi?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('absensi') }}/" + id,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire('Berhasil', res.message, 'success');
+
+                                // 🔥 LANGSUNG UPDATE TABEL
+                                loadData($('#bulan').val(), $('#tahun').val());
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+        // Otomatis isi bulan & tahun sekarang
+        let bulanSekarang = new Date().getMonth() + 1;
+        let tahunSekarang = new Date().getFullYear();
+        $('#bulan').val(bulanSekarang);
+        $('#tahun').val(tahunSekarang);
+
+        // Jalankan filter pertama kali
+        loadData(bulanSekarang, tahunSekarang);
+
+        $('#bulan, #tahun').on('change', function() {
+            let bulan = $('#bulan').val();
+            let tahun = $('#tahun').val();
+
+            if (bulan && tahun) {
+                loadData(bulan, tahun);
+            }
+        });
+
+
+    });
 
     $(function() {
         $('#absenForm').submit(function(e) {
@@ -365,44 +416,6 @@ $(document).ready(function() {
                         icon: 'error',
                         title: 'Gagal',
                         text: xhr.responseJSON.message
-                    });
-                }
-            });
-        });
-
-        $('.deleteBtn').click(function() {
-            let id = $(this).data('id');
-            Swal.fire({
-                title: 'Hapus Data Absensi?',
-                text: 'Data yang dihapus tidak bisa dikembalikan!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ url('absensi') }}/" + id,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        beforeSend: function() {
-                            Swal.fire({
-                                title: 'Processing...',
-                                text: 'Menghapus data absensi',
-                                didOpen: () => Swal.showLoading(),
-                                allowOutsideClick: false
-                            });
-                        },
-                        success: function(res) {
-                            if (res.success) {
-                                Swal.fire("Berhasil", res.message, "success");
-                                setTimeout(() => location.reload(), 800);
-                            } else {
-                                Swal.fire("Gagal", res.message, "error");
-                            }
-                        }
                     });
                 }
             });

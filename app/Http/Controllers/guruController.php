@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Guru;
 use App\Models\Jabatan;
+use App\Models\Setting;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManager;
@@ -12,15 +13,22 @@ use Illuminate\Support\Facades\DB;
 
 class guruController extends Controller
 {
-
+    
     public function index()
     {
+        $setting = Setting::all();
+        $logos = $setting->where('key', 'logo')->first();
+        $namas = $setting->where('key', 'nama')->first();
+        $logo = $logos->value;
+        $nama = $namas->value;
         $jbt = Jabatan::where('jabatan', 'admin')->first();
         $guru = Guru::orderBy('created_at', 'desc')->where('jabatan_id', '!=', $jbt->id)->get();
         $jabatan = Jabatan::orderBy('created_at', 'desc')->where('jabatan', '!=', 'admin')->get();
         return response()->view('guru', [
             'guru' => $guru,
             'jabatan' => $jabatan,
+            'logo' => $logo,
+            'nama' => $nama,
         ]);
     }
 
@@ -95,7 +103,7 @@ class guruController extends Controller
             $guru = Guru::findOrFail($id);
             if ($guru->jadwals()->exists() || $guru->absensis()->exists() || $guru->jabatan()->exists() || $guru->users()->exists()) {
                 return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus guru yang masih digunakan.']);
-            } 
+            }
             $user = User::where('guru_id', $id)->first();
             if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg' && file_exists(public_path($guru->foto))) {
                 unlink(public_path($guru->foto));

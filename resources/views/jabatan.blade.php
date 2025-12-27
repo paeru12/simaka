@@ -237,12 +237,11 @@
                         $('#updateJabatanForm')[0].reset();
                         $('#editJabatanModal').modal('hide');
                         setTimeout(() => location.reload(), 800);
-                    }else{
-                        console.log(res);
+                    }else {
+                        Swal.fire("Gagal", res.message, "error");
                     }
                 },
-                error: function(response) {
-                    console.log(response);  
+                error: function(response) { 
                     let errors = response.responseJSON?.errors;
                     let errorMessages = "";
 

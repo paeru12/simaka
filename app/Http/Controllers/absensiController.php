@@ -6,13 +6,17 @@ use Illuminate\Http\Request;
 use App\Models\Absensi;
 use App\Models\MataPelajaran;
 use App\Models\Jadwal;
-use Carbon\Carbon;
+use App\Models\AbsensiHarian;
+use Illuminate\Support\Carbon; 
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Auth;
 class AbsensiController extends Controller
 {
     public function index()
     {
+        $absen = AbsensiHarian::where('guru_id', Auth::user()->guru_id)
+            ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
+            ->first();
         $guruid = Auth::user()->guru_id;
 
         if (Auth::user()->jabatan->jabatan == 'admin') {
@@ -24,13 +28,13 @@ class AbsensiController extends Controller
                 ->where('guru_id', $guruid)
                 ->orderBy('created_at', 'desc')
                 ->get();
-        }
+        } 
 
         $mapel = MataPelajaran::all();
         $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', Auth::id())->get();
         $hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
-        return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari'));
+        return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari', 'absen'));
     }
 
     public function filter(Request $request)

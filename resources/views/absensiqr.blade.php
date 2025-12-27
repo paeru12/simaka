@@ -135,7 +135,7 @@
                             }).then(() => {
                                 scanning = true;
                                 requestAnimationFrame(scanQRCode);
-                            }); 
+                            });
                         }
                     },
                     error: function(xhr) {
@@ -143,19 +143,31 @@
                         try {
                             const json = JSON.parse(xhr.responseText);
                             if (json.message) msg = json.message;
+
                         } catch (e) {
                             console.warn("Response bukan JSON, tampilkan pesan default");
                         }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: msg,
-                            confirmButtonText: 'Ya, ulang',
-                        }).then(() => {
-                            scanning = true;
-                            requestAnimationFrame(scanQRCode);
-                        });
+                        const json = JSON.parse(xhr.responseText);
+                        if (json.message == 'Lakukan absen kehadiran hari ini') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: msg,
+                                confirmButtonText: 'Ya, Absen Kehadiran',
+                            }).then(() => {
+                                window.location.href = "{{ route('absensih.index') }}";
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: msg,
+                                confirmButtonText: 'Ya, ulang',
+                            }).then(() => {
+                                scanning = true;
+                                requestAnimationFrame(scanQRCode);
+                            });
+                        }
                     }
                 });
                 return;

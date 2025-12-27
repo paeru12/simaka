@@ -10,9 +10,10 @@ use Illuminate\Database\QueryException;
 use App\Models\Absensi;
 use App\Models\Jadwal;
 use App\Models\QrKelas;
+use App\Models\AbsensiHarian;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Auth;
-class absenqrController extends Controller
+class absenqrController extends Controller 
 {
     function index()
     {
@@ -20,6 +21,7 @@ class absenqrController extends Controller
     }
     public function scanKelas(Request $request)
     {
+        
         $request->validate([
             'token' => 'required|string',
             'foto'  => 'required|image|max:4096',
@@ -109,6 +111,13 @@ class absenqrController extends Controller
 
     public function validateScan(Request $request)
     {
+        $absen = AbsensiHarian::where('guru_id', Auth::user()->guru_id)
+            ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
+            ->first();
+        if (!$absen) {
+            return response()->json(['message' => 'Lakukan absen kehadiran hari ini'], 409);
+        }
+        
         $request->validate([
             'token' => 'required|string',
         ]);

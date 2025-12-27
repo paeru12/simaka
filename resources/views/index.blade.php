@@ -194,7 +194,7 @@ if ($hour >= 5 && $hour < 12) {
                                         <span>| Minggu Ini</span>
                                         @endif
                                     </h5>
-                                    @if($absen)
+                                    @if($absen) 
                                     @if(Auth::user()->jabatan->jabatan != 'admin')
                                     <a href="{{route('absenqr.index')}}" class="btn btn-purple mb-3"><i class="ri ri-qr-scan-line "></i> Absen QR Code</a>
                                     @endif
@@ -206,8 +206,8 @@ if ($hour >= 5 && $hour < 12) {
                                         data-bs-custom-class="tooltip-ungu">
                                         <i class="ri ri-qr-scan-line"></i> Absen QR Code
                                     </button>
-
                                     @endif
+                                    
                                     <div class="table-responsive">
                                         <table class="table table-hover datatable">
                                             <thead>
