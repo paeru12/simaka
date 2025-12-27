@@ -8,11 +8,11 @@ use App\Models\AbsensiHarian;
 use App\Models\Guru;
 use Carbon\Carbon;
 
-#[Schedule(dailyAt: '20:00')] 
+#[Schedule(dailyAt: '20:00')]
 class GenerateAlphaHarian extends Command
 {
     protected $signature = 'absensi:generate-alpha-harian';
-    protected $description = 'Buat otomatis absensi harian Alpha apabila guru tidak absen sama sekali hari ini';
+    protected $description = 'Buat otomatis Alpha harian jika guru tidak absen sama sekali';
 
     public function handle()
     {
@@ -20,22 +20,21 @@ class GenerateAlphaHarian extends Command
         $now   = Carbon::now()->format('H:i:s');
 
         $gurus = Guru::all();
-
         $count = 0;
 
         foreach ($gurus as $guru) {
-            // Cek apakah guru punya absensi hari ini
-            $absensiExists = AbsensiHarian::where('guru_id', $guru->id)
+
+            $exists = AbsensiHarian::where('guru_id', $guru->id)
                 ->whereDate('tanggal', $today)
                 ->exists();
 
-            if (!$absensiExists) {
+            if (!$exists) {
                 AbsensiHarian::create([
                     'guru_id'   => $guru->id,
                     'tanggal'   => $today,
                     'jam_absen' => $now,
                     'status'    => 'Alpha',
-                    'keterangan' => 'Tidak absen hari ini, otomatis Alpha oleh sistem',
+                    'keterangan'=> 'Tidak absen hari ini, otomatis Alpha oleh sistem',
                     'foto'      => 'assets/img/blank.jpg',
                 ]);
 

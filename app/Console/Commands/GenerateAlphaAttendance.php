@@ -6,37 +6,45 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Models\Jadwal;
 use App\Models\Absensi;
+use App\Models\AbsensiHarian;
 use Carbon\Carbon;
 
 #[Schedule(every: '5 minutes')]
-
 class GenerateAlphaAttendance extends Command
 {
     protected $signature = 'absensi:generate-alpha-jadwal';
-    protected $description = 'Buat otomatis absensi Alpha jadwal untuk guru yang tidak hadir';
+    protected $description = 'Alpha mapel otomatis (skip jika sudah Alpha harian)';
 
     public function handle()
     {
         $today = Carbon::today();
-        $now = Carbon::now();
+        $now   = Carbon::now();
 
-        // Samakan format dengan database
         $hariIni = ucfirst($today->locale('id')->dayName);
 
         $jadwals = Jadwal::where('hari', $hariIni)->get();
 
         $count = 0;
+        $skipped = 0;
 
         foreach ($jadwals as $jadwal) {
 
-            $jadwalSelesai = Carbon::parse($jadwal->jam_selesai);
+            $batasAlpha = Carbon::parse($jadwal->jam_selesai)->addMinutes(30);
 
-            // Skip jadwal yang belum selesai + 1 menit
-            if ($now->lt($jadwalSelesai->copy()->addMinute())) {
+            if ($now->lt($batasAlpha)) {
                 continue;
             }
 
-            // Check apakah guru sudah absen
+            $alphaHarian = AbsensiHarian::where('guru_id', $jadwal->guru_id)
+                ->whereDate('tanggal', $today)
+                ->where('status', 'Alpha')
+                ->exists();
+
+            if ($alphaHarian) {
+                $skipped++;
+                continue;
+            }
+
             $absensiExists = Absensi::where('jadwal_id', $jadwal->id)
                 ->where('guru_id', $jadwal->guru_id)
                 ->whereDate('tanggal', $today)
@@ -50,7 +58,7 @@ class GenerateAlphaAttendance extends Command
                     'tanggal'   => $today,
                     'jam_absen' => $now->format('H:i:s'),
                     'status'    => 'Alpha',
-                    'keterangan' => 'Tidak hadir, otomatis alpha jadwal oleh sistem',
+                    'keterangan'=> 'Tidak hadir, Alpha mapel (skip jika Alpha harian)',
                     'foto'      => 'assets/img/blank.jpg',
                 ]);
 
@@ -58,6 +66,6 @@ class GenerateAlphaAttendance extends Command
             }
         }
 
-        $this->info("✅ {$count} absensi Alpha jadwal berhasil dibuat.");
+        $this->info("✅ {$count} Alpha mapel dibuat | ⏭ {$skipped} dilewati (Alpha harian)");
     }
 }
