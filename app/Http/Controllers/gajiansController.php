@@ -17,7 +17,7 @@ class gajiansController extends Controller
         $guru = Guru::all();
         return view('gaji', compact('guru'));
     }
-
+ 
     function indexAll()
     {
         return view('gajiall');

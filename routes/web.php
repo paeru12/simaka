@@ -75,6 +75,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/qr-guru', [QrGuruController::class, 'store'])->name('qrguru.store');
 
     Route::resource('rekapp', rekapController::class)->except(['show']);
+    Route::get('/detail/{guru_id}/{bulan}/{tahun}', [rekapController::class, 'detail'])->name('rekap.details');
+    Route::get('/detailrekapdata/{guru_id}/{bulan}/{tahun}', [rekapController::class, 'detailrekapdata'])->name('rekap.detailrekapdata');
     Route::post('rekapp/filter', [rekapController::class, 'filter'])->name('rekap-filter');
     Route::get('rekapp/staff', [rekapController::class, 'indexAll'])->name('rekap.indexAll');
     Route::post('rekapp/filterAll', [rekapController::class, 'filterAll'])->name('rekap.filterAll');

@@ -55,7 +55,7 @@
                     </div>
                     <div class="row">
                         <div class="table-responsive">
-                            <table class="table table-hover datatable">
+                            <table class="table table-hover ">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -64,6 +64,7 @@
                                         <th>Izin</th>
                                         <th>Sakit</th>
                                         <th>Alpha</th>
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -121,7 +122,7 @@
         $("#bulan, #tahun").on("change", function() {
             let bulan = $("#bulan").val();
             let tahun = $("#tahun").val();
-
+ 
             if (bulan && tahun) {
                 $.ajax({
                     url: "{{ route('rekap.detailf') }}",
@@ -142,6 +143,7 @@
                                         <td>${item.izin}</td>
                                         <td>${item.sakit}</td>
                                         <td>${item.alfa}</td>
+                                        <td>${parseInt(item.hadir) + parseInt(item.izin) + parseInt(item.sakit) + parseInt(item.alfa)}</td>
                                     </tr>
                                     `;
                             });

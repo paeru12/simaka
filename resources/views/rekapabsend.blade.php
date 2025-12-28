@@ -104,12 +104,12 @@
                                         <td>${item.total_hadir_mapel}</td>
                                         <td>${item.total_kehadiran}</td>
                                         <td>
-                                        
-                                            <a href="/gaji/slip-gaji/${item.guru_id}/slip/${bulan}/${tahun}" class="btn btn-sm btn-purple">
+                                         
+                                            <a href="/detail/${item.guru_id}/${bulan}/${tahun}" class="btn btn-sm btn-purple">
                                                 <i class="ri-bar-chart-horizontal-fill"></i>
                                             </a>
                                         </td> 
-                                    </tr>`;
+                                    </tr>`; 
                             });
                         } else {
                             tbody = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;

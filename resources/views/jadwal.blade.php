@@ -18,7 +18,7 @@
                 <div class="card-body">
                     <h5 class="card-title mb-0">Data Jadwal</h5>
                     @if(Auth::user()->jabatan->jabatan == 'admin')
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addJadwalModal">
+                    <button type="button" class="btn btn-purple btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addJadwalModal">
                         Add Jadwal
                     </button>
 

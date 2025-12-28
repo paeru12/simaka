@@ -11,13 +11,13 @@ use App\Models\Guru;
 use Illuminate\Support\Facades\Auth;
 
 class jadwalController extends Controller
-{
+{ 
     function index()
     {
         $auth = Auth::user();
         $mapel = MataPelajaran::all();
         $guru = Guru::whereHas('jabatan', function ($query) {
-            $query->where('jabatan', '!=', 'admin');
+            $query->where('jabatan', 'guru');
         })->latest()->get();
         $kelas = Kelas::orderBy('kelas', 'asc')->get();
         $ruangan = Ruangan::all();

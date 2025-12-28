@@ -5,12 +5,59 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\Absensi;
+use App\Models\Guru;
 class rekapController extends Controller
 {
     function index()
     {
         return view('rekapabsend');
+    }
+
+    function detail($guru_id, $bulan, $tahun)
+    {
+        $guru = Guru::with('jabatan')->find($guru_id);
+
+        $absensiHarian = DB::table('absensi_harians')
+            ->where('guru_id', $guru_id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->get();
+
+        return view('detailrekapabsend', compact('guru', 'absensiHarian', 'bulan', 'tahun'));
+    }
+
+    function detailrekapdata($guru_id, $bulan, $tahun)
+    {
+        $guru_id = $guru_id;
+        $bulan = $bulan;
+        $tahun = $tahun;
+
+        $rekapHarian = DB::table('absensi_harians')
+            ->selectRaw('
+                SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
+                SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
+                SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
+                SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa
+            ')
+            ->where('guru_id', $guru_id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->get();
+
+        $rekap = Absensi::with('mataPelajaran:id,nama_mapel')
+            ->selectRaw('mapel_id,
+                SUM(CASE WHEN status = "Hadir" THEN 1 ELSE 0 END) as hadir,
+                SUM(CASE WHEN status = "Izin" THEN 1 ELSE 0 END) as izin,
+                SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
+                SUM(CASE WHEN status = "Alpha" THEN 1 ELSE 0 END) as alfa')
+            ->where('guru_id', $guru_id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->groupBy('mapel_id')
+            ->get();
+
+        return response()->json(['rekap' => $rekap, 'rekapHarian' => $rekapHarian]);
     }
 
     function indexAll()
@@ -113,7 +160,7 @@ class rekapController extends Controller
                 'harian.nama',
                 'harian.jabatan_id',
                 'harian.total_hadir_harian',
-                'harian.jabatan', 
+                'harian.jabatan',
                 DB::raw('COALESCE(mapel.total_hadir_mapel, 0) as total_hadir_mapel'),
                 'harian.total_izin',
                 'harian.total_sakit',

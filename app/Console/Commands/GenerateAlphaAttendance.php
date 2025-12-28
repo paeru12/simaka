@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class GenerateAlphaAttendance extends Command
 {
     protected $signature = 'absensi:generate-alpha-jadwal';
-    protected $description = 'Alpha mapel otomatis (skip jika sudah Alpha harian)';
+    protected $description = 'Alpha mapel otomatis berdasarkan jadwal dan absensi harian guru';
 
     public function handle()
     {
@@ -58,7 +58,7 @@ class GenerateAlphaAttendance extends Command
                     'tanggal'   => $today,
                     'jam_absen' => $now->format('H:i:s'),
                     'status'    => 'Alpha',
-                    'keterangan'=> 'Tidak hadir, Alpha mapel (skip jika Alpha harian)',
+                    'keterangan'=> 'Tidak hadir, Alpha mapel otomatis',
                     'foto'      => 'assets/img/blank.jpg',
                 ]);
 

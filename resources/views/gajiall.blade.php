@@ -9,7 +9,7 @@
             <li class="breadcrumb-item"><a href="/">Home</a></li>
             <li class="breadcrumb-item active">Laporan Gaji</li>
         </ol>
-    </nav>
+    </nav> 
 </div>
 
 <section class="section">

@@ -85,11 +85,12 @@
                 $.ajax({
                     url: "{{ route('gajians.filter') }}",
                     type: "POST",
-                    data: {
+                    data: { 
                         bulan: bulan,
                         tahun: tahun
                     },
                     success: function(res) {
+                        console.log(res);
                         let tbody = "";
                         if (res.length > 0) {
                             res.forEach((item, index) => {
