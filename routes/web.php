@@ -8,7 +8,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\guruController;
 use App\Http\Controllers\mapelController;
 use App\Http\Controllers\jadwalController;
-use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\absensiController;
 use App\Http\Controllers\absenqrController;
 use App\Http\Controllers\AbsensiHarianController;
 use App\Http\Controllers\GajiController;
@@ -40,8 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/kelas', KelasController::class);
     Route::resource('/mapel', mapelController::class);
     Route::resource('/jadwal', jadwalController::class);
-    Route::resource('/absensi', AbsensiController::class)->except(['show']);
-    Route::post('/absensi/filter', [AbsensiController::class, 'filter'])->name('absensi.filter');
+    Route::resource('/absensi', absensiController::class)->except(['show']);
+    Route::post('/absensi/filter', [absensiController::class, 'filter'])->name('absensi.filter');
     Route::resource('/rekap', GajiController::class)->except(['show']);
     Route::resource('/gaji', gajiansController::class);
     Route::resource('/gaji-guru', gajianguruController::class)->except(['show']);
@@ -64,8 +64,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/absensi/scan', [absenqrController::class, 'scanKelas'])->name('absensi.scan');
     Route::post('/absensi/validate', [absenqrController::class, 'validateScan'])->name('absensi.validate');
-    Route::get('/absensi/get-kelas', [AbsensiController::class, 'getKelasByHari'])->name('absensi.getKelas');
-    Route::get('/absensi/get-mapel', [AbsensiController::class, 'getMapelByKelas'])->name('absensi.getMapel');
+    Route::get('/absensi/get-kelas', [absensiController::class, 'getKelasByHari'])->name('absensi.getKelas');
+    Route::get('/absensi/get-mapel', [absensiController::class, 'getMapelByKelas'])->name('absensi.getMapel');
     Route::get('/absensi-harian', [AbsensiHarianController::class, 'index'])->name('absensi.harian');
     Route::post('/absensi-harian/datang', [AbsensiHarianController::class, 'absenDatang'])->name('absensi.harian.datang');
     Route::post('/absensi-harian/pulang', [AbsensiHarianController::class, 'absenPulang'])->name('absensi.harian.pulang');
