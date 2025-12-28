@@ -144,7 +144,9 @@
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th>Foto</th>
+                                @if(Auth::user()->jabatan->jabatan == 'admin')
                                 <th>Aksi</th>
+                                @endif
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -232,11 +234,13 @@
                                             </div>
                                         </div>
                                     </td>
+                                    @if(Auth::user()->jabatan->jabatan == 'admin')
                                     <td>
-                                    <button class="btn btn-danger btn-sm deleteBtn" data-id="${absen.id}">
-                                        <i class="ri ri-delete-bin-3-line"></i>
-                                    </button>
-                                </td>
+                                        <button class="btn btn-danger btn-sm deleteBtn" data-id="${absen.id}">
+                                            <i class="ri ri-delete-bin-3-line"></i>
+                                        </button>
+                                    </td>
+                                    @endif
                                 </tr>
                             `;
                     });

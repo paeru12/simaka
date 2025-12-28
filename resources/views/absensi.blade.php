@@ -214,11 +214,13 @@
                                     </div>
                                 </div>
                             </td>
+                            @if(Auth::user()->jabatan->jabatan == 'admin')
                             <td>
                                 <button class="btn btn-danger btn-sm deleteBtn" data-id="{{ $a->id }}">
                                     <i class="ri ri-delete-bin-3-line"></i>
                                 </button>
                             </td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>
@@ -308,11 +310,13 @@
                                         </div>
                                     </div>
                                 </td>
+                                @if(Auth::user()->jabatan->jabatan == 'admin')
                                 <td>
                                     <button class="btn btn-danger btn-sm deleteBtn" data-id="${a.id}">
                                     <i class="ri ri-delete-bin-3-line"></i>
                                 </button>
                                 </td>
+                                @endif
                             </tr>
                         `;
                     });
