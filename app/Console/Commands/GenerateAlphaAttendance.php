@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class GenerateAlphaAttendance extends Command
 {
     protected $signature = 'absensi:generate-alpha-jadwal';
-    protected $description = 'Alpha mapel otomatis berdasarkan jadwal dan absensi harian guru';
+    protected $description = 'Alpha mapel otomatis berdasarkan jadwal';
 
     public function handle()
     {
@@ -29,7 +29,7 @@ class GenerateAlphaAttendance extends Command
 
         foreach ($jadwals as $jadwal) {
 
-            $batasAlpha = Carbon::parse($jadwal->jam_selesai)->addMinutes(30);
+            $batasAlpha = Carbon::parse($jadwal->jam_selesai)->addMinutes(15);
 
             if ($now->lt($batasAlpha)) {
                 continue;

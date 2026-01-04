@@ -51,7 +51,7 @@ class SettingController extends Controller
 
         try {
             if ($request->hasFile('value')) {
-                if (in_array($setting->key, ['logo', 'kop_surat']) && $setting->value && file_exists(public_path($setting->value))) {
+                if (in_array($setting->key, ['logo', 'kop_surat']) && $setting->value && file_exists(public_path($setting->value) && $setting->value !== 'assets/img/blank.jpg')) {
                     unlink(public_path($setting->value));
                 }
                 $validated['value'] = $this->uploadFoto($request->file('value'));

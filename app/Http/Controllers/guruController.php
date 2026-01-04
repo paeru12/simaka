@@ -101,8 +101,8 @@ class guruController extends Controller
     {
         try {
             $guru = Guru::findOrFail($id);
-            if ($guru->jadwals()->exists() || $guru->absensis()->exists() || $guru->jabatan()->exists() || $guru->users()->exists()) {
-                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus guru yang masih digunakan.']);
+            if ($guru->jadwals()->exists() || $guru->absensis()->exists()) {
+                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus guru yang masih digunakan Jadwal.']);
             }
             $user = User::where('guru_id', $id)->first();
             if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg' && file_exists(public_path($guru->foto))) {

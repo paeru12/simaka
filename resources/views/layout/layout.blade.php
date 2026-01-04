@@ -31,6 +31,7 @@ $nama = $namas->value;
     <script src="{{ asset('assets/dist/sweetalert2.all.min.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
 </head>
 
 <body>
@@ -80,7 +81,7 @@ $nama = $namas->value;
             </ul>
         </nav>
     </header>
-    <!-- ======= Sidebar ======= --> 
+    <!-- ======= Sidebar ======= -->
     @include('layout.sidebar')
     <!-- End Sidebar-->
     <main id="main" class="main">
@@ -96,15 +97,20 @@ $nama = $namas->value;
 
     </footer>
     @stack('scripts')
+    @yield('scripts')
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
 
-  <script src="{{ asset('assets/vendor/quill/quill.min.js') }}"></script>
-
+    <script src="{{ asset('assets/vendor/quill/quill.min.js') }}"></script>
     <script>
+        function asset(path) {
+            if (!path) return '';
+            return `{{ asset('') }}` + path;
+        } 
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

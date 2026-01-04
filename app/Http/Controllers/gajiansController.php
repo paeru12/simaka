@@ -17,11 +17,6 @@ class gajiansController extends Controller
         $guru = Guru::all();
         return view('gaji', compact('guru'));
     }
- 
-    function indexAll()
-    {
-        return view('gajiall');
-    }
 
     public function filter(Request $request)
     {
@@ -29,62 +24,80 @@ class gajiansController extends Controller
             $settings = Setting::whereIn('key', ['gaji_mengajar', 'minggu', 'jp'])
                 ->pluck('value', 'key');
 
-            $gajiMengajar = isset($settings['gaji_mengajar'])
-                ? preg_replace('/[^0-9]/', '', $settings['gaji_mengajar'])
-                : 0;
+            $gajiMengajar = (int) preg_replace('/[^0-9]/', '', $settings['gaji_mengajar'] ?? 0);
+            $minggu = (int) ($settings['minggu'] ?? 4);
+            $jp     = (int) ($settings['jp'] ?? 40);
+
             $totalPotongan = Potongan::sum('jumlah_potongan');
-            $minggu = isset($settings['minggu'])
-                ? (int) $settings['minggu']
-                : 4;
 
-            $bulan = $request->bulan;
-            $tahun = $request->tahun;
+            $bulan  = $request->bulan;
+            $tahun  = $request->tahun;
+            $search = $request->search;
 
-            $query = DB::table('absensis as a')
-                ->join('gurus as g', 'g.id', '=', 'a.guru_id')
-                ->leftJoin('jabatans as jbt', 'jbt.id', '=', 'g.jabatan_id')
+            $query = DB::table('gurus as g')
+                ->leftJoin('jabatans as j', 'j.id', '=', 'g.jabatan_id')
+                ->leftJoin('absensis as a', function ($join) use ($bulan, $tahun) {
+                    $join->on('a.guru_id', '=', 'g.id')
+                        ->whereMonth('a.tanggal', $bulan)
+                        ->whereYear('a.tanggal', $tahun)
+                        ->where('a.status', 'Hadir');
+                })
                 ->leftJoin('jadwals as jd', 'jd.id', '=', 'a.jadwal_id')
-                ->leftJoin('mata_pelajarans as m', 'm.id', '=', 'jd.mapel_id')
-                ->whereMonth('a.tanggal', $bulan)
-                ->whereYear('a.tanggal', $tahun)
                 ->select(
                     'g.id as guru_id',
-                    'g.nama as nama',
-                    'jbt.jabatan',
-                    'jbt.nominal_gaji',
+                    'g.nama',
+                    'j.jabatan',
+                    'j.nominal_gaji',
                     DB::raw('COUNT(DISTINCT jd.mapel_id) as total_mapel'),
-                    DB::raw('SUM(CASE WHEN a.status = "Hadir" THEN 1 ELSE 0 END) as total_hadir')
+                    DB::raw('COUNT(a.id) as total_hadir')
                 )
-                ->groupBy('g.id', 'g.nama', 'jbt.jabatan', 'jbt.nominal_gaji');
+                ->when(
+                    $search,
+                    fn($q) =>
+                    $q->where('g.nama', 'like', "%$search%")
+                )
+                ->groupBy('g.id', 'g.nama', 'j.jabatan', 'j.nominal_gaji');
 
             if (Auth::user()->jabatan->jabatan !== 'admin') {
-                $query->where('a.guru_id', Auth::user()->guru->id);
+                $query->where('g.id', Auth::user()->guru->id);
             }
 
-            $data = $query->get();
-            $jp = isset($settings['jp']) ? (int) $settings['jp'] : 40;
-            $data = $data->map(function ($item) use ($minggu, $gajiMengajar, $jp, $totalPotongan) {
-                $gapok = $jp * ($item->nominal_gaji ?? 0) * $minggu;
-                $honorMapel = ($item->total_hadir ?? 0) * $gajiMengajar;
-                $totalGaji = $gapok + $honorMapel - $totalPotongan;
+            $data = $query->paginate(10);
+
+            // HITUNG GAJI
+            $data->getCollection()->transform(function ($item) use (
+                $minggu,
+                $jp,
+                $gajiMengajar,
+                $totalPotongan
+            ) {
+                $gapok       = $jp * ($item->nominal_gaji ?? 0) * $minggu;
+                $honorMapel  = $item->total_hadir * $gajiMengajar;
+                $totalGaji   = $gapok + $honorMapel - $totalPotongan;
 
                 return [
-                    'guru_id' => $item->guru_id,
-                    'nama' => $item->nama,
-                    'jabatan' => $item->jabatan ?? '-',
-                    'nominal_gaji' => (int)$item->nominal_gaji,
-                    'gapok' => $gapok,
-                    'honor_mengajar' => $honorMapel,
-                    'total_mapel' => $item->total_mapel,
-                    'total_hadir' => $item->total_hadir,
-                    'total_gaji' => $totalGaji,
+                    'guru_id'        => $item->guru_id,
+                    'nama'           => $item->nama,
+                    'jabatan'        => $item->jabatan ?? '-',
+                    'gapok'          => $gapok,
+                    'total_mapel'    => strtolower($item->jabatan) === 'guru'
+                        ? $item->total_mapel
+                        : '-',
+                    'total_hadir'    => $item->total_hadir,
+                    'total_gaji'     => $totalGaji,
                 ];
             });
 
             return response()->json($data);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
+    }
+
+
+    function indexAll()
+    {
+        return view('gajiall');
     }
 
     public function filterAll(Request $request)

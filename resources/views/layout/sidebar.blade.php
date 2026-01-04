@@ -20,15 +20,15 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
         <li class="nav-heading">Absensi</li>
 
         <li class="nav-item">
-            <a class="nav-link {{Request::is('absensi') ? 'active' : 'collapsed'}}"
-                href="{{route('absensi.index')}}">
+            <a class="nav-link {{Request::is('absensi-mapel') ? 'active' : 'collapsed'}}"
+                href="{{route('absensi-mapel.index')}}">
                 <i class="ri ri-qr-scan-line"></i>
                 <span>Absensi Mapel</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('absensih') ? 'active' : 'collapsed'}}"
-                href="{{route('absensih.index')}}">
+            <a class="nav-link {{Request::is('absensi-harian') ? 'active' : 'collapsed'}}"
+                href="/absensi-harian">
                 <i class="ri ri-qr-scan-line"></i>
                 <span>Absensi Harian</span>
             </a>
@@ -86,15 +86,15 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('rekapp') ? 'active' : 'collapsed'}}"
-                href="{{route('rekapp.index')}}">
+            <a class="nav-link {{Request::is('rekap-absensi') ? 'active' : 'collapsed'}}"
+                href="{{route('rekap-absensi.index')}}">
                 <i class="ri ri-file-list-3-line"></i>
                 <span>Rekapitulasi Absensi</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('gaji') ? 'active' : 'collapsed'}}"
-                href="{{route('gaji.index')}}">
+            <a class="nav-link {{Request::is('laporan-gaji') ? 'active' : 'collapsed'}}"
+                href="{{route('laporan-gaji.index')}}">
                 <i class="ri ri-money-dollar-circle-line"></i>
                 <span>Laporan Gaji</span>
             </a>
@@ -102,7 +102,7 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
 
         <li class="nav-heading">Administrator</li>
         <li class="nav-item ">
-            <a class="nav-link collapsed" href="{{route('admin.index')}}">
+            <a class="nav-link {{Request::is('administrator') ? 'active' : 'collapsed'}}" href="{{route('administrator.index')}}">
                 <i class="ri ri-shield-user-line"></i>
                 <span>Administrator</span>
             </a>
@@ -152,15 +152,15 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
         <li class="nav-heading">Absensi</li>
 
         <li class="nav-item">
-            <a class="nav-link {{Request::is('absensi') ? 'active' : 'collapsed'}}"
-                href="{{route('absensi.index')}}">
+            <a class="nav-link {{Request::is('absensi-mapel') ? 'active' : 'collapsed'}}"
+                href="{{route('absensi-mapel.index')}}">
                 <i class="ri ri-qr-scan-line"></i>
                 <span>Absensi Mapel</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('absensih') ? 'active' : 'collapsed'}}"
-                href="{{route('absensih.index')}}">
+            <a class="nav-link {{Request::is('absensi-harian') ? 'active' : 'collapsed'}}"
+                href="/absensi-harian">
                 <i class="ri ri-qr-scan-line"></i>
                 <span>Absensi Harian</span>
             </a>
@@ -174,15 +174,15 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('rekap/guru') ? 'active' : 'collapsed'}}"
+            <a class="nav-link {{Request::is('rekap-absensi/guru') ? 'active' : 'collapsed'}}"
                 href="{{route('rekap.dindex')}}">
                 <i class="ri ri-file-list-3-line"></i>
                 <span>Rekapitulasi Absensi</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('gaji') ? 'active' : 'collapsed'}}"
-                href="{{route('gaji.index')}}">
+            <a class="nav-link {{Request::is('laporan-gaji') ? 'active' : 'collapsed'}}"
+                href="{{route('laporan-gaji.index')}}">
                 <i class="ri ri-money-dollar-circle-line"></i>
                 <span>Laporan Gaji</span>
             </a>
@@ -214,8 +214,8 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
         </li>
         <li class="nav-heading">Absensi</li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('absensih') ? 'active' : 'collapsed'}}"
-                href="{{route('absensih.index')}}">
+            <a class="nav-link {{Request::is('absensi-harian') ? 'active' : 'collapsed'}}"
+                href="/absensi-harian">
                 <i class="ri ri-qr-scan-line"></i>
                 <span>Absensi Harian</span>
             </a>
@@ -228,7 +228,7 @@ $punyaJadwal = Jadwal::where('guru_id', $user->guru_id)->exists();
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{Request::is('gaji-all') ? 'active' : 'collapsed'}}"
+            <a class="nav-link {{Request::is('laporan-gaji-all') ? 'active' : 'collapsed'}}"
                 href="{{route('gaji.indexAll')}}">
                 <i class="ri ri-money-dollar-circle-line"></i>
                 <span>Laporan Gaji</span>

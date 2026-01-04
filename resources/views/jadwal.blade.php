@@ -390,48 +390,64 @@
 
         $('.deleteBtn').click(function() {
             let id = $(this).data('id');
+
             Swal.fire({
-                title: 'Hapus Data?',
-                text: 'Data yang dihapus tidak bisa dikembalikan!',
+                title: 'Hapus Jadwal?',
+                text: 'Jadwal akan dihapus',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
+                confirmButtonText: 'Ya, Hapus',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ url('jadwal') }}/" + id,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        beforeSend: function() {
-                            Swal.fire({
-                                title: 'Processing...',
-                                text: 'Menghapus data jadwal',
-                                didOpen: () => Swal.showLoading(),
-                                allowOutsideClick: false
-                            });
-                        },
-                        success: function(res) {
-                            if (res.success) {
-                                Swal.fire("Berhasil", res.message, "success");
-                                setTimeout(() => location.reload(), 800);
-                            } else {
-                                Swal.fire("Gagal", res.message, "error");
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal',
-                                text: xhr.responseJSON.message
-                            });
-                        }
-                    });
+                    deleteJadwal(id, false);
                 }
             });
         });
+
+        function deleteJadwal(id, forceDelete = false) {
+            $.ajax({
+                url: "{{ url('jadwal') }}/" + id,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    force: forceDelete
+                },
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    Swal.fire("Berhasil", res.message, "success");
+                    setTimeout(() => location.reload(), 800);
+                },
+                error: function(xhr) {
+                    let res = xhr.responseJSON;
+
+                    // Jika butuh konfirmasi ulang
+                    if (res.need_confirmation) {
+                        Swal.fire({
+                            title: 'PERINGATAN!',
+                            text: res.message + ' Lanjutkan?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'Ya, Hapus Semua',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                deleteJadwal(id, true);
+                            }
+                        });
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }
+            });
+        }
     });
 </script>
 @endsection

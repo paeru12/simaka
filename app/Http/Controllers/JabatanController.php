@@ -84,7 +84,7 @@ class JabatanController extends Controller
             }
 
             if ($jabatan->gurus()->exists()) {
-                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus jabatan yang masih digunakan guru.']);
+                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus jabatan yang masih digunakan.']);
             }
 
             $jabatan->delete();

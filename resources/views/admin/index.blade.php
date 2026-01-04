@@ -65,13 +65,13 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" name="nik" class="form-control" id="nik" placeholder="NIK" required>
+                                                    <input type="number" name="nik" class="form-control" id="nik" placeholder="NIK" required>
                                                     <label for="nik">NIK</label>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-floating mb-3">
-                                                    <input type="text" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
+                                                    <input type="number" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
                                                     <label for="no_hp">No HP</label>
                                                 </div>
                                             </div>
@@ -275,7 +275,7 @@
             $('#button-add').prop('disabled', true);
             $('#button-loader').removeClass('d-none');
             $.ajax({
-                url: "{{ route('admin.store') }}",
+                url: "{{ route('administrator.store') }}",
                 method: "POST",
                 data: formData,
                 processData: false,

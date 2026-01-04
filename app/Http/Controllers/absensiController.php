@@ -7,9 +7,10 @@ use App\Models\Absensi;
 use App\Models\MataPelajaran;
 use App\Models\Jadwal;
 use App\Models\AbsensiHarian;
-use Illuminate\Support\Carbon; 
+use Illuminate\Support\Carbon;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Auth;
+
 class AbsensiController extends Controller
 {
     public function index()
@@ -22,13 +23,15 @@ class AbsensiController extends Controller
         if (Auth::user()->jabatan->jabatan == 'admin') {
             $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
                 ->orderBy('created_at', 'desc')
+                ->limit(50)
                 ->get();
         } else {
             $absensi = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
                 ->where('guru_id', $guruid)
+                ->limit(50)
                 ->orderBy('created_at', 'desc')
                 ->get();
-        } 
+        }
 
         $mapel = MataPelajaran::all();
         $jadwal = Jadwal::with('mataPelajaran', 'kelas')->where('guru_id', Auth::id())->get();
@@ -39,31 +42,52 @@ class AbsensiController extends Controller
 
     public function filter(Request $request)
     {
-        $bulan = $request->bulan;
-        $tahun = $request->tahun;
-        $guruid = Auth::user()->guru_id;
+        $user = Auth::user();
 
-        if (!$bulan || !$tahun) {
-            return response()->json([]);
+        $query = Absensi::with([
+            'guru',
+            'mataPelajaran',
+            'jadwal.kelas',
+            'jadwal.ruangan'
+        ])->orderBy('tanggal', 'desc');
+
+        // 🔐 role
+        if ($user->jabatan->jabatan !== 'admin') {
+            $query->where('guru_id', $user->guru_id);
         }
 
-        if (Auth::user()->jabatan->jabatan == 'admin') {
-            $data = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
-        } else {
-            $data = Absensi::with(['guru', 'mataPelajaran', 'jadwal.kelas', 'jadwal.ruangan'])
-                ->where('guru_id', $guruid)
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
+        // 🔍 search
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('status', 'like', "%$search%")
+                    ->orWhere('tanggal', 'like', "%$search%")
+                    ->orWhereHas(
+                        'guru',
+                        fn($g) =>
+                        $g->where('nama', 'like', "%$search%")
+                    )
+                    ->orWhereHas(
+                        'mataPelajaran',
+                        fn($m) =>
+                        $m->where('nama_mapel', 'like', "%$search%")
+                    );
+            });
         }
+
+        // 📅 filter bulan & tahun
+        if ($request->bulan && $request->tahun) {
+            $query->whereMonth('tanggal', $request->bulan)
+                ->whereYear('tanggal', $request->tahun);
+        }
+
+        // 📄 pagination
+        $data = $query->paginate(10);
 
         return response()->json($data);
     }
+
 
     public function getKelasByHari(Request $request)
     {
@@ -156,10 +180,11 @@ class AbsensiController extends Controller
         }
     }
 
-    function destroy($id) {
+    function destroy($id)
+    {
         try {
             $absensi = Absensi::findOrFail($id);
-            if ($absensi->foto && file_exists(public_path($absensi->foto))) {
+            if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg' && file_exists(public_path($absensi->foto))) {
                 unlink(public_path($absensi->foto));
             }
             $absensi->delete();

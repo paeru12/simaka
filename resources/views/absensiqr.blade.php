@@ -155,7 +155,7 @@
                                 text: msg,
                                 confirmButtonText: 'Ya, Absen Kehadiran',
                             }).then(() => {
-                                window.location.href = "{{ route('absensih.index') }}";
+                                window.location.href = "/absensi-harian";
                             });
                         } else {
                             Swal.fire({
@@ -221,7 +221,7 @@
                         timer: 1000,
                         showConfirmButton: false
                     }).then(() => {
-                        location.href = "{{ route('absensi.index') }}";
+                        location.href = "absensi-mapel') }}";
                     });
                 }
             },

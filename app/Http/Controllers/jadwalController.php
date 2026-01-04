@@ -11,7 +11,7 @@ use App\Models\Guru;
 use Illuminate\Support\Facades\Auth;
 
 class jadwalController extends Controller
-{ 
+{
     function index()
     {
         $auth = Auth::user();
@@ -155,20 +155,47 @@ class jadwalController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             $jadwal = Jadwal::findOrFail($id);
-            if (method_exists($jadwal, 'absensis') && $jadwal->absensis()->exists()) {
+
+            $hasAbsensi = method_exists($jadwal, 'absensis')
+                && $jadwal->absensis()->exists();
+
+            $force = $request->boolean('force');
+            if ($hasAbsensi && !$force) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Jadwal tidak dapat dihapus karena sudah dipakai pada absensi.'
-                ], 422);
+                    'need_confirmation' => true,
+                    'message' => 'Jadwal ini sudah memiliki data absensi mapel. Jika dihapus, seluruh absensi mapel juga akan terhapus.'
+                ], 409);
             }
+
+            if ($hasAbsensi && $force) {
+                foreach ($jadwal->absensis as $absensi) {
+                    if (
+                        $absensi->foto &&
+                        $absensi->foto !== 'assets/img/blank.jpg' &&
+                        file_exists(public_path($absensi->foto))
+                    ) {
+                        unlink(public_path($absensi->foto));
+                    }
+                    $absensi->delete();
+                }
+            }
+
             $jadwal->delete();
-            return response()->json(['success' => true, 'message' => "Jadwal berhasil dihapus"]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal dan absensi mapel berhasil dihapus'
+            ]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 }

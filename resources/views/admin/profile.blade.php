@@ -25,7 +25,7 @@
     <h1>Profile</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">Administrator</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('administrator.index') }}">Administrator</a></li>
             <li class="breadcrumb-item active">Profile</li>
         </ol>
     </nav>
@@ -138,14 +138,14 @@
                                 <div class="row mb-3">
                                     <label for="nik" class="col-md-4 col-lg-3 col-form-label">NIK</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <input name="nik" type="text" class="form-control" id="nik"
+                                        <input name="nik" type="number" class="form-control" id="nik"
                                             value="{{ $data->nik }}" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="no_hp" class="col-md-4 col-lg-3 col-form-label">No HP</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <input name="no_hp" type="text" class="form-control" id="no_hp"
+                                        <input name="no_hp" type="number" class="form-control" id="no_hp"
                                             value="{{ $data->no_hp }}" required>
                                     </div>
                                 </div>

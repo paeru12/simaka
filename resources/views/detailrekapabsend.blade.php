@@ -136,7 +136,13 @@
                         } else {
                             absensiMapel = `
                                 <tr>
-                                    <td colspan="7" class="text-center">Tidak ada data absensi mata pelajaran.</td>
+                                    <th scope="row">1.</th>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
                                 </tr>
                             `;
                         }
@@ -145,7 +151,12 @@
                         if (data.rekapHarian[0].hadir == null) {
                             harianTbody = `
                                 <tr>
-                                    <td colspan="6" class="text-center">Tidak ada data absensi harian.</td>
+                                    <th scope="row">1.</th>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
                                 </tr>
                             `;
                         } else {

@@ -11,57 +11,50 @@ use Intervention\Image\ImageManager;
 
 class AbsensiHarianController extends Controller
 {
-    function index()
+    public function index()
     {
-        // Ambil semua data default bulan & tahun ini
-        $bulan = date('m');
-        $tahun = date('Y');
         $user = Auth::user();
-
-        if ($user->jabatan->jabatan == 'admin') {
-            $data = AbsensiHarian::whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
-        } else {
-            $data = AbsensiHarian::where('guru_id', $user->guru_id)
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
-        }
 
         $absen = AbsensiHarian::where('guru_id', $user->guru_id)
-            ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
+            ->whereDate('tanggal', Carbon::now('Asia/Jakarta'))
             ->first();
 
-        return view('absenh', compact('data', 'absen'));
+        return view('absenh', compact('absen'));
     }
 
-    function filter(Request $request)
+    public function data(Request $request)
     {
-        $bulan = $request->bulan;
-        $tahun = $request->tahun;
         $user = Auth::user();
 
-        if (!$bulan || !$tahun) {
-            return response()->json([], 200);
+        $query = AbsensiHarian::with('guru', 'guru.jabatan')
+            ->orderBy('tanggal', 'desc');
+
+        // 🔐 role
+        if ($user->jabatan->jabatan !== 'admin') {
+            $query->where('guru_id', $user->guru_id);
         }
 
-        if ($user->jabatan->jabatan == 'admin') {
-            $data = AbsensiHarian::with('guru', 'guru.jabatan')
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
-        } else {
-            $data = AbsensiHarian::where('guru_id', $user->guru_id)
-                ->with('guru', 'guru.jabatan')
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'desc')
-                ->get();
+        // 🔍 search
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('status', 'like', "%$search%")
+                    ->orWhere('tanggal', 'like', "%$search%")
+                    ->orWhereHas('guru', function ($g) use ($search) {
+                        $g->where('nama', 'like', "%$search%");
+                    });
+            });
         }
+
+        // 📅 filter bulan & tahun
+        if ($request->bulan && $request->tahun) {
+            $query->whereMonth('tanggal', $request->bulan)
+                ->whereYear('tanggal', $request->tahun);
+        }
+
+        // 📄 pagination
+        $data = $query->paginate(10);
 
         return response()->json($data);
     }
@@ -283,7 +276,7 @@ class AbsensiHarianController extends Controller
     {
         try {
             $absensi = AbsensiHarian::findOrFail($id);
-            if ($absensi->foto && file_exists(public_path($absensi->foto))) {
+            if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg' && file_exists(public_path($absensi->foto))) {
                 unlink(public_path($absensi->foto));
             }
             $absensi->delete();

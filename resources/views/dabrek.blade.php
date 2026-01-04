@@ -148,7 +148,7 @@
                                     `;
                             });
                         } else {
-                            tbody = `<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>`;
+                            tbody = `<tr><td colspan="7" class="text-center">Tidak ada data</td></tr>`;
                         }
                         $("table tbody").html(tbody);
                     },
