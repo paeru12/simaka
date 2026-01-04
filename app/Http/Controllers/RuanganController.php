@@ -72,14 +72,16 @@ class RuanganController extends Controller
     {
         try {
             $ruangan = Ruangan::findOrFail($id);
-            $qr = QrKelas::where('ruangan_id', $id)->first();
             if ($ruangan->jadwal()->exists()) {
                 return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus ruangan yang sudah digunakan di jadwal.']);
             }
-            if ($qr->file && file_exists(public_path($qr->file))) {
-                unlink(public_path($qr->file));
+            $qr = QrKelas::where('ruangan_id', $id)->first();
+            if ($qr) {
+                if ($qr->file && file_exists(public_path($qr->file))) {
+                    unlink(public_path($qr->file));
+                }
+                $qr->delete();
             }
-            $qr->delete();
             $ruangan->delete();
             return response()->json(['success' => true, 'message' => "Ruangan berhasil dihapus"]);
         } catch (\Throwable $th) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Guru;
 use App\Models\Jabatan;
+use App\Models\QrGuru;
 use App\Models\Setting;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -106,7 +107,14 @@ class guruController extends Controller
             }
             $user = User::where('guru_id', $id)->first();
             if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg' && file_exists(public_path($guru->foto))) {
-                unlink(public_path($guru->foto));
+                unlink(public_path($guru->foto)); 
+            }
+            $qr = QrGuru::where('guru_id', $id)->first();
+            if ($qr) {
+                if ($qr->file && file_exists(public_path($qr->file))) {
+                    unlink(public_path($qr->file));
+                }
+                $qr->delete();
             }
             $guru->delete();
             if ($user) {
