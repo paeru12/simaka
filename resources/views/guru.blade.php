@@ -381,57 +381,67 @@
             });
         });
 
+        
+
         $(document).on('click', '.btn-delete', function(e) {
-            e.preventDefault();
-            const id = $(this).data('id');
+            let id = $(this).data('id');
+
             Swal.fire({
                 title: 'Yakin ingin menghapus?',
                 text: 'Data yang dihapus tidak bisa dikembalikan!',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
+                confirmButtonText: 'Ya, Hapus',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/guru/${id}`,
-                        type: 'POST',
-                        data: {
-                            _method: 'DELETE',
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Gagal',
-                                    text: response.message || 'Terjadi kesalahan.'
-                                });
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Gagal menghapus data.'
-                            });
-                        }
-                    });
+                    deleteJadwal(id, false);
                 }
             });
         });
+
+        function deleteJadwal(id, forceDelete = false) {
+            $.ajax({
+                url: "{{ url('guru') }}/" + id,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    force: forceDelete
+                },
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Processing...',
+                        didOpen: () => Swal.showLoading(),
+                        allowOutsideClick: false
+                    });
+                },
+                success: function(res) {
+                    Swal.fire("Berhasil", res.message, "success");
+                    setTimeout(() => location.reload(), 800);
+                },
+                error: function(xhr) {
+                    let res = xhr.responseJSON;
+
+                    if (res.need_confirmation) {
+                        Swal.fire({
+                            title: 'PERINGATAN!',
+                            text: res.message + ' Lanjutkan?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'Ya, Hapus Semua',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                deleteJadwal(id, true);
+                            }
+                        });
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }
+            });
+        }
     });
 
     document.addEventListener("DOMContentLoaded", function() {

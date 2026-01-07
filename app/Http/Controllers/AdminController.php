@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+
 class AdminController extends Controller
 {
     function login()
@@ -201,32 +202,83 @@ class AdminController extends Controller
         return response()->json(['success' => true, 'message' => 'Password berhasil diubah.']);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $jbt = Jabatan::where('jabatan', 'admin')->first();
-        $usr = User::where('jabatan_id', $jbt->id)->count();
-        if ($usr <= 1) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak bisa menghapus data, minimal harus ada 1 admin.'
-            ], 422);
-        }
         try {
-            $guru = Guru::findOrFail($id);
-            $user = User::where('guru_id', $id)->first();
-            if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg' && file_exists(public_path($guru->foto))) {
-                unlink(public_path($guru->foto));
+            /* ================= CEK ADMIN MINIMAL ================= */
+
+            $jabatanAdmin = Jabatan::where('jabatan', 'admin')->first();
+
+            $jumlahAdmin = User::where('jabatan_id', $jabatanAdmin->id)->count();
+
+            if ($jumlahAdmin <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak bisa menghapus data, minimal harus ada 1 admin.'
+                ], 422);
             }
-            $guru->delete();
+
+            /* ================= DATA ADMIN ================= */
+
+            $guru = Guru::findOrFail($id);
+            $user = User::where('guru_id', $guru->id)->first();
+
+            $force = $request->boolean('force');
+
+            /* ================= NEED CONFIRMATION ================= */
+
+            if ($guru->absensi_harian()->exists() && !$force) {
+                return response()->json([
+                    'success' => false,
+                    'need_confirmation' => true,
+                    'message' => 'Admin ini memiliki data absensi harian. Jika dilanjutkan, seluruh absensi harian akan ikut terhapus.'
+                ], 409);
+            }
+
+            /* ================= FORCE DELETE ================= */
+
+            if ($force) {
+                foreach ($guru->absensi_harian as $absensi) {
+                    // 🔥 hapus absensi mapel
+                    if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg') {
+                        $fotoPath = public_path($absensi->foto);
+                        if (file_exists($fotoPath)) {
+                            unlink($fotoPath);
+                        }
+                    }
+                    $absensi->delete();
+                }
+            }
+
+            /* ================= CLEAN FILE ================= */
+
+            if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg') {
+                $fotoPath = public_path($guru->foto);
+                if (file_exists($fotoPath)) {
+                    unlink($fotoPath);
+                }
+            }
+
+            /* ================= DELETE DATA ================= */
+
             if ($user) {
                 $user->delete();
             }
 
-            return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
+            $guru->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Admin dan seluruh data terkait berhasil dihapus.'
+            ]);
         } catch (\Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menghapus data: ' . $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
         }
     }
+
 
     private function uploadFoto($file)
     {

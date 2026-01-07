@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class guruController extends Controller
 {
-    
+
     public function index()
     {
         $setting = Setting::all();
@@ -98,31 +98,88 @@ class guruController extends Controller
         }
     }
 
-    function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            $guru = Guru::findOrFail($id);
-            if ($guru->jadwals()->exists() || $guru->absensis()->exists()) {
-                return response()->json(['success' => false, 'message' => 'Tidak bisa menghapus guru yang masih digunakan Jadwal.']);
+            $guru  = Guru::findOrFail($id);
+            $force = $request->boolean('force');
+
+            /* ================= TIDAK BOLEH DIHAPUS ================= */
+
+            // ❌ Masih digunakan di Jadwal
+            if ($guru->jadwals()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru masih digunakan pada data jadwal.'
+                ], 409);
             }
-            $user = User::where('guru_id', $id)->first();
-            if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg' && file_exists(public_path($guru->foto))) {
-                unlink(public_path($guru->foto)); 
+
+            if ($guru->absensis()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru ini memiliki data absensi mapel.'
+                ], 409);
             }
-            $qr = QrGuru::where('guru_id', $id)->first();
+
+            /* ================= BUTUH KONFIRMASI ================= */
+
+            if ($guru->absensi_harian()->exists() && !$force) {
+                return response()->json([
+                    'success' => false,
+                    'need_confirmation' => true,
+                    'message' => 'Guru masih memiliki data absensi harian. Jika dilanjutkan, seluruh absensi mapel akan ikut terhapus.'
+                ], 409);
+            }
+
+            /* ================= FORCE DELETE ================= */
+
+            if ($force) {
+                foreach ($guru->absensi_harian as $absensi) {
+                    // 🔥 hapus absensi mapel
+                    if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg') {
+                        $fotoPath = public_path($absensi->foto);
+                        if (file_exists($fotoPath)) {
+                            unlink($fotoPath);
+                        }
+                    }
+                    $absensi->delete();
+                }
+            }
+
+            /* ================= CLEAN UP ================= */
+
+            // Hapus foto guru
+            if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg') {
+                $fotoPath = public_path($guru->foto);
+                if (file_exists($fotoPath)) {
+                    unlink($fotoPath);
+                }
+            }
+
+            // Hapus QR Guru
+            $qr = QrGuru::where('guru_id', $guru->id)->first();
             if ($qr) {
                 if ($qr->file && file_exists(public_path($qr->file))) {
                     unlink(public_path($qr->file));
                 }
                 $qr->delete();
             }
+
+            // Hapus user login
+            User::where('guru_id', $guru->id)->delete();
+
+            // Hapus guru
             $guru->delete();
-            if ($user) {
-                $user->delete();
-            }
-            return response()->json(['success' => true, 'message' => "Guru berhasil dihapus"]);
-        } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Guru dan seluruh data terkait berhasil dihapus'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

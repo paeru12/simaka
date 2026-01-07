@@ -168,7 +168,7 @@ class jadwalController extends Controller
                 return response()->json([
                     'success' => false,
                     'need_confirmation' => true,
-                    'message' => 'Jadwal ini sudah memiliki data absensi mapel. Jika dihapus, seluruh absensi mapel juga akan terhapus.'
+                    'message' => 'Guru ini sudah memiliki data absensi mata pelajaran. Jika dihapus, seluruh absensi mapel juga akan terhapus.'
                 ], 409);
             }
 
