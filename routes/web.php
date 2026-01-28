@@ -30,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/absensi-mapel', absensiController::class)->except(['show'])->middleware('role:admin,guru');
     Route::get('/absensi-harian', [AbsensiHarianController::class, 'index'])->name('absensiHarian.ind');
     Route::resource('/jabatan', JabatanController::class)->middleware('role:admin');
-    Route::resource('/guru', guruController::class);
+    Route::resource('/guru', guruController::class)->middleware('role:admin');
     Route::resource('/ruangan', RuanganController::class)->middleware('role:admin');
     Route::resource('/jurusan', JurusanController::class)->middleware('role:admin');
     Route::resource('/kelas', KelasController::class)->middleware('role:admin');
