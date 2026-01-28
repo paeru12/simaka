@@ -38,7 +38,7 @@ function renderGuruRow(item, index, currentPage, perPage) {
 
                     <li>
                         <a class="dropdown-item d-flex align-items-center"
-                           href="/guru/edit/${item.id}">
+                           href="/profile/${item.id}/edit">
                            <i class="bi bi-person"></i>
                            <span>Profile</span>
                         </a>
