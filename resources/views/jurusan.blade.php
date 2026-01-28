@@ -33,70 +33,83 @@
         </ol>
     </nav>
 </div>
+{{-- Modal Add --}}
+<div class="modal fade" id="addJurusanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="JurusanForm" class="need-validation" novalidate>
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Jurusan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" data-role="tagsinput" name="nama" placeholder="Jurusan">
 
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-purple" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Edit --}}
+<div class="modal fade" id="editJurusanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="editJurusanForm" class="need-validation" novalidate>
+                <input type="hidden" name="id" id="editJurusanId">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Jurusan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="nama" id="editJurusanNama" placeholder="Jurusan" required>
+                        <label>Jurusan</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-purple" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Data Jurusan</h5>
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addJurusanModal">
-                        Add Jurusan
-                    </button>
 
-                    {{-- Modal Add --}}
-                    <div class="modal fade" id="addJurusanModal" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <form id="JurusanForm" class="need-validation" novalidate>
-                                    @csrf
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Add Jurusan</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" data-role="tagsinput" name="nama" placeholder="Jurusan">
-
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                        <button class="btn btn-purple" type="submit">Save</button>
-                                    </div>
-                                </form>
+                    <!-- filter -->
+                    <div class="col-12">
+                        <div class="row needs-validation d-flex justify-content-between align-items-center gap-2" novalidate>
+                            <div class="col-4 col-md-4">
+                                <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addJurusanModal">
+                                    Add Jurusan
+                                </button>
+                            </div>
+                            <div class="col-7 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="search" placeholder="Search">
+                                    <label for="search">Search</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Modal Edit --}}
-                    <div class="modal fade" id="editJurusanModal" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <form id="editJurusanForm" class="need-validation" novalidate>
-                                    <input type="hidden" name="id" id="editJurusanId">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Edit Jurusan</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" name="nama" id="editJurusanNama" placeholder="Jurusan" required>
-                                            <label>Jurusan</label>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                        <button class="btn btn-purple" type="submit">Update</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- end filter -->
                     <div class="table-responsive">
-                        <table class="table table-hover datatable">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -104,43 +117,25 @@
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-capitalize">
-                                @foreach ($jurusan as $j)
-                                <tr>
-                                    <th>{{$loop->iteration}}.</th>
-                                    <td class="text-uppercase">{{$j->nama}}</td>
-                                    <td class="aksi">
-                                        <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
-                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                                            <li>
-                                                <button class="dropdown-item d-flex align-items-center editBtnJurusan" data-id="{{ $j->id }}">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                    <span>Update</span>
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            @if ($j->kelas_count == 0)
-                                            <li>
-                                                <button class="dropdown-item d-flex align-items-center deleteBtnJurusan" data-id="{{ $j->id }}">
-                                                    <i class="ri ri-delete-bin-6-fill"></i>
-                                                    <span>Delete</span>
-                                                </button>
-                                            </li>
-                                            @endif
-                                        </ul>
-                                    </td>
-                                </tr>
-                                @endforeach
+                            <tbody id="tableBody" class="text-capitalize">
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3 w-100">
+                            <div id="dataInfo" class="text-muted small"></div>
+                            <ul class="pagination pagination-sm" id="pagination"></ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+@endsection
+
+@section('scripts')
+@include('utils.utils')
+<script src="{{ asset('assets/js/render/jurusanRow.js') }}"></script>
+<script src="{{ asset('assets/js/pages/jurusan.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
@@ -182,15 +177,6 @@
                 }
             });
         });
-        // SHOW UPDATE FORM
-        $('.editBtnJurusan').click(function() {
-            let id = $(this).data('id');
-            $.get("{{ url('jurusan') }}/" + id, function(data) {
-                $('#editJurusanId').val(data.id);
-                $('#editJurusanNama').val(data.nama);
-                $('#editJurusanModal').modal('show');
-            });
-        });
 
         // UPDATE
         $('#editJurusanForm').submit(function(e) {
@@ -224,51 +210,6 @@
                         icon: 'error',
                         title: 'Error',
                         text: xhr.responseJSON.message
-                    });
-                }
-            });
-        });
-        // DELETE
-        $('.deleteBtnJurusan').click(function() {
-            let id = $(this).data('id');
-            Swal.fire({
-                title: 'Hapus Data?',
-                text: 'Data yang dihapus tidak bisa dikembalikan!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ url('jurusan') }}/" + id,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        beforeSend: function() {
-                            Swal.fire({
-                                title: 'Processing...',
-                                text: 'Menghapus data jurusan',
-                                didOpen: () => Swal.showLoading(),
-                                allowOutsideClick: false
-                            });
-                        },
-                        success: function(res) {
-                            if (res.success) {
-                                Swal.fire("Berhasil", res.message, "success");
-                                setTimeout(() => location.reload(), 800);
-                            } else {
-                                Swal.fire("Gagal", res.message, "error");
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON.message
-                            });
-                        }
                     });
                 }
             });

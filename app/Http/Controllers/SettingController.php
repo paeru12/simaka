@@ -48,7 +48,6 @@ class SettingController extends Controller
             'value' => 'nullable',
         ]);
 
-
         try {
             if ($request->hasFile('value')) {
                 if (in_array($setting->key, ['logo', 'kop_surat']) && $setting->value && file_exists(public_path($setting->value) && $setting->value !== 'assets/img/blank.jpg')) {
@@ -66,7 +65,6 @@ class SettingController extends Controller
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
-
 
     private function uploadFoto($file)
     {

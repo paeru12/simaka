@@ -9,9 +9,27 @@ class JabatanController extends Controller
 {
     function index()
     {
-        $data = Jabatan::orderBy('created_at', 'asc')->get();
-        return view('jabatan', compact('data'));
+        return view('jabatan');
     }
+
+    public function filter(Request $request)
+    {
+        $query = Jabatan::orderBy('created_at', 'asc');
+
+        if ($request->search) {
+            $s = $request->search;
+
+            $query->where(function ($q) use ($s) {
+                $q->where('jabatan', 'like', "%$s%")
+                    ->orWhere('nominal_gaji', 'like', "%$s%");
+            });
+        }
+
+        return response()->json(
+            $query->paginate(10)
+        );
+    }
+
 
     function store(Request $request)
     {
@@ -48,7 +66,7 @@ class JabatanController extends Controller
             'nominal_gaji' => 'required|integer',
         ]);
 
-        try { 
+        try {
             $exists = Jabatan::where('jabatan', $validated['jabatan'])->where('id', '!=', $id)->exists();
             if ($exists && strtolower($validated['jabatan']) !== 'admin') {
                 return response()->json([

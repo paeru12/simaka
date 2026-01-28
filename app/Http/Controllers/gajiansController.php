@@ -64,7 +64,6 @@ class gajiansController extends Controller
 
             $data = $query->paginate(10);
 
-            // HITUNG GAJI
             $data->getCollection()->transform(function ($item) use (
                 $minggu,
                 $jp,

@@ -57,6 +57,30 @@ class AdminController extends Controller
         ]);
     }
 
+    public function filter(Request $request)
+    {
+        $search = $request->search;
+
+        $adminRole = Jabatan::where('jabatan', 'admin')->first();
+
+        $query = User::with(['guru.qrguru'])
+            ->where('jabatan_id', $adminRole->id)
+            ->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%$search%")
+                    ->orWhereHas('guru', function ($g) use ($search) {
+                        $g->where('nama', 'like', "%$search%")
+                            ->orWhere('nik', 'like', "%$search%");
+                    });
+            });
+        }
+
+        return response()->json($query->paginate(10));
+    }
+
+
     public function edits($id)
     {
         $guru = Guru::findOrFail($id);
@@ -205,12 +229,8 @@ class AdminController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            /* ================= CEK ADMIN MINIMAL ================= */
-
             $jabatanAdmin = Jabatan::where('jabatan', 'admin')->first();
-
             $jumlahAdmin = User::where('jabatan_id', $jabatanAdmin->id)->count();
-
             if ($jumlahAdmin <= 1) {
                 return response()->json([
                     'success' => false,
@@ -218,14 +238,10 @@ class AdminController extends Controller
                 ], 422);
             }
 
-            /* ================= DATA ADMIN ================= */
-
             $guru = Guru::findOrFail($id);
             $user = User::where('guru_id', $guru->id)->first();
 
             $force = $request->boolean('force');
-
-            /* ================= NEED CONFIRMATION ================= */
 
             if ($guru->absensi_harian()->exists() && !$force) {
                 return response()->json([
@@ -235,11 +251,8 @@ class AdminController extends Controller
                 ], 409);
             }
 
-            /* ================= FORCE DELETE ================= */
-
             if ($force) {
                 foreach ($guru->absensi_harian as $absensi) {
-                    // 🔥 hapus absensi mapel
                     if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg') {
                         $fotoPath = public_path($absensi->foto);
                         if (file_exists($fotoPath)) {
@@ -250,16 +263,12 @@ class AdminController extends Controller
                 }
             }
 
-            /* ================= CLEAN FILE ================= */
-
             if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg') {
                 $fotoPath = public_path($guru->foto);
                 if (file_exists($fotoPath)) {
                     unlink($fotoPath);
                 }
             }
-
-            /* ================= DELETE DATA ================= */
 
             if ($user) {
                 $user->delete();
@@ -278,7 +287,6 @@ class AdminController extends Controller
             ], 500);
         }
     }
-
 
     private function uploadFoto($file)
     {

@@ -11,7 +11,7 @@ function renderAbsensiMapelRow(item, index, currentPage, perPage, isAdmin) {
         ? `${item.jadwal.hari}
            (${formatWaktuIndo(item.jadwal.jam_mulai)} -
             ${formatWaktuIndo(item.jadwal.jam_selesai)})`
-        : '-';
+        : '-'; 
 
     return `
         <tr>

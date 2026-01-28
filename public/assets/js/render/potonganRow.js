@@ -1,0 +1,36 @@
+function renderPotonganRow(p, index, currentPage, perPage) {
+
+    const no = (currentPage - 1) * perPage + index + 1;
+
+    const jumlahFormat = new Intl.NumberFormat('id-ID').format(p.jumlah_potongan);
+
+    return `
+        <tr>
+            <th>${no}.</th>
+            <td class="text-capitalize">${p.nama_potongan}</td>
+            <td>Rp ${jumlahFormat}</td>
+            <td>${p.keterangan ?? "-"}</td>
+
+            <td class="aksi">
+                <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown">
+                    <i class="ri-bar-chart-horizontal-fill"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center editBtn"
+                            data-id="${p.id}">
+                            <i class="bi bi-pencil-square"></i><span>Update</span>
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center deleteBtn"
+                                data-id="${p.id}">
+                            <i class="ri ri-delete-bin-6-fill"></i><span>Delete</span>
+                        </button>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    `;
+}

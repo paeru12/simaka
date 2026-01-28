@@ -13,6 +13,23 @@ class JurusanController extends Controller
         return view('jurusan', compact('jurusan'));
     }
 
+    public function filter(Request $request)
+    {
+        $query = Jurusan::withCount('kelas')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->search) {
+            $s = $request->search;
+
+            $query->where('nama', 'like', "%$s%");
+        }
+
+        return response()->json(
+            $query->paginate(10)
+        );
+    }
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -26,7 +43,10 @@ class JurusanController extends Controller
             foreach ($namas as $n) {
                 $n = trim($n);
                 $exists = Jurusan::where('nama', $n)->exists();
-                if ($exists) {$namaSudahAda[] = $n; continue;}
+                if ($exists) {
+                    $namaSudahAda[] = $n;
+                    continue;
+                }
                 Jurusan::create(['nama' => $n]);
             }
 

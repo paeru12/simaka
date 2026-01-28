@@ -196,7 +196,7 @@ if ($hour >= 5 && $hour < 12) {
                                     </h5>
                                     @if($absen) 
                                     @if(Auth::user()->jabatan->jabatan != 'admin')
-                                    <a href="{{route('absenqr.index')}}" class="btn btn-purple mb-3"><i class="ri ri-qr-scan-line "></i> Absen QR Code</a>
+                                    <a href="{{route('absen-qr.index')}}" class="btn btn-purple mb-3"><i class="ri ri-qr-scan-line "></i> Absen QR Code</a>
                                     @endif
                                     @else
                                     <button type="button" class="btn btn-purple mb-3"

@@ -39,7 +39,7 @@ class AbsensiController extends Controller
 
         return view('absensi', compact('absensi', 'mapel', 'jadwal', 'hari', 'absen'));
     }
-
+ 
     public function filter(Request $request)
     {
         $user = Auth::user();
@@ -51,12 +51,10 @@ class AbsensiController extends Controller
             'jadwal.ruangan'
         ])->orderBy('tanggal', 'desc');
 
-        // 🔐 role
         if ($user->jabatan->jabatan !== 'admin') {
             $query->where('guru_id', $user->guru_id);
         }
 
-        // 🔍 search
         if ($request->search) {
             $search = $request->search;
 
@@ -76,13 +74,11 @@ class AbsensiController extends Controller
             });
         }
 
-        // 📅 filter bulan & tahun
         if ($request->bulan && $request->tahun) {
             $query->whereMonth('tanggal', $request->bulan)
                 ->whereYear('tanggal', $request->tahun);
         }
 
-        // 📄 pagination
         $data = $query->paginate(10);
 
         return response()->json($data);

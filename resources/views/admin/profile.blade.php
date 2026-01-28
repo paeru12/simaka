@@ -74,28 +74,28 @@
                         <div class="tab-pane fade show active profile-overview text-capitalize" id="profile-overview">
                             <h5 class="card-title">Profile Details</h5>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label ">Nama</div>
-                                <div class="col-lg-9 col-md-8 text-capitalize">: {{ $data->nama }}</div>
+                                <div class="col-3 col-md-4 label ">Nama</div>
+                                <div class="col-9 col-md-8 text-capitalize">: {{ $data->nama }}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label ">NIK</div>
-                                <div class="col-lg-9 col-md-8 text-capitalize">: {{ $data->nik }}</div>
+                                <div class="col-3 col-md-4 label ">NIK</div>
+                                <div class="col-9 col-md-8 text-capitalize">: {{ $data->nik }}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label">Email</div>
-                                <div class="col-lg-9 col-md-8">: <span class="text-lowercase">{{ $data->users->email }}</span></div>
+                                <div class="col-3 col-md-4 label">Email</div>
+                                <div class="col-9 col-md-8">: <span class="text-lowercase">{{ $data->users->email }}</span></div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label">No HP</div>
-                                <div class="col-lg-9 col-md-8">: {{ $data->no_hp }}</div>
+                                <div class="col-3 col-md-4 label">No HP</div>
+                                <div class="col-9 col-md-8">: {{ $data->no_hp }}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label">JK</div>
-                                <div class="col-lg-9 col-md-8">: {{ $data->jk }}</div>
+                                <div class="col-3 col-md-4 label">JK</div>
+                                <div class="col-9 col-md-8">: {{ $data->jk }}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-4 label">Jabatan</div>
-                                <div class="col-lg-9 col-md-8">: {{ $data->users->jabatan->jabatan }}</div>
+                                <div class="col-3 col-md-4 label">Jabatan</div>
+                                <div class="col-9 col-md-8">: {{ $data->users->jabatan->jabatan }}</div>
                             </div>
 
                         </div>

@@ -9,15 +9,29 @@ use App\Models\Setting;
 
 class RuanganController extends Controller
 {
-    function index() 
+    function index()
     {
         $setting = Setting::all();
         $logos = $setting->where('key', 'logo')->first();
         $namas = $setting->where('key', 'nama')->first();
         $logo = $logos->value;
         $nama = $namas->value;
-        $data = Ruangan::orderBy('created_at', 'asc')->get();
-        return view('ruangan', compact('data', 'logo', 'nama'));
+        return view('ruangan', compact('logo', 'nama'));
+    }
+
+    public function filter(Request $request)
+    {
+        $query = Ruangan::with('qrKelas')->orderBy('created_at', 'desc');
+
+        if ($request->search) {
+            $s = $request->search;
+
+            $query->where('nama', 'like', "%$s%");
+        }
+
+        return response()->json(
+            $query->paginate(10)
+        );
     }
 
     function store(Request $request)

@@ -10,11 +10,32 @@ class KelasController extends Controller
 {
     function index()
     {
-        $kelas = Kelas::withCount(['jadwal'])->orderBy('created_at', 'desc')->get();
         $jurusan = Jurusan::withCount('kelas')->orderBy('created_at', 'desc')->get();
         $data = Jurusan::all();
-        return view('kelas', compact('kelas', 'jurusan', 'data'));
+        return view('kelas', compact('jurusan', 'data'));
     }
+
+    public function filter(Request $request)
+    {
+        $query = Kelas::with(['jurusan'])
+            ->withCount('jadwal')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->search) {
+            $s = $request->search;
+
+            $query->where(function ($q) use ($s) {
+                $q->where('kelas', 'like', "%$s%")
+                    ->orWhere('rombel', 'like', "%$s%")
+                    ->orWhereHas('jurusan', function ($qr) use ($s) {
+                        $qr->where('nama', 'like', "%$s%");
+                    });
+            });
+        }
+
+        return response()->json($query->paginate(10));
+    }
+
 
     function store(Request $request)
     {

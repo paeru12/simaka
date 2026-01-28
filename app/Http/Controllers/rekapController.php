@@ -21,9 +21,6 @@ class rekapController extends Controller
         $tahun  = $request->tahun;
         $search = $request->search;
 
-        // ======================
-        // REKAP ABSEN HARIAN
-        // ======================
         $rekapHarian = DB::table('absensi_harians')
             ->select(
                 'gurus.id as guru_id',
@@ -45,9 +42,6 @@ class rekapController extends Controller
             )
             ->groupBy('gurus.id', 'gurus.nama', 'jabatans.jabatan');
 
-        // ======================
-        // HADIR MAPEL
-        // ======================
         $rekapMapel = DB::table('absensis')
             ->select(
                 'gurus.id as guru_id',
@@ -58,9 +52,6 @@ class rekapController extends Controller
             ->whereYear('absensis.tanggal', $tahun)
             ->groupBy('gurus.id');
 
-        // ======================
-        // TOTAL MAPEL GURU
-        // ======================
         $totalMapelGuru = DB::table('jadwals')
             ->select(
                 'jadwals.guru_id',
@@ -68,9 +59,6 @@ class rekapController extends Controller
             )
             ->groupBy('jadwals.guru_id');
 
-        // ======================
-        // GABUNG SEMUA
-        // ======================
         $data = DB::table(DB::raw("({$rekapHarian->toSql()}) as harian"))
             ->mergeBindings($rekapHarian)
 
@@ -91,10 +79,8 @@ class rekapController extends Controller
                 'harian.total_sakit',
                 'harian.total_alpha',
 
-                // Total hadir mapel
                 DB::raw('COALESCE(mapel.total_hadir_mapel, 0) as total_hadir_mapel'),
 
-                // Total mapel (hanya guru)
                 DB::raw("
                 CASE 
                     WHEN LOWER(harian.jabatan) = 'guru'
@@ -103,7 +89,6 @@ class rekapController extends Controller
                 END as total_mapel
             "),
 
-                // Total kehadiran
                 DB::raw('
                 (harian.total_hadir_harian + COALESCE(mapel.total_hadir_mapel, 0))
                 as total_kehadiran
@@ -113,8 +98,6 @@ class rekapController extends Controller
 
         return response()->json($data);
     }
-
-
 
     function detail($guru_id, $bulan, $tahun)
     {
@@ -170,14 +153,8 @@ class rekapController extends Controller
     public function filterAll(Request $request)
     {
         $tahun = $request->tahun ?? date('Y');
-
-        // Ambil user login
         $user = Auth::user();
-
-        // Jika user punya relasi guru, dapatkan id-nya (null jika tidak ada)
         $guruId = $user->guru->id ?? null;
-
-        // Query rekap absensi per bulan
         $query = DB::table('absensi_harians')
             ->select(
                 DB::raw('MONTH(tanggal) as bulan_index'),
@@ -188,10 +165,8 @@ class rekapController extends Controller
             )
             ->whereYear('tanggal', $tahun);
 
-        // Kalau bukan admin, batasi hasil ke guru yang login
         if ($user->jabatan->jabatan !== 'admin') {
             if (is_null($guruId)) {
-                // user bukan admin tapi tidak punya relasi guru -> tidak boleh lihat data
                 return response()->json([], 200);
             }
             $query->where('guru_id', $guruId);

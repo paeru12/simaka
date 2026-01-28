@@ -76,7 +76,7 @@ $(document).ready(function () {
     initFilter();
     loadData();
 
-    $('#search').on('keyup', debounce(() => loadData(1), 400));
+    $('#search').on('keyup', debounce(() => loadData(1)));
     $('#bulan, #tahun').on('change', () => loadData(1));
 
     $(document).on('click', '.page-link', function (e) {

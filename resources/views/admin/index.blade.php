@@ -29,124 +29,139 @@
         </ol>
     </nav>
 </div>
+
+<div class="modal fade" id="verticalycentered" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
+                @csrf
+                <input type="hidden" name="role" value="guru">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
+                                <label for="name">Nama</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
+                                <label for="email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" name="nik" class="form-control" id="nik" placeholder="NIK" required>
+                                <label for="nik">NIK</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
+                                <label for="no_hp">No HP</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" name="jk" id="jk">
+                                    <option selected disabled>Open this select menu</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                                <label for="jk">Jenis Kelamin</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="form-floating flex-grow-1">
+                                        <input type="password" name="password" class="form-control" id="yourPassword" placeholder="Password" required>
+                                        <label for="yourPassword">Password</label>
+                                    </div>
+                                    <button id="showHidePassword" type="button" class="btn btn-secondary text-dark">
+                                        <i id="passwordIcon" class="bi bi-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Please enter your password!</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="form-floating flex-grow-1">
+                                        <input type="password" name="kpassword" class="form-control" id="yourPassword2" placeholder="Konfirmasi Password" required>
+                                        <label for="yourPassword2">Konfirmasi Password</label>
+                                    </div>
+                                    <button id="showHidePassword2" type="button" class="btn btn-secondary text-dark">
+                                        <i id="passwordIcon2" class="bi bi-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Please enter your password!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-3">
+                                <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
+                            </div>
+                            <div class="col-9">
+                                <div class="input-group mb-3">
+                                    <input type="file" class="form-control" id="input-type-file" name="foto" aria-label="file example" onchange="readUrl(this)" required>
+                                    <button class="btn btn-purple" type="button" onclick="hapusGambar()">
+                                        <i class="ri ri-delete-bin-6-line"></i>
+                                    </button>
+                                </div>
+                                <div id="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-purple" id="button-add">
+                        <span id="button-text">Save</span>
+                        <span id="button-loader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 <section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-0">Data Admin</h5>
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
-                        Add Admin
-                    </button>
 
-                    <div class="modal fade" id="verticalycentered" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
-                                    @csrf
-                                    <input type="hidden" name="role" value="guru">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Add Admin</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
-                                                    <label for="name">Nama</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
-                                                    <label for="email">Email</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="number" name="nik" class="form-control" id="nik" placeholder="NIK" required>
-                                                    <label for="nik">NIK</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="number" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
-                                                    <label for="no_hp">No HP</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <select class="form-select" name="jk" id="jk">
-                                                        <option selected disabled>Open this select menu</option>
-                                                        <option value="L">Laki-laki</option>
-                                                        <option value="P">Perempuan</option>
-                                                    </select>
-                                                    <label for="jk">Jenis Kelamin</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <div class="input-group">
-                                                        <div class="form-floating flex-grow-1">
-                                                            <input type="password" name="password" class="form-control" id="yourPassword" placeholder="Password" required>
-                                                            <label for="yourPassword">Password</label>
-                                                        </div>
-                                                        <button id="showHidePassword" type="button" class="btn btn-secondary text-dark">
-                                                            <i id="passwordIcon" class="bi bi-eye-slash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="invalid-feedback">Please enter your password!</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <div class="input-group">
-                                                        <div class="form-floating flex-grow-1">
-                                                            <input type="password" name="kpassword" class="form-control" id="yourPassword2" placeholder="Konfirmasi Password" required>
-                                                            <label for="yourPassword2">Konfirmasi Password</label>
-                                                        </div>
-                                                        <button id="showHidePassword2" type="button" class="btn btn-secondary text-dark">
-                                                            <i id="passwordIcon2" class="bi bi-eye-slash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="invalid-feedback">Please enter your password!</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-3">
-                                                    <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
-                                                </div>
-                                                <div class="col-9">
-                                                    <div class="input-group mb-3">
-                                                        <input type="file" class="form-control" id="input-type-file" name="foto" aria-label="file example" onchange="readUrl(this)" required>
-                                                        <button class="btn btn-purple" type="button" onclick="hapusGambar()">
-                                                            <i class="ri ri-delete-bin-6-line"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div id="invalid-feedback"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-purple" id="button-add">
-                                            <span id="button-text">Save</span>
-                                            <span id="button-loader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                                        </button>
-                                    </div>
-                                </form>
-
+                    <!-- filter -->
+                    <div class="col-12">
+                        <div class="row needs-validation d-flex justify-content-between align-items-center gap-2" novalidate>
+                            <div class="col-4 col-md-4">
+                                <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                                    Add Admin
+                                </button>
+                            </div>
+                            <div class="col-7 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="search" placeholder="Search">
+                                    <label for="search">Search</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-
+                    <!-- end filter -->
                     <div class="table-responsive">
-                        <table class="table table-hover datatable">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">No</th>
@@ -159,103 +174,30 @@
                                     <th scope="col">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse($data as $d)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}.</th>
-                                    <td>
-                                        <img src="{{asset($d->guru->foto)}}" class="img-thumbnail p-0 border-none rounded-circle"
-                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy">
-                                    </td>
-                                    <td class="text-capitalize">{{ $d->guru->nama }}</td>
-                                    <td>{{ $d->email }}</td>
-                                    <td>{{ $d->guru->jk }}</td>
-                                    <td>{{ $d->guru->no_hp }}</td>
-                                    <td>
-                                        @if(!$d->guru->qrguru)
-                                        <button class="btn btn-primary btn-generate" data-id="{{ $d->guru_id }}">
-                                            Generate
-                                        </button>
-                                        @else
-                                        <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#idcard{{ $d->guru_id }}">
-                                            Download
-                                        </button>
-
-                                        {{-- Modal ID Card --}}
-                                        <div class="modal fade" id="idcard{{ $d->guru_id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <form id="jabatanForm" novalidate>
-                                                        @csrf
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Download ID Card {{ ucfirst($d->nama) }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <div class="modal-body align-items-center" id="qrContent{{$d->guru_id}}">
-                                                            <div class="text-center border-2">
-                                                                <img src="{{ asset($d->guru->foto) }}" alt="ID Card" class="w-25 rounded-circle mb-2">
-                                                                <p class="text-capitalize mb-0 mt-0 fw-bold">{{ $d->guru->nama }}</p>
-                                                                <p class="text-capitalize mb-0">{{ $d->jabatan->jabatan }}</p>
-                                                                <img src="{{asset($d->guru->qrguru->file)}}" class="w-75">
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                                            <button type="button" id="printBtn" class="btn btn-purple btn-sm mt-2 d-print-none" onclick='downloadPDF(@json($d->guru_id), "{{ $d->guru->nama }}")'>Download</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
-                                    </td>
-                                    <td class="aksi">
-                                        <button class="btn btn-purple btn-sm"
-                                            data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center"
-                                                    href="{{ route('admin.edits', ['id' => $d->guru_id]) }}">
-                                                    <i class="bi bi-person"></i>
-                                                    <span>Profile</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);"
-                                                    class="dropdown-item d-flex align-items-center btn-delete"
-                                                    data-id="{{ $d->guru_id }}">
-                                                    <i class="ri ri-delete-bin-6-fill"></i>
-                                                    <span>Delete</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="9" class="text-center">No data available</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
+                            <tbody id="tableBody"></tbody>
                         </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3 w-100">
+                            <div id="dataInfo" class="text-muted small"></div>
+                            <ul class="pagination pagination-sm" id="pagination"></ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-@push('scripts')
+@endsection
+
+@section('scripts')
 <script src="{{ asset('assets/js/main2.js') }}"></script>
-@endpush
+@include('utils.utils')
+<script src="{{ asset('assets/js/render/adminRow.js') }}"></script>
+<script src="{{ asset('assets/js/pages/administrator.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    const BASE_URL = "{{ asset('') }}";
     $(document).ready(function() {
 
         $('#formTambahGuru').on('submit', function(e) {
@@ -349,161 +291,6 @@
             });
         });
 
-        // $(document).on('click', '.btn-delete', function(e) {
-        //     e.preventDefault();
-        //     const id = $(this).data('id');
-        //     Swal.fire({
-        //         title: 'Yakin ingin menghapus?',
-        //         text: 'Data yang dihapus tidak bisa dikembalikan!',
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#d33',
-        //         cancelButtonColor: '#3085d6',
-        //         confirmButtonText: 'Ya, hapus!',
-        //         cancelButtonText: 'Batal'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             $.ajax({
-        //                 url: `/administrator/${id}`,
-        //                 type: 'POST',
-        //                 data: {
-        //                     _method: 'DELETE',
-        //                     _token: $('meta[name="csrf-token"]').attr('content')
-        //                 },
-        //                 success: function(response) {
-        //                     if (response.success) {
-        //                         Swal.fire({
-        //                             icon: 'success',
-        //                             title: 'Berhasil',
-        //                             text: response.message,
-        //                             showConfirmButton: false,
-        //                             timer: 2000
-        //                         }).then(() => {
-        //                             location.reload();
-        //                         });
-        //                     } else {
-        //                         Swal.fire({
-        //                             icon: 'error',
-        //                             title: 'Gagal',
-        //                             text: response.message || 'Terjadi kesalahan.'
-        //                         });
-        //                     }
-        //                 },
-        //                 error: function(response) {
-
-        //                     let errors = response.responseJSON?.errors;
-        //                     let errorMessages = "";
-        //                     if (response.responseJSON?.message) {
-        //                         errorMessages = response.responseJSON.message;
-        //                     } else {
-        //                         errorMessages = "Terjadi kesalahan tidak diketahui.";
-        //                     }
-        //                     Swal.fire({
-        //                         icon: 'error',
-        //                         title: 'Gagal',
-        //                         text: errorMessages
-        //                     });
-        //                 }
-        //             });
-        //         }
-        //     });
-        // });
-
-        $(document).on('click', '.btn-delete', function(e) {
-            let id = $(this).data('id');
-
-            Swal.fire({
-                title: 'Yakin ingin menghapus?',
-                text: 'Data yang dihapus tidak bisa dikembalikan!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteJadwal(id, false);
-                }
-            });
-        });
-
-        function deleteJadwal(id, forceDelete = false) {
-            $.ajax({
-                url: "{{ url('administrator') }}/" + id,
-                type: "DELETE",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    force: forceDelete
-                },
-                beforeSend: function() {
-                    Swal.fire({
-                        title: 'Processing...',
-                        didOpen: () => Swal.showLoading(),
-                        allowOutsideClick: false
-                    });
-                },
-                success: function(res) {
-                    Swal.fire("Berhasil", res.message, "success");
-                    setTimeout(() => location.reload(), 800);
-                },
-                error: function(xhr) {
-                    let res = xhr.responseJSON;
-
-                    if (res.need_confirmation) {
-                        Swal.fire({
-                            title: 'PERINGATAN!',
-                            text: res.message + ' Lanjutkan?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            confirmButtonText: 'Ya, Hapus Semua',
-                            cancelButtonText: 'Batal'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                deleteJadwal(id, true);
-                            }
-                        });
-                    } else {
-                        Swal.fire("Gagal", res.message, "error");
-                    }
-                }
-            });
-        }
-        // id card
-        $('.btn-generate').on('click', function() {
-            let guruId = $(this).data('id');
-
-            $.ajax({
-                url: "{{ route('qrguru.store') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    guru_id: guruId
-                },
-                beforeSend: function() {
-                    Swal.fire({
-                        title: 'Processing...',
-                        text: 'Membuat QR Code Guru',
-                        didOpen: () => Swal.showLoading(),
-                        allowOutsideClick: false
-                    });
-                },
-                success: function(res) {
-                    if (res.success) {
-                        Swal.close();
-                        Swal.fire("Berhasil", res.message, "success");
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        Swal.fire("Gagal", res.message, "error");
-                        console.log(res);
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                    Swal.close();
-                    Swal.fire("Error", err.responseJSON.message, "error");
-                }
-            });
-        });
     });
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -535,26 +322,5 @@
             }
         });
     });
-
-    function downloadPDF(id, nama) {
-        const element = document.getElementById("qrContent" + id);
-        const opt = {
-            margin: [8, 0, 0, 0],
-            filename: "id-card-" + nama + ".pdf",
-            image: {
-                type: 'jpeg',
-                quality: 1
-            },
-            html2canvas: {
-                scale: 2
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: [85.6, 54],
-                orientation: 'portrait'
-            }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
 </script>
 @endsection

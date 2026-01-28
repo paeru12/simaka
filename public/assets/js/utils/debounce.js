@@ -1,4 +1,4 @@
-function debounce(fn, delay = 500) {
+function debounce(fn, delay = 800) {
     let timer;
     return function (...args) {
         clearTimeout(timer);

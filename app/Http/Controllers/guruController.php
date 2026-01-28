@@ -22,16 +22,37 @@ class guruController extends Controller
         $namas = $setting->where('key', 'nama')->first();
         $logo = $logos->value;
         $nama = $namas->value;
-        $jbt = Jabatan::where('jabatan', 'admin')->first();
-        $guru = Guru::orderBy('created_at', 'desc')->where('jabatan_id', '!=', $jbt->id)->get();
         $jabatan = Jabatan::orderBy('created_at', 'desc')->where('jabatan', '!=', 'admin')->get();
         return response()->view('guru', [
-            'guru' => $guru,
             'jabatan' => $jabatan,
             'logo' => $logo,
             'nama' => $nama,
         ]);
     }
+
+    public function filter(Request $request)
+    {
+        $search = $request->search;
+        $jbt = Jabatan::where('jabatan', 'admin')->first();
+        $query = Guru::with(['jabatan', 'qrguru', 'users'])
+            ->where('jabatan_id', '!=', $jbt->id)
+            ->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where('nama', 'like', "%$search%")
+                ->orWhere('nik', 'like', "%$search%")
+                ->orWhere('no_hp', 'like', "%$search%")
+                ->orWhereHas('users', function ($q) use ($search) {
+                    $q->where('email', 'like', "%$search%");
+                })
+                ->orWhereHas('jabatan', function ($q) use ($search) {
+                    $q->where('jabatan', 'like', "%$search%");
+                });
+        }
+
+        return response()->json($query->paginate(10));
+    }
+
 
     function store(Request $request)
     {
@@ -104,9 +125,6 @@ class guruController extends Controller
             $guru  = Guru::findOrFail($id);
             $force = $request->boolean('force');
 
-            /* ================= TIDAK BOLEH DIHAPUS ================= */
-
-            // ❌ Masih digunakan di Jadwal
             if ($guru->jadwals()->exists()) {
                 return response()->json([
                     'success' => false,
@@ -121,8 +139,6 @@ class guruController extends Controller
                 ], 409);
             }
 
-            /* ================= BUTUH KONFIRMASI ================= */
-
             if ($guru->absensi_harian()->exists() && !$force) {
                 return response()->json([
                     'success' => false,
@@ -131,11 +147,8 @@ class guruController extends Controller
                 ], 409);
             }
 
-            /* ================= FORCE DELETE ================= */
-
             if ($force) {
                 foreach ($guru->absensi_harian as $absensi) {
-                    // 🔥 hapus absensi mapel
                     if ($absensi->foto && $absensi->foto !== 'assets/img/blank.jpg') {
                         $fotoPath = public_path($absensi->foto);
                         if (file_exists($fotoPath)) {
@@ -146,9 +159,6 @@ class guruController extends Controller
                 }
             }
 
-            /* ================= CLEAN UP ================= */
-
-            // Hapus foto guru
             if ($guru->foto && $guru->foto !== 'assets/img/blank.jpg') {
                 $fotoPath = public_path($guru->foto);
                 if (file_exists($fotoPath)) {
@@ -156,7 +166,6 @@ class guruController extends Controller
                 }
             }
 
-            // Hapus QR Guru
             $qr = QrGuru::where('guru_id', $guru->id)->first();
             if ($qr) {
                 if ($qr->file && file_exists(public_path($qr->file))) {
@@ -165,10 +174,8 @@ class guruController extends Controller
                 $qr->delete();
             }
 
-            // Hapus user login
             User::where('guru_id', $guru->id)->delete();
 
-            // Hapus guru
             $guru->delete();
 
             return response()->json([

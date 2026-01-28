@@ -14,20 +14,53 @@ class jadwalController extends Controller
 {
     function index()
     {
-        $auth = Auth::user();
         $mapel = MataPelajaran::all();
         $guru = Guru::whereHas('jabatan', function ($query) {
             $query->where('jabatan', 'guru');
         })->latest()->get();
         $kelas = Kelas::orderBy('kelas', 'asc')->get();
         $ruangan = Ruangan::all();
-        if ($auth->jabatan->jabatan == 'admin') {
-            $jadwal = Jadwal::with(['guru', 'mataPelajaran'])->orderby('hari', 'asc')->get();
-        } else {
-            $jadwal = Jadwal::with(['guru', 'mataPelajaran'])->where('guru_id', $auth->guru_id)->orderby('hari', 'asc')->get();
-        }
-        return view('jadwal', compact('mapel', 'guru', 'jadwal', 'kelas', 'ruangan'));
+        return view('jadwal', compact('mapel', 'guru', 'kelas', 'ruangan'));
     }
+
+    public function filter(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = Jadwal::with([
+            'guru:id,nama',
+            'mataPelajaran:id,nama_mapel',
+            'kelas.jurusan:id,nama',
+            'ruangan:id,nama'
+        ])
+            ->orderBy('hari', 'asc');
+
+        if ($user->jabatan->jabatan !== 'admin') {
+            $query->where('guru_id', $user->guru_id);
+        }
+
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->whereHas(
+                'guru',
+                fn($q) =>
+                $q->where('nama', 'like', "%$search%")
+            )
+                ->orWhereHas(
+                    'mataPelajaran',
+                    fn($q) =>
+                    $q->where('nama_mapel', 'like', "%$search%")
+                )
+                ->orWhere('hari', 'like', "%$search%");
+        }
+
+        return response()->json([
+            'is_admin' => $user->jabatan->jabatan === 'admin',
+            ...$query->paginate(10)->toArray()
+        ]);
+    }
+
 
     function store(Request $request)
     {

@@ -7,10 +7,26 @@ use Illuminate\Http\Request;
 
 class PotonganController extends Controller
 {
-    function index() {
+    function index()
+    {
         $potongans = Potongan::all();
         return view('potongan', compact('potongans'));
     }
+
+    public function filter(Request $request)
+    {
+        $search = $request->search;
+
+        $query = Potongan::orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where('nama_potongan', 'like', "%$search%")
+                ->orWhere('keterangan', 'like', "%$search%");
+        }
+
+        return response()->json($query->paginate(10));
+    }
+
 
     function show($id)
     {
@@ -18,7 +34,8 @@ class PotonganController extends Controller
         return response()->json($potongan);
     }
 
-    function store(Request $request) {
+    function store(Request $request)
+    {
         $validated = $request->validate([
             'nama_potongan' => 'required|string|max:255',
             'jumlah_potongan' => 'required|numeric',
@@ -33,7 +50,8 @@ class PotonganController extends Controller
         }
     }
 
-    function update(Request $request, $id) {
+    function update(Request $request, $id)
+    {
         $potongan = Potongan::findOrFail($id);
         $validated = $request->validate([
             'nama_potongan' => 'required|string|max:255',
@@ -48,7 +66,8 @@ class PotonganController extends Controller
         }
     }
 
-    function destroy($id) {
+    function destroy($id)
+    {
         try {
             $potongan = Potongan::findOrFail($id);
             $potongan->delete();

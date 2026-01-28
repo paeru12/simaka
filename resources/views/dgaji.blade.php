@@ -9,7 +9,7 @@ $bulanTahun = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedForma
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{route('gaji.index')}}">Laporan Gaji</a></li>
+            <li class="breadcrumb-item"><a href="{{route('laporan-gaji.index')}}">Laporan Gaji</a></li>
             <li class="breadcrumb-item active">Slip Gaji</li>
         </ol>
     </nav>

@@ -31,7 +31,7 @@ $nama = $namas->value;
     <script src="{{ asset('assets/dist/sweetalert2.all.min.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    
+
 </head>
 
 <body>
@@ -56,7 +56,7 @@ $nama = $namas->value;
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
                             <h6 class="text-capitalize">{{ Auth::user()->guru->nama }}</h6>
-                            <span>Guru & Staff</span>
+                            <span class="text-capitalize">{{ Auth::user()->jabatan->jabatan }}</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
@@ -90,9 +90,12 @@ $nama = $namas->value;
 
     <footer id="footer" class="footer">
         <div class="copyright">
-            &copy; Copyright <strong><span>
-                    {{ Carbon\Carbon::now()->timezone('Asia/Jakarta')->format('Y') }}</span></strong>. All Rights
-            Reserved
+            <p class="mb-0">
+                &copy; Copyright <strong><span>
+                        {{ Carbon\Carbon::now()->timezone('Asia/Jakarta')->format('Y') }}</span></strong>. All Rights
+                Reserved
+            </p>
+            <p class="mb-0">Design & Development by <a href="https://www.yukti.id/" target="_blank">Yukti</a></p>
         </div>
 
     </footer>
@@ -109,7 +112,7 @@ $nama = $namas->value;
         function asset(path) {
             if (!path) return '';
             return `{{ asset('') }}` + path;
-        } 
+        }
 
         $.ajaxSetup({
             headers: {

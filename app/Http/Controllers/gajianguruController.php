@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Absensi;
-use App\Models\Guru;
 use App\Models\Potongan;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
@@ -21,24 +19,19 @@ class gajianguruController extends Controller
     {
         try {
             $tahun = $request->tahun ?? date('Y');
-
-            // Setting dasar
             $minggu = (int) (Setting::where('key', 'minggu')->value('value') ?? 4);
             $jp = (int) (Setting::where('key', 'jp')->value('value') ?? 40);
-            $totalPotongan = Potongan::sum('jumlah_potongan'); // total semua potongan (bpjs + asuransi)
-
+            $totalPotongan = Potongan::sum('jumlah_potongan');
             $settings = Setting::pluck('value', 'key');
             $gajiMengajar = isset($settings['gaji_mengajar'])
                 ? preg_replace('/[^0-9]/', '', $settings['gaji_mengajar'])
                 : 0;
 
-            // Guru login
             $guruId = Auth::user()->guru->id ?? null;
             if (!$guruId) {
                 return response()->json([], 200);
             }
 
-            // Ambil data absensi per bulan untuk guru login
             $data = DB::table('gurus as g')
                 ->leftJoin('jabatans as jbt', 'jbt.id', '=', 'g.jabatan_id')
                 ->leftJoin('absensis as a', function ($join) use ($tahun) {
@@ -57,7 +50,6 @@ class gajianguruController extends Controller
                 ->orderBy('bulan_index')
                 ->get();
 
-            // Daftar nama bulan
             $bulanNames = [
                 1 => 'Januari',
                 2 => 'Februari',
@@ -73,13 +65,11 @@ class gajianguruController extends Controller
                 12 => 'Desember'
             ];
 
-            // Hitung total gaji per bulan
             $result = $data->map(function ($item) use ($minggu, $jp, $totalPotongan, $gajiMengajar, $bulanNames, $guruId) {
-                $gapokBulanan = $jp * ($item->nominal_gaji ?? 0) * $minggu; // gaji dasar per bulan
-                $honorHadir = ($item->total_hadir ?? 0) * $gajiMengajar; // tambahan per kehadiran
+                $gapokBulanan = $jp * ($item->nominal_gaji ?? 0) * $minggu;
+                $honorHadir = ($item->total_hadir ?? 0) * $gajiMengajar;
                 $totalGaji = $gapokBulanan + $honorHadir - $totalPotongan;
 
-                // Jangan biarkan negatif
                 if ($totalGaji < 0) $totalGaji = 0;
 
                 return [

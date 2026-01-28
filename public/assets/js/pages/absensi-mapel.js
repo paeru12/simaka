@@ -49,7 +49,7 @@ $(document).ready(function () {
     initFilter();
     loadAbsensiMapel();
 
-    $('#search').on('keyup', debounce(() => loadAbsensiMapel(1), 400));
+    $('#search').on('keyup', debounce(() => loadAbsensiMapel(1)));
     $('#bulan, #tahun').on('change', () => loadAbsensiMapel(1));
 
     $(document).on('click', '.page-link', function (e) {

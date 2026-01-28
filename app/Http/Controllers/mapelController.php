@@ -9,9 +9,25 @@ class mapelController extends Controller
 {
     function index()
     {
-        $mapel = MataPelajaran::orderBy('created_at', 'desc')->get();
-        return view('mapel', compact('mapel'));
+        return view('mapel');
     }
+
+    public function filter(Request $request)
+    {
+        $query = MataPelajaran::withCount('jadwals')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->search) {
+            $s = $request->search;
+
+            $query->where('nama_mapel', 'like', "%$s%");
+        }
+
+        return response()->json(
+            $query->paginate(10)
+        );
+    }
+
 
     function store(Request $request)
     {
@@ -44,7 +60,7 @@ class mapelController extends Controller
         $exists = MataPelajaran::where('nama_mapel', $validated['nama_mapel'])
             ->where('id', '!=', $id)
             ->exists();
-        if ($exists) { 
+        if ($exists) {
             return response()->json([
                 'success' => false,
                 'message' => "Nama Mapel sudah ada."

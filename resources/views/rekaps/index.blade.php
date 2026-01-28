@@ -1,13 +1,13 @@
 @extends('layout.layout')
-@section('title', 'Detail Rekap Absen Guru')
+@section('title', 'Detail Rekap Absen '.ucfirst(Auth::user()->jabatan->jabatan))
 @section('content')
 
 <div class="pagetitle">
-    <h1>Rekap Absen {{Auth::user()->jabatan->jabatan}} </h1>
+    <h1 class="text-capitalize">Rekap Absen {{Auth::user()->jabatan->jabatan}} </h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active">Rekap Absen Guru</li>
+            <li class="breadcrumb-item active text-capitalize">Rekap Absen {{Auth::user()->jabatan->jabatan}}</li>
         </ol>
     </nav>
 </div>
@@ -15,7 +15,7 @@
 <section class="section">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title mb-0">Rekap Absen {{Auth::user()->jabatan->jabatan}} </h5>
+            <h5 class="card-title mb-0 text-capitalize">Rekap Absen {{Auth::user()->jabatan->jabatan}} </h5>
             <div class="col-8">
                 <div class="row needs-validation" novalidate>
 
@@ -34,7 +34,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-hover datatable">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>No</th>

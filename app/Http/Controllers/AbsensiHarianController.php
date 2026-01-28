@@ -14,7 +14,6 @@ class AbsensiHarianController extends Controller
     public function index()
     {
         $user = Auth::user();
-
         $absen = AbsensiHarian::where('guru_id', $user->guru_id)
             ->whereDate('tanggal', Carbon::now('Asia/Jakarta'))
             ->first();
@@ -29,12 +28,10 @@ class AbsensiHarianController extends Controller
         $query = AbsensiHarian::with('guru', 'guru.jabatan')
             ->orderBy('tanggal', 'desc');
 
-        // 🔐 role
         if ($user->jabatan->jabatan !== 'admin') {
             $query->where('guru_id', $user->guru_id);
         }
 
-        // 🔍 search
         if ($request->search) {
             $search = $request->search;
 
@@ -47,13 +44,11 @@ class AbsensiHarianController extends Controller
             });
         }
 
-        // 📅 filter bulan & tahun
         if ($request->bulan && $request->tahun) {
             $query->whereMonth('tanggal', $request->bulan)
                 ->whereYear('tanggal', $request->tahun);
         }
 
-        // 📄 pagination
         $data = $query->paginate(10);
 
         return response()->json($data);
@@ -110,7 +105,6 @@ class AbsensiHarianController extends Controller
             $today = now()->toDateString();
             $userId = Auth::user()->guru_id;
 
-            // Validasi minimal
             if (!$request->qr_token) {
                 return response()->json(['status' => 'error', 'message' => 'QR Code tidak terdeteksi!'], 422);
             }
@@ -119,7 +113,6 @@ class AbsensiHarianController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Foto bukti wajib diambil!'], 422);
             }
 
-            // Cek absensi existing
             $absensi = AbsensiHarian::firstOrNew([
                 'guru_id' => $userId,
                 'tanggal' => $today,
@@ -129,7 +122,6 @@ class AbsensiHarianController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Anda sudah absen datang hari ini!'], 409);
             }
 
-            // Simpan foto (base64 to file)
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.jpg';
@@ -137,7 +129,6 @@ class AbsensiHarianController extends Controller
                 $file->move(public_path('uploads/absensi_harian'), $filename);
                 $absensi->foto = $path;
             } else {
-                // Handle jika dikirim dalam bentuk base64 (dari kamera)
                 $image = $request->foto;
                 if (str_starts_with($image, 'data:image')) {
                     $image = str_replace('data:image/jpeg;base64,', '', $image);
@@ -205,7 +196,6 @@ class AbsensiHarianController extends Controller
         $now = \Carbon\Carbon::now('Asia/Jakarta');
         $tanggal = $now->toDateString();
 
-        // Cari QR Guru
         $qr = QrGuru::where('token', $request->token)
             ->where('aktif', 1)
             ->with('guru')
@@ -218,7 +208,6 @@ class AbsensiHarianController extends Controller
             ], 422);
         }
 
-        // Validasi kepemilikan QR sesuai user login
         if ($user->guru_id !== $qr->guru_id) {
             return response()->json([
                 'status' => 'error',
@@ -226,7 +215,6 @@ class AbsensiHarianController extends Controller
             ], 403);
         }
 
-        // Cek apakah sudah ada absensi hari ini
         $absensi = \App\Models\AbsensiHarian::where('guru_id', $qr->guru_id)
             ->whereDate('tanggal', $tanggal)
             ->first();
@@ -238,7 +226,6 @@ class AbsensiHarianController extends Controller
             ], 409);
         }
 
-        // Tentukan status absensi berikutnya
         $next = 'datang';
         if ($absensi && $absensi->jam_datang && !$absensi->jam_pulang) {
             $next = 'pulang';

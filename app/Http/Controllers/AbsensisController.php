@@ -11,6 +11,7 @@ use App\Models\Absensi;
 use App\Models\Jadwal;
 use App\Models\QrKelas;
 use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Auth;
 
 class AbsensisController extends Controller
 {
@@ -23,7 +24,7 @@ class AbsensisController extends Controller
             'lng'   => 'nullable|numeric',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $now = Carbon::now('Asia/Jakarta');
         $tanggal = $now->toDateString();
         $time = $now->format('H:i:s');
@@ -111,7 +112,7 @@ class AbsensisController extends Controller
             'token' => 'required|string',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $now = Carbon::now('Asia/Jakarta');
         $tanggal = $now->toDateString();
         $time = $now->format('H:i:s');

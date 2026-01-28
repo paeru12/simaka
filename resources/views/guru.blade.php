@@ -29,141 +29,156 @@
         </ol>
     </nav>
 </div>
+
+{{-- Modal Add Guru --}}
+<div class="modal fade" id="verticalycentered" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
+                @csrf
+                <input type="hidden" name="role" value="guru">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Guru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
+                                <label for="name">Nama</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
+                                <label for="email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" name="nik" class="form-control" id="nik" placeholder="NIK" required>
+                                <label for="nik">NIK</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
+                                <label for="no_hp">No HP</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" name="jk" id="jk">
+                                    <option selected disabled>Open this select menu</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                                <label for="jk">Jenis Kelamin</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select name="jabatan_id" class="form-select text-capitalize" id="floatingSelect" aria-label="Floating label select example">
+                                    <option selected disabled>Open this select menu</option>
+                                    @foreach ($jabatan as $j)
+                                    <option value="{{ $j->id }}" class="text-capitalize">{{ $j->jabatan }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="floatingSelect">Pilih Jabatan</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="form-floating flex-grow-1">
+                                        <input type="password" name="password" class="form-control" id="yourPassword" placeholder="Password" required>
+                                        <label for="yourPassword">Password</label>
+                                    </div>
+                                    <button id="showHidePassword" type="button" class="btn btn-secondary text-dark">
+                                        <i id="passwordIcon" class="bi bi-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Please enter your password!</div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="form-floating flex-grow-1">
+                                        <input type="password" name="kpassword" class="form-control" id="yourPassword2" placeholder="Konfirmasi Password" required>
+                                        <label for="yourPassword2">Konfirmasi Password</label>
+                                    </div>
+                                    <button id="showHidePassword2" type="button" class="btn btn-secondary text-dark">
+                                        <i id="passwordIcon2" class="bi bi-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Please enter your password!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-3">
+                                <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
+                            </div>
+                            <div class="col-9">
+                                <div class="input-group mb-3">
+                                    <input type="file" class="form-control" id="input-type-file" name="foto" aria-label="file example" onchange="readUrl(this)" required>
+                                    <button class="btn btn-purple" type="button" onclick="hapusGambar()">
+                                        <i class="ri ri-delete-bin-6-line"></i>
+                                    </button>
+                                </div>
+                                <div id="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-purple" id="button-add">
+                        <span id="button-text">Save</span>
+                        <span id="button-loader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{-- End Modal Add Guru --}}
+
 <section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-0">Data Guru</h5>
-                    <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
-                        Add Guru
-                    </button>
-
-                    {{-- Modal Add Guru --}}
-                    <div class="modal fade" id="verticalycentered" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form id="formTambahGuru" class="needs-validation" enctype="multipart/form-data" novalidate>
-                                    @csrf
-                                    <input type="hidden" name="role" value="guru">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Add Guru</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" name="nama" class="form-control" id="name" placeholder="Nama" required>
-                                                    <label for="name">Nama</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
-                                                    <label for="email">Email</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="number" name="nik" class="form-control" id="nik" placeholder="NIK" required>
-                                                    <label for="nik">NIK</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <input type="number" name="no_hp" class="form-control" id="no_hp" placeholder="No HP" required>
-                                                    <label for="no_hp">No HP</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <select class="form-select" name="jk" id="jk">
-                                                        <option selected disabled>Open this select menu</option>
-                                                        <option value="L">Laki-laki</option>
-                                                        <option value="P">Perempuan</option>
-                                                    </select>
-                                                    <label for="jk">Jenis Kelamin</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-floating mb-3">
-                                                    <select name="jabatan_id" class="form-select text-capitalize" id="floatingSelect" aria-label="Floating label select example">
-                                                        <option selected disabled>Open this select menu</option>
-                                                        @foreach ($jabatan as $j)
-                                                        <option value="{{ $j->id }}" class="text-capitalize">{{ $j->jabatan }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <label for="floatingSelect">Pilih Jabatan</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <div class="input-group">
-                                                        <div class="form-floating flex-grow-1">
-                                                            <input type="password" name="password" class="form-control" id="yourPassword" placeholder="Password" required>
-                                                            <label for="yourPassword">Password</label>
-                                                        </div>
-                                                        <button id="showHidePassword" type="button" class="btn btn-secondary text-dark">
-                                                            <i id="passwordIcon" class="bi bi-eye-slash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="invalid-feedback">Please enter your password!</div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <div class="input-group">
-                                                        <div class="form-floating flex-grow-1">
-                                                            <input type="password" name="kpassword" class="form-control" id="yourPassword2" placeholder="Konfirmasi Password" required>
-                                                            <label for="yourPassword2">Konfirmasi Password</label>
-                                                        </div>
-                                                        <button id="showHidePassword2" type="button" class="btn btn-secondary text-dark">
-                                                            <i id="passwordIcon2" class="bi bi-eye-slash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="invalid-feedback">Please enter your password!</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-3">
-                                                    <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
-                                                </div>
-                                                <div class="col-9">
-                                                    <div class="input-group mb-3">
-                                                        <input type="file" class="form-control" id="input-type-file" name="foto" aria-label="file example" onchange="readUrl(this)" required>
-                                                        <button class="btn btn-purple" type="button" onclick="hapusGambar()">
-                                                            <i class="ri ri-delete-bin-6-line"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div id="invalid-feedback"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-purple" id="button-add">
-                                            <span id="button-text">Save</span>
-                                            <span id="button-loader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                                        </button>
-                                    </div>
-                                </form>
+                    <!-- filter -->
+                    <div class="col-12">
+                        <div class="row needs-validation d-flex justify-content-between align-items-center gap-2" novalidate>
+                            <div class="col-4 col-md-4">
+                                <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                                    Add Guru
+                                </button>
+                            </div>
+                            <div class="col-7 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="search" placeholder="Search">
+                                    <label for="search">Search</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-
+                    <!-- end filter -->
                     <div class="table-responsive">
-                        <table class="table table-hover datatable">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">No</th>
@@ -177,114 +192,33 @@
                                     <th scope="col">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse($guru as $g)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}.</th>
-                                    <td>
-                                        <img src="{{asset($g->foto)}}" class="img-thumbnail p-0 border-none rounded-circle"
-                                            style="width: 40px; aspect-ratio: 1/1; object-fit: cover;" loading="lazy">
-                                    </td>
-                                    <td class="text-capitalize">{{ $g->nama }}</td>
-                                    <td>{{ $g->users->email }}</td>
-                                    <td class="text-capitalize">{{ $g->users->jabatan->jabatan }}</td>
-                                    <td>{{ $g->jk }}</td>
-                                    <td>{{ $g->no_hp }}</td>
-                                    <td>
-                                        @if(!$g->qrguru)
-                                        <button class="btn btn-primary btn-generate" data-id="{{ $g->id }}">
-                                            Generate
-                                        </button>
-                                        @else
-                                        <a href="{{ route('qr.guru.download', $g->id) }}"
-                                            class="btn btn-purple btn-sm">
-                                            Download
-                                        </a>
-                                        @endif
-                                    </td>
-                                    <td class="aksi">
-                                        <button class="btn btn-purple btn-sm"
-                                            data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center"
-                                                    href="{{ route('admin.edits', ['id' => $g->id]) }}">
-                                                    <i class="bi bi-person"></i>
-                                                    <span>Profile</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);"
-                                                    class="dropdown-item d-flex align-items-center btn-delete"
-                                                    data-id="{{ $g->id }}">
-                                                    <i class="ri ri-delete-bin-6-fill"></i>
-                                                    <span>Delete</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="9" class="text-center">No data available</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
+                            <tbody id="tableBody"></tbody>
                         </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3 w-100">
+                            <div id="dataInfo" class="text-muted small"></div>
+                            <ul class="pagination pagination-sm" id="pagination"></ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-@push('scripts')
+
+@endsection
+
+@section('scripts')
 <script src="{{ asset('assets/js/main2.js') }}"></script>
-@endpush
+@include('utils.utils')
+<script src="{{ asset('assets/js/render/guruRow.js') }}"></script>
+<script src="{{ asset('assets/js/pages/guru.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    const BASE_URL = "{{ asset('') }}";
     $(document).ready(function() {
-        // CETAK QR GURU
-        $('.btn-generate').on('click', function() {
-            let guruId = $(this).data('id');
-
-            $.ajax({
-                url: "{{ route('qrguru.store') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    guru_id: guruId
-                },
-                beforeSend: function() {
-                    Swal.fire({
-                        title: 'Processing...',
-                        text: 'Membuat QR Code Guru',
-                        didOpen: () => Swal.showLoading(),
-                        allowOutsideClick: false
-                    });
-                },
-                success: function(res) {
-                    if (res.success) {
-                        Swal.close();
-                        Swal.fire("Berhasil", res.message, "success");
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        Swal.fire("Gagal", res.message, "error");
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                    Swal.close();
-                    Swal.fire("Error", err.responseJSON.message, "error");
-                }
-            });
-        });
+        
 
         $('#formTambahGuru').on('submit', function(e) {
             e.preventDefault();
@@ -379,9 +313,7 @@
                     $('#button-loader').addClass('d-none');
                 }
             });
-        });
-
-        
+        });      
 
         $(document).on('click', '.btn-delete', function(e) {
             let id = $(this).data('id');
@@ -473,7 +405,5 @@
             }
         });
     });
-
 </script>
-
 @endsection

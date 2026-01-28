@@ -3,91 +3,106 @@
 @section('content')
 
 <div class="pagetitle">
-    <h1>Gaji Guru</h1>
+    <h1>Potongan Gaji</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active">Gaji Guru</li>
+            <li class="breadcrumb-item active">Potongan Gaji</li>
         </ol>
     </nav>
+</div>
+
+{{-- Modal Add --}}
+<div class="modal fade" id="addPotonganModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="potonganForm" novalidate>
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Potongan Gaji</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="nama_potongan" placeholder="Nama Potongan">
+                        <label>Nama Potongan</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" oninput="convertToCurrency(this)" name="jumlah_potongan" placeholder="Jumlah Potongan">
+                        <label>Jumlah Potongan</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="keterangan" placeholder="Keterangan">
+                        <label>Keterangan</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-purple" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{-- Modal Update --}}
+<div class="modal fade" id="editPotonganModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="updatePotonganForm" novalidate>
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="id" id="edit_id">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Potongan Gaji</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="nama_potongan" id="edit_nama_potongan" placeholder="Nama Potongan">
+                        <label>Nama Potongan</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" oninput="convertToCurrency(this)" name="jumlah_potongan" id="edit_jumlah_potongan" placeholder="Jumlah Potongan">
+                        <label>Jumlah Potongan</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="keterangan" id="edit_keterangan" placeholder="Keterangan">
+                        <label>Keterangan</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-purple" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <section class="dashboard">
     <div class="card recent-sales">
         <div class="card-body">
             <h5 class="card-title mb-0">Data Potongan Gaji</h5>
-            <button type="button" class="btn btn-purple btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#addPotonganModal">
-                Add Potongan Gaji
-            </button>
-            {{-- Modal Add --}}
-            <div class="modal fade" id="addPotonganModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <form id="potonganForm" novalidate>
-                            @csrf
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add Potongan Gaji</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="nama_potongan" placeholder="Nama Potongan">
-                                    <label>Nama Potongan</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="jumlah_potongan" placeholder="Jumlah Potongan">
-                                    <label>Jumlah Potongan</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="keterangan" placeholder="Keterangan">
-                                    <label>Keterangan</label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                <button class="btn btn-purple" type="submit">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {{-- Modal Update --}}
-            <div class="modal fade" id="editPotonganModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <form id="updatePotonganForm" novalidate>
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="id" id="edit_id">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Update Potongan Gaji</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="nama_potongan" id="edit_nama_potongan" placeholder="Nama Potongan">
-                                    <label>Nama Potongan</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" oninput="convertToCurrency(this)" name="jumlah_potongan" id="edit_jumlah_potongan" placeholder="Jumlah Potongan">
-                                    <label>Jumlah Potongan</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="keterangan" id="edit_keterangan" placeholder="Keterangan">
-                                    <label>Keterangan</label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                <button class="btn btn-purple" type="submit">Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
 
+            <!-- filter -->
+            <div class="col-12">
+                <div class="row needs-validation d-flex justify-content-between align-items-center gap-2" novalidate>
+                    <div class="col-4 col-md-4">
+                        <button type="button" class="btn btn-purple btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#addPotonganModal">
+                            Add Potongan Gaji
+                        </button>
+                    </div>
+                    <div class="col-7 col-md-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="search" placeholder="Search">
+                            <label for="search">Search</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end filter -->
             <div class="table-responsive">
-                <table class="table table-hover datatable">
+                <table class="table table-hover">
                     <thead>
                         <tr>
                             <th scope="col">No</th>
@@ -97,46 +112,26 @@
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($potongans as $potongan)
-                        <tr>
-                            <th scope="row">{{ $loop->iteration }}.</th>
-                            <td class="text-capitalize">{{ $potongan->nama_potongan }}</td>
-                            <td>Rp {{ number_format($potongan->jumlah_potongan, 0, ',', '.') }}</td>
-                            <td>{{ $potongan->keterangan }}</td>
-                            <td class="aksi">
-                                <button class="btn btn-purple btn-sm" data-bs-toggle="dropdown"><i class="ri-bar-chart-horizontal-fill"></i></button>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-
-                                    <li>
-                                        <button class="dropdown-item d-flex align-items-center editBtn" data-id="{{ $potongan->id }}">
-                                            <i class="bi bi-pencil-square"></i>
-                                            <span>Update</span>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item d-flex align-items-center deleteBtn" data-id="{{ $potongan->id }}">
-                                            <i class="ri ri-delete-bin-6-fill"></i>
-                                            <span>Delete</span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                        @endforeach
+                    <tbody id="tableBody" class="text-capitalize">
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-between align-items-center mt-3 w-100">
+                    <div id="dataInfo" class="text-muted small"></div>
+                    <ul class="pagination pagination-sm" id="pagination"></ul>
+                </div>
             </div>
         </div>
     </div>
 </section>
+@endsection
 
+@section('scripts')
+@include('utils.utils')
+<script src="{{ asset('assets/js/render/potonganRow.js') }}"></script>
+<script src="{{ asset('assets/js/pages/potongan.js') }}"></script>
 <script>
     $(function() {
-        window.convertToCurrency = function (input) {
+        window.convertToCurrency = function(input) {
             let value = input.value.replace(/[^\d]/g, '');
             if (value) {
                 input.value = new Intl.NumberFormat('id-ID').format(value);
