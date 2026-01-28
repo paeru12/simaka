@@ -73,7 +73,7 @@
                             </table>
                         </div>
                     </div>
-                     @if($guru->jabatan->jabatan == 'guru')
+                     @if(strtolower($guru->jabatan->jabatan) == 'guru')
                     <div class="row">
                         <div class="table-responsive">
                             <h5 class="card-title">Absensi Mata Pelajaran</h5>
@@ -114,7 +114,7 @@
 
             if (bulan && tahun) {
                 $.ajax({
-                    url: '/detailrekapdata/' + guru_id + '/' + bulan + '/' + tahun,
+                    url: '/detail-rekap-data/' + guru_id + '/' + bulan + '/' + tahun,
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {

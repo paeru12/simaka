@@ -132,7 +132,13 @@ if ($hour >= 5 && $hour < 12) {
                                                         <th>{{ $loop->iteration }}.</th>
                                                         <td class="text-capitalize">{{ $absen->guru->nama }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($absen->tanggal)->format('d M Y') }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($absen->jam_datang)->format('H:i') }} WIB</td>
+                                                        <td>
+                                                            @if($absen->jam_datang)
+                                                            {{ \Carbon\Carbon::parse($absen->jam_datang)->format('H:i') }} WIB
+                                                            @else
+                                                            <p>-</p>
+                                                            @endif
+                                                        </td>
                                                         <td>
                                                             @if($absen->jam_pulang)
                                                             {{ \Carbon\Carbon::parse($absen->jam_pulang)->format('H:i') }} WIB
@@ -194,7 +200,7 @@ if ($hour >= 5 && $hour < 12) {
                                         <span>| Minggu Ini</span>
                                         @endif
                                     </h5>
-                                    @if($absen) 
+                                    @if($absen)
                                     @if(Auth::user()->jabatan->jabatan != 'admin')
                                     <a href="{{route('absen-qr.index')}}" class="btn btn-purple mb-3"><i class="ri ri-qr-scan-line "></i> Absen QR Code</a>
                                     @endif
@@ -207,7 +213,7 @@ if ($hour >= 5 && $hour < 12) {
                                         <i class="ri ri-qr-scan-line"></i> Absen QR Code
                                     </button>
                                     @endif
-                                    
+
                                     <div class="table-responsive">
                                         <table class="table table-hover datatable">
                                             <thead>

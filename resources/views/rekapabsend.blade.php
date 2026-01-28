@@ -61,7 +61,7 @@
                                 <th>Total Mapel</th>
                                 <th>Total Hadir</th>
                                 <th>Total Izin</th>
-                                <th>Total Sakit</th>
+                                <th>Total Sakit</th> 
                                 <th>Total Alpha</th>
                                 <th>Total Hadir Mapel</th>
                                 <th>Total Kehadiran</th>
