@@ -15,7 +15,7 @@ class RoleMiddleware
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        if (!in_array(Auth::user()->jabatan->jabatan, $roles)) {
+        if (!in_array(strtolower(Auth::user()->jabatan->jabatan), $roles)) {
             abort(404, 'Page not found');
         }
 

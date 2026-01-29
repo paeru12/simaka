@@ -27,34 +27,34 @@ Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     // sidebar
     Route::get('/', [IndexController::class, 'index'])->name('dashboard');
-    Route::resource('/absensi-mapel', absensiController::class)->except(['show'])->middleware('role:admin,guru');
+    Route::resource('/absensi-mapel', absensiController::class)->except(['show']);
     Route::get('/absensi-harian', [AbsensiHarianController::class, 'index'])->name('absensiHarian.ind');
-    Route::resource('/jabatan', JabatanController::class)->middleware('role:admin');
-    Route::resource('/guru', guruController::class)->middleware('role:admin');
-    Route::resource('/ruangan', RuanganController::class)->middleware('role:admin');
-    Route::resource('/jurusan', JurusanController::class)->middleware('role:admin');
-    Route::resource('/kelas', KelasController::class)->middleware('role:admin');
-    Route::resource('/mapel', mapelController::class)->middleware('role:admin');
-    Route::resource('/jadwal', jadwalController::class)->middleware('role:admin,guru');
-    Route::resource('rekap-absensi', rekapController::class)->except(['show'])->middleware('role:admin');
+    Route::resource('/jabatan', JabatanController::class);
+    Route::resource('/guru', guruController::class);
+    Route::resource('/ruangan', RuanganController::class);
+    Route::resource('/jurusan', JurusanController::class);
+    Route::resource('/kelas', KelasController::class);
+    Route::resource('/mapel', mapelController::class);
+    Route::resource('/jadwal', jadwalController::class);
+    Route::resource('rekap-absensi', rekapController::class)->except(['show']);
     Route::resource('/laporan-gaji', gajiansController::class);
-    Route::resource('/setting', SettingController::class)->middleware('role:admin');
-    Route::resource('administrator', AdminController::class)->middleware('role:admin');
-    Route::resource('potongan-gaji', PotonganController::class)->middleware('role:admin');
+    Route::resource('/setting', SettingController::class);
+    Route::resource('administrator', AdminController::class);
+    Route::resource('potongan-gaji', PotonganController::class);
     // endsidebar
-    Route::delete('/absensih/{id}', [AbsensiHarianController::class, 'destroy'])->name('absensih.destroy')->middleware('role:admin');
+    Route::delete('/absensih/{id}', [AbsensiHarianController::class, 'destroy'])->name('absensih.destroy');
     Route::post('/absensih/data', [AbsensiHarianController::class, 'data'])->name('absensi.harian.data');
-    Route::resource('/absen-qr', absenqrController::class)->middleware('role:guru');
+    Route::resource('/absen-qr', absenqrController::class);
     Route::resource('/rekap', GajiController::class)->except(['show']);
     Route::resource('/gaji-guru', gajianguruController::class)->except(['show']);
     Route::get('/laporan-gaji-all', [gajiansController::class, 'indexAll'])->name('gaji.indexAll');
-    Route::post('/gaji-filterAll', [gajiansController::class, 'filterAll'])->name('gaji.filterAll');
+    Route::post('/gaji-filterAll', [gajiansController::class, 'filterAll'])->name('gaji.filterAll'); 
     Route::get('/profile/{id}/edit', [AdminController::class, 'edits'])->name('admin.edits');
     Route::put('/admin/{id}/update-profile', [AdminController::class, 'updateProfile'])->name('admin.update-profile');
     Route::put('/admin/{id}/update-akun', [AdminController::class, 'updateAkun'])->name('admin.update-akun');
     Route::post('/admin/{id}/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
     Route::get('/gaji/slip-gaji/{guru_id}/slip/{bulan}/{tahun}', [gajiansController::class, 'getDataGuru'])->name('gaji.getDataGuru');
-    Route::get('/rekap-absensi/guru', [GajiController::class, 'dindex'])->name('rekap.dindex')->middleware('role:guru');
+    Route::get('/rekap-absensi/guru', [GajiController::class, 'dindex'])->name('rekap.dindex');
     Route::post('/rekap/detail', [GajiController::class, 'detailf'])->name('rekap.detailf');
     Route::post('/rekap/total', [GajiController::class, 'rekapTotal'])->name('rekap.total');
     Route::get('/rekap/{guru_id}/detail/{bulan}/{tahun}', [GajiController::class, 'detail'])->name('rekap.detail');
@@ -71,7 +71,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/detail/{guru_id}/{bulan}/{tahun}', [rekapController::class, 'detail'])->name('rekap.details');
     Route::get('/detail-rekap-data/{guru_id}/{bulan}/{tahun}', [rekapController::class, 'detailrekapdata'])->name('rekap.detailrekapdata');
-    Route::get('rekapp/staff', [rekapController::class, 'indexAll'])->name('rekap.indexAll')->middleware('role:karyawan,admin');
+    Route::get('rekapp/staff', [rekapController::class, 'indexAll'])->name('rekap.indexAll');
     // QR Code
     Route::post('/qr-kelas', [QrKelasController::class, 'store'])->name('qrkelas.store');
     Route::post('/qr-guru', [QrGuruController::class, 'store'])->name('qrguru.store');
