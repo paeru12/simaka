@@ -71,31 +71,9 @@ function loadData(page = 1) {
             }
 
             $('#tableBody').html(html);
-            renderPagination(res);
+            renderPagination(res, $("#pagination"));
+            renderDataInfo(res, $("#dataInfo"));
         }
     });
 }
 
-function renderPagination(res) {
-    let pag = `
-        <li class="page-item ${res.current_page === 1 ? 'disabled' : ''}">
-            <a class="page-link pageBtn" data-page="${res.current_page - 1}">&laquo;</a>
-        </li>
-    `;
-
-    for (let i = 1; i <= res.last_page; i++) {
-        pag += `
-            <li class="page-item ${i === res.current_page ? 'active' : ''}">
-                <a class="page-link pageBtn" data-page="${i}">${i}</a>
-            </li>
-        `;
-    }
-
-    pag += `
-        <li class="page-item ${res.current_page === res.last_page ? 'disabled' : ''}">
-            <a class="page-link pageBtn" data-page="${res.current_page + 1}">&raquo;</a>
-        </li>
-    `;
-
-    $('#pagination').html(pag);
-}

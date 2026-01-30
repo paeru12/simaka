@@ -61,7 +61,7 @@
                                 <th>Total Mapel</th>
                                 <th>Total Hadir</th>
                                 <th>Total Izin</th>
-                                <th>Total Sakit</th> 
+                                <th>Total Sakit</th>
                                 <th>Total Alpha</th>
                                 <th>Total Hadir Mapel</th>
                                 <th>Total Kehadiran</th>
@@ -70,14 +70,11 @@
                         </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div id="dataInfo" class="text-muted small"></div>
-                        <ul class="pagination pagination-sm" id="pagination"></ul>
-                    </div>
+                    @include('utils.pagination')
                 </div>
-
             </div>
         </div>
+    </div>
 </section>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

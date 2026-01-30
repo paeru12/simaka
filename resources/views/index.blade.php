@@ -95,7 +95,13 @@ if ($hour >= 5 && $hour < 12) {
                             <div class="col-12">
                                 <div class="card recent-sales">
                                     <div class="card-body">
-                                        <h5 class="card-title mb-0">Absensi Harian <span>| Bulan Ini</span></h5>
+                                        <h5 class="card-title mb-0">Absensi Harian 
+                                            @if(Auth::user()->jabatan->jabatan == 'admin')
+                                            <span>| Hari Ini</span>
+                                            @else
+                                            <span>| Bulan Ini</span>
+                                            @endif
+                                        </h5>
                                         @php
                                         $statusNonHadir = ['Izin', 'Sakit', 'Alpha'];
                                         @endphp

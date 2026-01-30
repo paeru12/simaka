@@ -173,10 +173,7 @@
                     <tbody id="tableBody"></tbody>
                 </table>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div id="dataInfo" class="text-muted small"></div>
-                    <ul class="pagination pagination-sm" id="pagination"></ul>
-                </div>
+                @include('utils.pagination')
             </div>
         </div>
     </div>
