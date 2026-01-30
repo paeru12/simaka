@@ -5,13 +5,14 @@
 <section class="section">
     <div class="card">
         <div class="card-body text-center">
-            <h5 class="card-title">Absensi QR</h5>
-            <p class="card-text">Arahkan kamera ke QR Code kelas untuk melakukan absensi.</p>
+            <h5 class="card-title">Absensi Mapel</h5>
+            <p class="card-text">Arahkan kamera ke QR Code Ruangan untuk melakukan absensi.</p>
 
             <video id="preview" class="border border-2 rounded w-100" style="max-height: 300px;" autoplay playsinline></video>
             <canvas id="canvas" class="d-none"></canvas>
 
-            <button id="captureBtn" class="btn btn-purple mt-3">Ambil Foto Bukti</button>
+            <button id="switchCameraBtn" class="btn mt-2 btn-purple" data-bs-toggle="tooltip" data-bs-placement="top" title="Ubah Kamera" data-bs-custom-class="tooltip-ungu"><i class="ri ri-camera-switch-line"></i></button>
+            <button id="captureBtn" class="btn btn-purple mt-2">Ambil Foto Bukti</button>
 
             <div id="photoPreview" class="mt-3 d-none">
                 <h6>Foto Bukti</h6>
@@ -70,6 +71,41 @@
             title: 'Browser tidak mendukung akses kamera'
         });
     }
+
+    let currentFacingMode = "environment";
+
+    async function startCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: currentFacingMode
+                }
+            });
+
+            video.srcObject = stream;
+            video.play();
+
+            scanning = true;
+            requestAnimationFrame(scanQRCode);
+
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Kamera tidak dapat diakses',
+                text: err.message
+            });
+        }
+    }
+
+    document.getElementById('switchCameraBtn').addEventListener('click', () => {
+        currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+        startCamera();
+    });
+
 
     function scanQRCode() {
         if (!scanning) return;

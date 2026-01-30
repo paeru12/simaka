@@ -179,6 +179,10 @@
     </div>
 </section>
 
+
+@endsection
+
+@section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
@@ -284,12 +288,7 @@
             }).appendTo('#absenForm');
         });
     });
-</script>
-@endsection
 
-@section('scripts')
-
-<script>
     const BASE_URL = "{{ asset('') }}";
     const IS_ADMIN = {{ Auth::user()->jabatan->jabatan === 'admin' ? 'true' : 'false' }};
 </script>

@@ -692,7 +692,7 @@ h6 {
   color: #ffffff;
   transition: 0.3;
   background: linear-gradient(to right, #73247f, #2b1361);
-  
+
   padding: 10px 15px;
   border-radius: 0 10px;
 }
@@ -1285,7 +1285,12 @@ h6 {
 .text-purple {
   color: #331972;
 }
-.aksi .btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active{
+
+.aksi .btn-check:checked+.btn,
+.btn.active,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active {
   color: #fff;
 }
 
@@ -1294,3 +1299,13 @@ h6 {
   color: #fff;
 }
 
+.pagination .page-item .page-link {
+  color: #331972;
+}
+
+.active>.page-link,
+.page-link.active {
+  color: #fff;
+  background: linear-gradient(to right, #73247f, #2b1361);
+  border: 1px solid #73247f;
+}

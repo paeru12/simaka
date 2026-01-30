@@ -13,7 +13,7 @@
     </section>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+    <button id="switchCameraBtn" type="button" class="btn btn-purple" data-bs-toggle="tooltip" data-bs-placement="top" title="Ubah Kamera" data-bs-custom-class="tooltip-ungu"><i class="ri ri-camera-switch-line"></i></button>
     <button id="captureBtn" type="button" class="btn btn-purple">Ambil Foto Bukti</button>
 </div>
 @push('scripts')
@@ -32,52 +32,66 @@
 
     let qrTokenHarian = null;
     let streamHarian = null;
-    let scanningHarian = true;
+    let scanningHarian = false;
     let lokasiHarian = null;
 
-    function startCameraHarian() {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: "environment"
-                    }
-                })
-                .then(s => {
-                    streamHarian = s;
-                    videoHarian.srcObject = streamHarian;
-                    videoHarian.play();
-                    requestAnimationFrame(scanQRCodeHarian);
-                })
-                .catch(err => {
-                    Swal.fire("Error", "Kamera tidak bisa diakses: " + err.message, "error");
-                });
-        } else {
-            Swal.fire("Error", "Browser tidak mendukung kamera", "error");
-        }
-    }
+    // 🔄 Mode kamera default belakang
+    let currentFacingModeHarian = "environment";
 
-    function stopCameraHarian() {
+    // ======================================
+    // 🚀 MULAI / SWITCH KAMERA ABSENSI HARIAN
+    // ======================================
+    async function startCameraHarian() {
+
+        // Stop kamera sebelumnya bila ada
         if (streamHarian) {
             streamHarian.getTracks().forEach(track => track.stop());
-            streamHarian = null;
         }
-        scanningHarian = false;
+
+        try {
+            streamHarian = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: currentFacingModeHarian
+                }
+            });
+
+            videoHarian.srcObject = streamHarian;
+            videoHarian.play();
+
+            scanningHarian = true;
+            requestAnimationFrame(scanQRCodeHarian);
+
+        } catch (err) {
+            Swal.fire("Error", "Kamera tidak dapat diakses: " + err.message, "error");
+        }
     }
 
+    // 🔘 Tombol switch kamera
+    document.getElementById('switchCameraBtn').addEventListener('click', () => {
+        currentFacingModeHarian =
+            currentFacingModeHarian === "environment" ? "user" : "environment";
+
+        startCameraHarian(); // restart kamera dengan mode baru
+    });
+
+    // ======================================
+    // 🔍 SCAN QR KODE ABSENSI HARIAN
+    // ======================================
     function scanQRCodeHarian() {
         if (!scanningHarian) return;
 
         if (videoHarian.readyState === videoHarian.HAVE_ENOUGH_DATA) {
             canvasHarian.width = videoHarian.videoWidth;
             canvasHarian.height = videoHarian.videoHeight;
+
             ctxHarian.drawImage(videoHarian, 0, 0, canvasHarian.width, canvasHarian.height);
 
             const imageData = ctxHarian.getImageData(0, 0, canvasHarian.width, canvasHarian.height);
             const code = jsQR(imageData.data, imageData.width, imageData.height);
 
             if (code) {
+                scanningHarian = false;
                 qrTokenHarian = code.data;
-                validGuru = false;
 
                 $.ajax({
                     url: "{{ route('absensi.validateGuru') }}",
@@ -92,78 +106,57 @@
                     },
                     success: function(res) {
                         if (res.status === 'ok') {
-                            scanning = false;
-                            validGuru = true;
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Konfirmasi Guru',
-                                html: `
-                        <b>Nama:</b> ${res.guru.nama}<br><br>
-                        Lanjut absen harian?
-                    `,
+                                html: `<b>Nama:</b> ${res.guru.nama}<br><br>Lanjut absen harian?`,
                                 showCancelButton: true,
                                 confirmButtonText: 'Ya, lanjut',
                                 cancelButtonText: 'Batal'
                             }).then(result => {
                                 if (!result.isConfirmed) {
-                                    validGuru = false;
-                                    scanning = true;
+                                    scanningHarian = true;
                                     requestAnimationFrame(scanQRCodeHarian);
                                 } else {
                                     Swal.fire('Silakan ambil foto bukti!', '', 'info');
                                 }
                             });
                         } else {
-                            qrTokenHarian = null;
-                            validGuru = false;
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Validasi Gagal',
-                                text: res.message,
-                            }).then(() => {
-                                scanning = true;
+                            Swal.fire("Error", res.message, "error").then(() => {
+                                scanningHarian = true;
                                 requestAnimationFrame(scanQRCodeHarian);
                             });
                         }
                     },
                     error: function(xhr) {
-                        let errorMessages = "";
-                        if (xhr.responseJSON?.errors) {
-                            errorMessages = Object.values(xhr.responseJSON.errors).flat().join("\n");
-                        } else if (xhr.responseJSON?.message) {
-                            errorMessages = xhr.responseJSON.message;
-                        } else {
-                            errorMessages = "Terjadi kesalahan tidak diketahui.";
-                        }
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: errorMessages
-                        }).then(() => {
-                            scanning = true;
-                            requestAnimationFrame(scanQRCodeHarian);
-                        });
+                        Swal.fire("Error", xhr.responseJSON?.message ?? "Gagal memvalidasi QR!", "error")
+                            .then(() => {
+                                scanningHarian = true;
+                                requestAnimationFrame(scanQRCodeHarian);
+                            });
                     }
                 });
                 return;
             }
-
         }
-        if (scanningHarian) requestAnimationFrame(scanQRCodeHarian);
+
+        requestAnimationFrame(scanQRCodeHarian);
     }
 
-    // 🔹 Ambil Foto & Kirim via AJAX
+    // ================================
+    // 📸 AMBIL FOTO BUKTI HARIAN
+    // ================================
     captureBtnHarian.addEventListener('click', () => {
         if (!qrTokenHarian) {
-            Swal.fire("Peringatan", "QR Code belum terbaca!", "warning");
+            Swal.fire("Warning", "QR belum terbaca!", "warning");
             return;
         }
 
         canvasHarian.width = videoHarian.videoWidth;
         canvasHarian.height = videoHarian.videoHeight;
         ctxHarian.drawImage(videoHarian, 0, 0, canvasHarian.width, canvasHarian.height);
-        const dataURL = canvasHarian.toDataURL('image/jpeg', 0.7);
 
+        const dataURL = canvasHarian.toDataURL('image/jpeg', 0.7);
         capturedImageHarian.src = dataURL;
         photoPreviewHarian.classList.remove('d-none');
 
@@ -181,12 +174,10 @@
             headers: {
                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
             },
-            beforeSend: () => {
-                Swal.fire({
-                    title: "Mengirim Absensi...",
-                    didOpen: () => Swal.showLoading()
-                });
-            },
+            beforeSend: () => Swal.fire({
+                title: "Mengirim Absensi...",
+                didOpen: () => Swal.showLoading()
+            }),
             success: res => {
                 Swal.close();
                 Swal.fire({
@@ -198,69 +189,10 @@
             },
             error: xhr => {
                 Swal.close();
-                Swal.fire("Error", xhr.responseJSON?.message || "Terjadi kesalahan!", "error");
+                Swal.fire("Error", xhr.responseJSON?.message ?? "Gagal mengirim absensi!", "error");
             }
         });
     });
-
-    // 🔹 Fungsi minta izin Kamera + Lokasi
-    async function requestPermissionHarian() {
-        return Swal.fire({
-            title: 'Izin Dibutuhkan',
-            html: 'Untuk absen harian, aplikasi butuh akses <b>kamera</b> dan <b>lokasi</b> Anda.',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Izinkan',
-            cancelButtonText: 'Batal'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    // 🔹 Akses Kamera
-                    streamHarian = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: "environment"
-                        }
-                    });
-                    videoHarian.srcObject = streamHarian;
-                    videoHarian.play();
-                    scanningHarian = true;
-                    requestAnimationFrame(scanQRCodeHarian);
-
-                    // 🔹 Akses Lokasi
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            pos => lokasiHarian = pos.coords.latitude + "," + pos.coords.longitude,
-                            err => Swal.fire("Peringatan", "Lokasi tidak bisa diakses: " + err.message, "warning")
-                        );
-                    }
-                    return true;
-                } catch (err) {
-                    Swal.fire("Error", "Gagal mengakses kamera/lokasi: " + err.message, "error");
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        });
-    }
-
-    // 🔹 Event Modal Dibuka
-    $('#absenharians').on('shown.bs.modal', async function() {
-        const izin = await requestPermissionHarian();
-        if (!izin) {
-            // Jika user menolak → langsung tutup modal
-            $('#absenharians').modal('hide');
-        }
-    });
-
-    // 🔹 Event Modal Ditutup
-    $('#absenharians').on('hidden.bs.modal', function() {
-        stopCameraHarian();
-        photoPreviewHarian.classList.add('d-none');
-        capturedImageHarian.src = "";
-        qrTokenHarian = null;
-    });
-
 
     function dataURLtoFileHarian(dataurl, filename) {
         const arr = dataurl.split(',');
@@ -273,5 +205,28 @@
             type: mime
         });
     }
+
+    // ================================
+    // 🚪 EVENT MODAL ABSEN HARIAN
+    // ================================
+    $('#absenharians').on('shown.bs.modal', async function() {
+        startCameraHarian();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => lokasiHarian = pos.coords.latitude + "," + pos.coords.longitude
+            );
+        }
+    });
+
+    $('#absenharians').on('hidden.bs.modal', function() {
+        if (streamHarian) {
+            streamHarian.getTracks().forEach(t => t.stop());
+        }
+        scanningHarian = false;
+        qrTokenHarian = null;
+        photoPreviewHarian.classList.add('d-none');
+        capturedImageHarian.src = "";
+    });
 </script>
 @endpush
