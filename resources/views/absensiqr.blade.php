@@ -221,7 +221,7 @@
                         timer: 1000,
                         showConfirmButton: false
                     }).then(() => {
-                        location.href = "absensi-mapel') }}";
+                        location.href = "{{route('absensi-mapel.index')}}";
                     });
                 }
             },

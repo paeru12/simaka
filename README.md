@@ -20,6 +20,3 @@
 
 # Staff
 1. pito@gmail.com / asdfghjk 
-
-absen lokasi
-alpha harian otomatis
