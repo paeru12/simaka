@@ -22,6 +22,7 @@ class IndexController extends Controller
         $now = Carbon::now('Asia/Jakarta');
         $absen = AbsensiHarian::where('guru_id', Auth::user()->guru_id)
             ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
+            ->orderBy('tanggal','desc')
             ->first();
         if (Auth::user()->jabatan->jabatan == 'admin') {
             $absensi = AbsensiHarian::whereDate('created_at', $now->toDateString())->orderBy('tanggal','desc')->get();
@@ -32,7 +33,6 @@ class IndexController extends Controller
                 ->orderBy('tanggal','desc')
                 ->get();
         }
-
         
         if (Auth::user()->jabatan->jabatan == 'admin') {
             $data = Absensi::orderBy('created_at', 'desc')

@@ -17,6 +17,7 @@ class AbsensiController extends Controller
     {
         $absen = AbsensiHarian::where('guru_id', Auth::user()->guru_id)
             ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
+            ->orderBy('created_at','desc')
             ->first();
         $guruid = Auth::user()->guru_id;
 

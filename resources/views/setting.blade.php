@@ -16,63 +16,6 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Pengaturan</h5>
-            <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addDataModal">
-                Add Data
-            </button>
-
-            <div class="modal fade" id="addDataModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <form id="dataForm" enctype="multipart/form-data" novalidate>
-                            @csrf
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add Data</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-floating mb-3">
-                                    <select name="key" class="form-select text-capitalize" id="floatingSelect">
-                                        <option selected disabled>Pilih Opsi</option>
-                                        <option value="logo">Logo</option>
-                                        <option value="nama">Nama</option>
-                                        <option value="kop_surat">Kop Surat</option>
-                                        <option value="gaji_mengajar">Gaji Mengajar</option>
-                                        <option value="minggu">Minggu</option>
-                                        <option value="jp">Jam Pelajaran</option>
-                                        <option value="lokasi">Lokasi</option>
-                                        <option value="alamat_ip">Alamat IP</option>
-                                    </select>
-                                    <label for="floatingSelect">Pilih Jenis</label>
-                                </div>
-                                <div class="mb-3 d-none" id="file-input-container">
-                                    <div class="row align-items-center">
-                                        <div class="col-3">
-                                            <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
-                                        </div>
-                                        <div class="col-9">
-                                            <div class="input-group mb-3">
-                                                <input type="file" class="form-control" id="input-type-file" name="value" onchange="readUrl(this)">
-                                                <button class="btn btn-purple" type="button" onclick="hapusGambar()">
-                                                    <i class="ri ri-delete-bin-6-line"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-floating mb-3 d-none" id="text-input-container">
-                                    <input type="text" class="form-control" name="value" placeholder="Value">
-                                    <label>Value</label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                <button class="btn btn-purple" type="submit">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
