@@ -16,7 +16,63 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Pengaturan</h5>
-            
+            <button type="button" class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#addDataModal">
+                Add Data
+            </button>
+
+            <div class="modal fade" id="addDataModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form id="dataForm" enctype="multipart/form-data" novalidate>
+                            @csrf
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Data</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-floating mb-3">
+                                    <select name="key" class="form-select text-capitalize" id="floatingSelect">
+                                        <option selected disabled>Pilih Opsi</option>
+                                        <option value="logo">Logo</option>
+                                        <option value="nama">Nama</option>
+                                        <option value="kop_surat">Kop Surat</option>
+                                        <option value="gaji_mengajar">Gaji Mengajar</option>
+                                        <option value="minggu">Minggu</option>
+                                        <option value="jp">Jam Pelajaran</option>
+                                        <option value="lokasi">Lokasi</option>
+                                        <option value="alamat_ip">Alamat IP</option>
+                                    </select>
+                                    <label for="floatingSelect">Pilih Jenis</label>
+                                </div>
+                                <div class="mb-3 d-none" id="file-input-container">
+                                    <div class="row align-items-center">
+                                        <div class="col-3">
+                                            <img src="{{ asset('assets/img/blank.jpg') }}" class="w-100 shadow" alt="" id="gam">
+                                        </div>
+                                        <div class="col-9">
+                                            <div class="input-group mb-3">
+                                                <input type="file" class="form-control" id="input-type-file" name="value" onchange="readUrl(this)">
+                                                <button class="btn btn-purple" type="button" onclick="hapusGambar()">
+                                                    <i class="ri ri-delete-bin-6-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-3 d-none" id="text-input-container">
+                                    <input type="text" class="form-control" name="value" placeholder="Value">
+                                    <label>Value</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-purple" type="submit">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -76,13 +132,23 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    @endif
+                                                    @elseif($s->key == 'lokasi')
+                                                    {{-- input lokasi --}}
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control lokasi-input"
+                                                            name="value" value="{{ $s->value }}" placeholder="Lat, Long">
+                                                        <label>Koordinat Lokasi (Lat,Long)</label>
+                                                    </div>
 
+                                                    <div id="map-{{ $s->id }}"
+                                                        style="height: 300px; border-radius: 10px;" class="mb-3"></div>
+                                                    @elseif(in_array($s->key, ['nama','gaji_mengajar','minggu','jp', 'alamat_ip']))
                                                     {{-- input text --}}
-                                                    <div class="form-floating mb-3 {{ in_array($s->key, ['nama','gaji_mengajar','minggu','jp']) ? '' : 'd-none' }}">
+                                                    <div class="form-floating mb-3 {{ in_array($s->key, ['nama','gaji_mengajar','minggu','jp', 'alamat_ip']) ? '' : 'd-none' }}">
                                                         <input type="text" class="form-control" name="value" value="{{ $s->value }}" placeholder="Value">
                                                         <label>Value</label>
                                                     </div>
+                                                    @endif
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -102,6 +168,11 @@
         </div>
     </div>
 </section>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
     const selectElement = document.getElementById('floatingSelect');
@@ -114,7 +185,7 @@
         fileInputContainer.classList.add('d-none');
         textInputContainer.classList.add('d-none');
 
-        if (value === 'nama' || value === 'gaji_mengajar' || value === 'minggu' || value === 'jp') {
+        if (value === 'nama' || value === 'gaji_mengajar' || value === 'minggu' || value === 'jp' || value === 'lokasi' || value === 'alamat_ip') {
             textInputContainer.classList.remove('d-none');
         } else if (value === 'logo' || value === 'kop_surat') {
             fileInputContainer.classList.remove('d-none');
@@ -122,7 +193,7 @@
     });
 
     $(function() {
-        
+
         $('#dataForm').submit(function(e) {
             e.preventDefault();
             let formData = new FormData(this);
@@ -202,5 +273,71 @@
             });
         })
     });
+
+    $(document).ready(function() {
+
+        // Loop semua modal setting
+        @foreach($settings as $s)
+        @if($s -> key == 'lokasi')
+
+        $('#UpdateDataModal{{$s->id}}').on('shown.bs.modal', function() {
+
+            let stored = "{{$s->value}}".split(',');
+            let lat = parseFloat(stored[0]);
+            let lng = parseFloat(stored[1]);
+
+            // Ambil radius dari tabel setting
+            let radius = {{$radius ?? 100}}; // pastikan controller mengirim $radius
+
+            // Inisialisasi Map
+            let map = L.map('map-{{$s->id}}').setView([lat, lng], 18);
+
+            // Tile dari OpenStreetMap
+            L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                maxZoom: 22,
+            }).addTo(map);
+
+            // Marker utama
+            let marker = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(map);
+
+            // Circle radius
+            let circle = L.circle([lat, lng], {
+                radius: radius,
+                color: "purple",
+                fillColor: "#b19cd9",
+                fillOpacity: 0.4
+            }).addTo(map);
+
+            // Update input otomatis
+            function updateLocation(lat, lng) {
+                $('.lokasi-input[name="value"]').val(lat + "," + lng);
+                circle.setLatLng([lat, lng]);
+                marker.setLatLng([lat, lng]);
+            }
+
+            // Klik peta → pindahkan lokasi
+            map.on('click', function(e) {
+                updateLocation(e.latlng.lat, e.latlng.lng);
+            });
+
+            // Drag marker → update lokasi
+            marker.on('dragend', function(e) {
+                let pos = marker.getLatLng();
+                updateLocation(pos.lat, pos.lng);
+            });
+
+            // Perbaikan tampilan jika map awalnya tidak muncul
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+
+        });
+
+        @endif
+        @endforeach
+    });
 </script>
+
 @endsection

@@ -29,6 +29,7 @@ class IndexController extends Controller
             $absensi = AbsensiHarian::where('guru_id', Auth::user()->guru_id)
                 ->whereMonth('tanggal', Carbon::now('Asia/Jakarta')->month)
                 ->whereYear('tanggal', Carbon::now('Asia/Jakarta')->year)
+                ->orderBy('tanggal','desc')
                 ->get();
         }
 
