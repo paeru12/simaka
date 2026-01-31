@@ -103,22 +103,22 @@ class AbsensiHarianController extends Controller
     public function validateScanGuru(Request $request)
     {
         $request->validate([
-            'token' => 'required|string'
+            'token' => 'required|string',
+            'ip_lan' => 'required|string'
         ]);
 
-        // Ambil IP LAN user
-        $userIp = $request->ip();
+        // IP prefix sekolah
         $ipPrefix = Setting::where('key', 'alamat_ip')->value('value');
 
-        // Validasi WiFi sekolah
-        if (!str_starts_with($userIp, $ipPrefix)) {
+        // Validasi IP LAN (TRUE, karena dari browser)
+        if (!str_starts_with($request->ip_lan, $ipPrefix)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Anda harus terhubung ke WiFi sekolah!'
             ], 403);
         }
 
-        // Validasi QR
+        // ---- VALIDASI QR ----
         $qr = QrGuru::where('token', $request->token)
             ->where('aktif', 1)
             ->with('guru')
@@ -147,6 +147,7 @@ class AbsensiHarianController extends Controller
             ]
         ]);
     }
+
 
     public function absenDatang(Request $request)
     {
@@ -223,9 +224,6 @@ class AbsensiHarianController extends Controller
             'message' => 'Absen pulang berhasil!'
         ]);
     }
-
-
-
 
     function destroy($id)
     {

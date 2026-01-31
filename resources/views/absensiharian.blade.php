@@ -95,7 +95,7 @@ function scanQRCodeHarian() {
             $.ajax({
                 url: "{{ route('absensi.validateGuru') }}",
                 method: "POST",
-                data: JSON.stringify({ token: qrTokenHarian }),
+                data: JSON.stringify({ token: qrTokenHarian,ip_lan: ipLAN }),
                 contentType: "application/json",
                 headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
 
@@ -175,7 +175,32 @@ function dataURLtoFile(dataurl, filename) {
 // ========================
 //  MODAL EVENT
 // ========================
-$('#absenharians').on('shown.bs.modal', function() {
+let ipLAN = null;
+
+// Ambil IP LAN via WebRTC
+async function getLocalIP() {
+    return new Promise((resolve) => {
+        let pc = new RTCPeerConnection({iceServers: []});
+        pc.createDataChannel("");
+        pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+        pc.onicecandidate = (event) => {
+            if (!event || !event.candidate) return;
+            let ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+            let ipMatch = ipRegex.exec(event.candidate.candidate);
+            if (ipMatch) {
+                resolve(ipMatch[1]);
+                pc.close();
+            }
+        };
+    });
+}
+
+// Panggil saat modal dibuka
+$('#absenharians').on('shown.bs.modal', async function() {
+    ipLAN = await getLocalIP();
+    console.log("IP LAN guru:", ipLAN);
+
     startCameraHarian();
 });
 
