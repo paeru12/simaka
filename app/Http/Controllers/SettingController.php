@@ -10,7 +10,7 @@ class SettingController extends Controller
 {
     function index()
     {
-        $settings = Setting::orderBy('created_at', 'desc')->get();
+        $settings = Setting::orderBy('created_at', 'asc')->get();
         return view('setting', compact('settings'));
     }
 

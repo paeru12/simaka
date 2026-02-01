@@ -1,6 +1,33 @@
 @extends('layout.layout')
 @section('title', 'Pengaturan')
 @section('content')
+<style>
+    .setting-card {
+        transition: all .25s ease;
+        border-radius: 14px !important;
+        background: white;
+        border: 1px solid #eeeeee;
+    }
+
+    .setting-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        border-color: #b184f5 !important;
+    }
+
+    .setting-icon {
+        font-size: 24px;
+        color: #6d28d9;
+        background: #f3e8ff;
+        padding: 10px;
+        border-radius: 8px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 45px;
+        height: 45px;
+    }
+</style>
 
 <div class="pagetitle">
     <h1>Pengaturan</h1>
@@ -12,134 +39,157 @@
     </nav>
 </div>
 
+
 <section class="section">
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Pengaturan</h5>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">Nama</th>
-                            <th scope="col">Value</th>
-                            <th scope="col">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-capitalize">
-                        @foreach($settings as $s)
-                        <tr>
-                            <th scope="row">{{$loop->iteration}}.</th>
-                            <td>{{ ucwords(str_replace('_', ' ', $s->key)) }}</td>
-                            <td>
-                                @if(in_array($s->key, ['logo','kop_surat']))
-                                <img src="{{ asset($s->value) }}" alt="" class="img-fluid mt-2" style="max-height: 50px;">
-                                @else
-                                @if($s->key == 'gaji_mengajar')
-                                Rp.{{ number_format($s->value , 0, ',', '.') }}
-                                @else
-                                {{ $s->value }}
-                                @endif
-                                @endif
-                            </td>
-                            <td>
-                                <button class="btn btn-purple btn-sm edit-button" data-bs-toggle="modal" data-bs-target="#UpdateDataModal{{$s->id}}"><i class="ri ri-edit-line"></i> Edit</button>
-                                {{-- Modal Update --}}
-                                <div class="modal fade" id="UpdateDataModal{{$s->id}}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <form class="updateDataForm" enctype="multipart/form-data" novalidate>
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="edit_id" value="{{$s->id}}">
-                                                <input type="hidden" name="key" value="{{$s->key}}">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Update <span class="text-capitalize">{{ ucwords(str_replace('_', ' ', $s->key)) }}</span></h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    {{-- input file --}}
-                                                    @if(in_array($s->key, ['logo','kop_surat']))
-                                                    <div class="mb-3 {{ in_array($s->key, ['logo','kop_surat']) ? '' : 'd-none' }}">
-                                                        <div class="row align-items-center">
-                                                            <div class="col-3">
-                                                                <img src="{{ asset($s->value) }}" class="w-100 shadow" id="gam" alt="">
-                                                            </div>
-                                                            <div class="col-9">
-                                                                <div class="input-group mb-3">
-                                                                    <input type="file" class="form-control" name="value" onchange="readUrl(this)">
-                                                                    <button class="btn btn-purple" type="button" onclick="hapusGambar()">
-                                                                        <i class="ri ri-delete-bin-6-line"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    @elseif($s->key == 'lokasi')
-                                                    {{-- input lokasi --}}
-                                                    <div class="form-floating mb-3">
-                                                        <input type="text" class="form-control lokasi-input"
-                                                            name="value" value="{{ $s->value }}" placeholder="Lat, Long">
-                                                        <label>Koordinat Lokasi (Lat,Long)</label>
-                                                    </div>
 
-                                                    <div id="map-{{ $s->id }}"
-                                                        style="height: 300px; border-radius: 10px;" class="mb-3"></div>
-                                                    @elseif(in_array($s->key, ['nama','gaji_mengajar','minggu','jp', 'alamat_ip']))
-                                                    {{-- input text --}}
-                                                    <div class="form-floating mb-3 {{ in_array($s->key, ['nama','gaji_mengajar','minggu','jp', 'alamat_ip']) ? '' : 'd-none' }}">
-                                                        <input type="text" class="form-control" name="value" value="{{ $s->value }}" placeholder="Value">
-                                                        <label>Value</label>
-                                                    </div>
-                                                    @endif
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                                    <button class="btn btn-purple" type="submit">Save</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+    <div class="row g-3">
+
+        @foreach($settings as $s)
+
+        @php
+        // Daftar icon setiap key
+        $icons = [
+        'nama' => 'ri-user-3-line',
+        'alamat_ip' => 'ri-wifi-line',
+        'gaji_mengajar' => 'ri-money-dollar-circle-line',
+        'minggu' => 'ri-calendar-2-line',
+        'jp' => 'ri-time-line',
+        'logo' => 'ri-image-line',
+        'kop_surat' => 'ri-file-paper-2-line',
+        ];
+
+        $icon = $icons[$s->key] ?? 'ri-settings-3-line';
+        @endphp
+
+        <div class="col-md-4 col-lg-3">
+            <div class="setting-card shadow-sm border p-3 h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex gap-2 align-items-center">
+                    {{-- Icon --}}
+                    <div class="mb-2">
+                        <i class="{{ $icon }} setting-icon"></i>
+                    </div>
+
+                    {{-- Nama --}}
+                    <h6 class="fw-bold mt-2 text-capitalize">
+                        {{ ucwords(str_replace('_', ' ', $s->key)) }}
+                    </h6>
+                </div>
+                
+                {{-- Value --}}
+                <div class="mt-2 mb-3">
+
+                    @if(in_array($s->key, ['logo','kop_surat']))
+                    <img src="{{ asset($s->value) }}"
+                        class="img-fluid rounded shadow-sm"
+                        style="max-height:70px; object-fit:contain;">
+                    @else
+                    @if($s->key == 'gaji_mengajar')
+                    <span class="fw-semibold text-dark">Rp. {{ number_format($s->value, 0, ',', '.') }}</span>
+                    @else
+                    <span class="fw-semibold text-dark">{{ $s->value }}</span>
+                    @endif
+                    @endif
+
+                </div>
+
+                {{-- Edit Button --}}
+                <button class="btn btn-purple btn-sm w-100 mt-auto"
+                    data-bs-toggle="modal"
+                    data-bs-target="#UpdateDataModal{{$s->id}}">
+                    <i class="ri-edit-2-line me-1"></i> Edit
+                </button>
+
+
             </div>
+        </div>
 
+        @endforeach
+    </div>
+
+</section>
+@foreach($settings as $s)
+{{-- Modal Update --}}
+<div class="modal fade" id="UpdateDataModal{{$s->id}}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form class="updateDataForm" enctype="multipart/form-data" novalidate>
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="edit_id" value="{{$s->id}}">
+                <input type="hidden" name="key" value="{{$s->key}}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Update
+                        <span class="text-capitalize">{{ ucwords(str_replace('_', ' ', $s->key)) }}</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    {{-- Input File --}}
+                    @if(in_array($s->key, ['logo','kop_surat']))
+                    <div class="mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-3">
+                                <img src="{{ asset($s->value) }}" class="w-100 shadow" id="preview-{{ $s->id }}" alt="">
+                            </div>
+                            <div class="col-9">
+                                <div class="input-group mb-3">
+                                    <input type="file" class="form-control" name="value" onchange="previewImage(this, '{{ $s->id }}')">
+                                    <button class="btn btn-purple" type="button" onclick="hapusGambar('{{ $s->id }}')">
+                                        <i class="ri ri-delete-bin-6-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Input Text --}}
+                    @elseif(in_array($s->key, ['nama','gaji_mengajar','minggu','jp', 'alamat_ip']))
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="value"
+                            value="{{ $s->value }}" placeholder="Value">
+                        <label>Value</label>
+                    </div>
+                    @endif
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-purple" type="submit">Save</button>
+                </div>
+
+            </form>
         </div>
     </div>
-</section>
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+</div>
+@endforeach
 <script>
-    const selectElement = document.getElementById('floatingSelect');
-    const fileInputContainer = document.getElementById('file-input-container');
-    const textInputContainer = document.getElementById('text-input-container');
-
-    selectElement.addEventListener('change', function() {
-        const value = this.value;
-
-        fileInputContainer.classList.add('d-none');
-        textInputContainer.classList.add('d-none');
-
-        if (value === 'nama' || value === 'gaji_mengajar' || value === 'minggu' || value === 'jp' || value === 'lokasi' || value === 'alamat_ip') {
-            textInputContainer.classList.remove('d-none');
-        } else if (value === 'logo' || value === 'kop_surat') {
-            fileInputContainer.classList.remove('d-none');
+    function previewImage(input, id) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById("preview-" + id).src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
         }
-    });
-
+    }
+    function hapusGambar(id) {
+        document.getElementById("preview-" + id).src = "";
+        let fileInput = document.querySelector(`input[name="value"][onchange="previewImage(this, '${id}')"]`);
+        if (fileInput) {
+            fileInput.value = "";
+        }
+    }
     $(function() {
 
+        // ==== Simpan Data Baru ====
         $('#dataForm').submit(function(e) {
             e.preventDefault();
             let formData = new FormData(this);
+
             $.ajax({
                 url: "{{ route('setting.store') }}",
                 type: "POST",
@@ -149,7 +199,7 @@
                 beforeSend: function() {
                     Swal.fire({
                         title: 'Processing...',
-                        text: 'Menyimpan data ',
+                        text: 'Menyimpan data',
                         didOpen: () => Swal.showLoading(),
                         allowOutsideClick: false
                     });
@@ -166,15 +216,12 @@
                     }
                 },
                 error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON.message
-                    });
+                    Swal.fire("Error", xhr.responseJSON.message, "error");
                 }
             });
         });
 
+        // ==== Update Data ====
         $(document).on('submit', '.updateDataForm', function(e) {
             e.preventDefault();
             let form = this;
@@ -207,79 +254,11 @@
                     }
                 },
                 error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON.message
-                    });
+                    Swal.fire("Error", xhr.responseJSON.message, "error");
                 }
             });
-        })
-    });
-
-    $(document).ready(function() {
-
-        // Loop semua modal setting
-        @foreach($settings as $s)
-        @if($s -> key == 'lokasi')
-
-        $('#UpdateDataModal{{$s->id}}').on('shown.bs.modal', function() {
-
-            let stored = "{{$s->value}}".split(',');
-            let lat = parseFloat(stored[0]);
-            let lng = parseFloat(stored[1]);
-
-            // Ambil radius dari tabel setting
-            let radius = {{$radius ?? 100}}; // pastikan controller mengirim $radius
-
-            // Inisialisasi Map
-            let map = L.map('map-{{$s->id}}').setView([lat, lng], 18);
-
-            // Tile dari OpenStreetMap
-            L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-                maxZoom: 22,
-            }).addTo(map);
-
-            // Marker utama
-            let marker = L.marker([lat, lng], {
-                draggable: true
-            }).addTo(map);
-
-            // Circle radius
-            let circle = L.circle([lat, lng], {
-                radius: radius,
-                color: "purple",
-                fillColor: "#b19cd9",
-                fillOpacity: 0.4
-            }).addTo(map);
-
-            // Update input otomatis
-            function updateLocation(lat, lng) {
-                $('.lokasi-input[name="value"]').val(lat + "," + lng);
-                circle.setLatLng([lat, lng]);
-                marker.setLatLng([lat, lng]);
-            }
-
-            // Klik peta → pindahkan lokasi
-            map.on('click', function(e) {
-                updateLocation(e.latlng.lat, e.latlng.lng);
-            });
-
-            // Drag marker → update lokasi
-            marker.on('dragend', function(e) {
-                let pos = marker.getLatLng();
-                updateLocation(pos.lat, pos.lng);
-            });
-
-            // Perbaikan tampilan jika map awalnya tidak muncul
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 300);
-
         });
 
-        @endif
-        @endforeach
     });
 </script>
 
