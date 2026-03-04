@@ -5,7 +5,7 @@ function renderPagination(meta, container, maxPages = 5) {
 
     const pageItem = (page, active = false, disabled = false, label = null) => `
         <li class="page-item ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}">
-            <a class="page-link" href="#" data-page="${page}">
+            <a class="page-link" href="" data-page="${page}">
                 ${label ?? page}
             </a>
         </li>

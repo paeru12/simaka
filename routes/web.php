@@ -96,4 +96,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/gaji-guru/filter', [gajianguruController::class, 'filter'])->name('gajiGuru.filter');
     Route::post('rekapp/filter', [rekapController::class, 'filter'])->name('rekap-filter');
     Route::post('rekapp/filterAll', [rekapController::class, 'filterAll'])->name('rekap.filterAll');
+    Route::get('/rekapp/export', [rekapController::class, 'export']);
 });

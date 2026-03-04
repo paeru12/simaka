@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Models\Jadwal;
 use App\Models\Absensi;
-use App\Models\AbsensiHarian;
 use Carbon\Carbon;
 
 #[Schedule(every: '5 minutes')]
@@ -20,12 +19,16 @@ class GenerateAlphaAttendance extends Command
         $today = Carbon::today();
         $now   = Carbon::now();
 
-        $hariIni = ucfirst($today->locale('id')->dayName);
+        if ($today->isSunday()) {
+            $this->info('⏭ Hari Minggu, tidak ada Alpha mapel.');
+            return;
+        }
+
+        $hariIni = ucfirst($today->locale('id')->dayName); 
 
         $jadwals = Jadwal::where('hari', $hariIni)->get();
 
         $count = 0;
-        $skipped = 0;
 
         foreach ($jadwals as $jadwal) {
 
@@ -35,37 +38,28 @@ class GenerateAlphaAttendance extends Command
                 continue;
             }
 
-            $alphaHarian = AbsensiHarian::where('guru_id', $jadwal->guru_id)
+            $absensiExists = Absensi::where('jadwal_id', $jadwal->id)
                 ->whereDate('tanggal', $today)
-                ->where('status', 'Alpha')
                 ->exists();
 
-            if ($alphaHarian) {
-                $skipped++;
+            if ($absensiExists) {
                 continue;
             }
 
-            $absensiExists = Absensi::where('jadwal_id', $jadwal->id)
-                ->where('guru_id', $jadwal->guru_id)
-                ->whereDate('tanggal', $today)
-                ->exists();
+            Absensi::create([
+                'jadwal_id' => $jadwal->id,
+                'mapel_id'  => $jadwal->mapel_id,
+                'guru_id'   => $jadwal->guru_id,
+                'tanggal'   => $today->toDateString(),
+                'jam_absen' => $now->format('H:i:s'),
+                'status'    => 'Alpha',
+                'keterangan' => 'Tidak hadir sesuai jadwal, Alpha otomatis oleh sistem',
+                'foto'      => 'assets/img/blank.jpg',
+            ]);
 
-            if (!$absensiExists) {
-                Absensi::create([
-                    'jadwal_id' => $jadwal->id,
-                    'mapel_id'  => $jadwal->mapel_id,
-                    'guru_id'   => $jadwal->guru_id,
-                    'tanggal'   => $today,
-                    'jam_absen' => $now->format('H:i:s'),
-                    'status'    => 'Alpha',
-                    'keterangan'=> 'Tidak hadir, Alpha mapel otomatis',
-                    'foto'      => 'assets/img/blank.jpg',
-                ]);
-
-                $count++;
-            }
+            $count++;
         }
 
-        $this->info("✅ {$count} Alpha mapel dibuat | ⏭ {$skipped} dilewati (Alpha harian)");
+        $this->info("✅ {$count} Alpha mapel berhasil dibuat.");
     }
 }

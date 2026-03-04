@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Absensi;
 use App\Models\Guru;
+use App\Exports\RekapAbsenExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class rekapController extends Controller
 {
@@ -15,12 +17,11 @@ class rekapController extends Controller
         return view('rekapabsend');
     }
 
-    public function filter(Request $request)
+    function filter(Request $request)
     {
         $bulan  = $request->bulan;
         $tahun  = $request->tahun;
         $search = $request->search;
-
         $rekapHarian = DB::table('absensi_harians')
             ->select(
                 'gurus.id as guru_id',
@@ -31,15 +32,10 @@ class rekapController extends Controller
                 DB::raw("COUNT(CASE WHEN status = 'Sakit' THEN 1 END) as total_sakit"),
                 DB::raw("COUNT(CASE WHEN status = 'Alpha' THEN 1 END) as total_alpha")
             )
-            ->join('gurus', 'gurus.id', '=', 'absensi_harians.guru_id')
+            ->rightJoin('gurus', 'gurus.id', '=', 'absensi_harians.guru_id') // 🔥 RIGHT JOIN
             ->join('jabatans', 'jabatans.id', '=', 'gurus.jabatan_id')
             ->whereMonth('absensi_harians.tanggal', $bulan)
             ->whereYear('absensi_harians.tanggal', $tahun)
-            ->when(
-                $search,
-                fn($q) =>
-                $q->where('gurus.nama', 'like', "%$search%")
-            )
             ->groupBy('gurus.id', 'gurus.nama', 'jabatans.jabatan');
 
         $rekapMapel = DB::table('absensis')
@@ -47,56 +43,71 @@ class rekapController extends Controller
                 'gurus.id as guru_id',
                 DB::raw("COUNT(CASE WHEN status = 'Hadir' THEN 1 END) as total_hadir_mapel")
             )
-            ->join('gurus', 'gurus.id', '=', 'absensis.guru_id')
+            ->rightJoin('gurus', 'gurus.id', '=', 'absensis.guru_id') // 🔥 RIGHT JOIN
             ->whereMonth('absensis.tanggal', $bulan)
             ->whereYear('absensis.tanggal', $tahun)
             ->groupBy('gurus.id');
 
-        $totalMapelGuru = DB::table('jadwals')
-            ->select(
-                'jadwals.guru_id',
-                DB::raw('COUNT(jadwals.id) as total_mapel')
+        $rekap = DB::table('gurus as g')
+            ->leftJoinSub($rekapHarian, 'harian', 'g.id', '=', 'harian.guru_id')
+            ->leftJoinSub($rekapMapel, 'mapel', 'g.id', '=', 'mapel.guru_id')
+            ->join('jabatans', 'jabatans.id', '=', 'g.jabatan_id');
+
+        $data = $rekap->select(
+            'g.id as guru_id',
+            'g.nama',
+            'jabatans.jabatan',
+
+            DB::raw('COALESCE(harian.total_hadir_harian, 0) as total_hadir_harian'),
+            DB::raw('COALESCE(harian.total_izin, 0) as total_izin'),
+            DB::raw('COALESCE(harian.total_sakit, 0) as total_sakit'),
+            DB::raw('COALESCE(harian.total_alpha, 0) as total_alpha'),
+
+            DB::raw('COALESCE(mapel.total_hadir_mapel, 0) as total_hadir_mapel'),
+
+            DB::raw("
+            CASE 
+                WHEN LOWER(jabatans.jabatan) = 'guru'
+                THEN (
+                    SELECT COUNT(*)
+                    FROM jadwals 
+                    WHERE jadwals.guru_id = g.id
+                )
+                ELSE '-'
+            END as total_mapel
+        "),
+
+            DB::raw('
+            (COALESCE(harian.total_hadir_harian, 0) +
+             COALESCE(mapel.total_hadir_mapel, 0))
+             as total_kehadiran
+        ')
+        )
+
+            // 🔥 SEARCH di hasil akhir
+            ->when(
+                $search,
+                fn($q) =>
+                $q->where('g.nama', 'like', "%$search%")
             )
-            ->groupBy('jadwals.guru_id');
 
-        $data = DB::table(DB::raw("({$rekapHarian->toSql()}) as harian"))
-            ->mergeBindings($rekapHarian)
-
-            ->leftJoinSub($rekapMapel, 'mapel', function ($join) {
-                $join->on('harian.guru_id', '=', 'mapel.guru_id');
-            })
-
-            ->leftJoinSub($totalMapelGuru, 'tm', function ($join) {
-                $join->on('harian.guru_id', '=', 'tm.guru_id');
-            })
-
-            ->select(
-                'harian.guru_id',
-                'harian.nama',
-                'harian.jabatan',
-                'harian.total_hadir_harian',
-                'harian.total_izin',
-                'harian.total_sakit',
-                'harian.total_alpha',
-
-                DB::raw('COALESCE(mapel.total_hadir_mapel, 0) as total_hadir_mapel'),
-
-                DB::raw("
-                CASE 
-                    WHEN LOWER(harian.jabatan) = 'guru'
-                    THEN COALESCE(tm.total_mapel, 0)
-                    ELSE '-'
-                END as total_mapel
-            "),
-
-                DB::raw('
-                (harian.total_hadir_harian + COALESCE(mapel.total_hadir_mapel, 0))
-                as total_kehadiran
-            ')
-            )
+            ->orderBy('g.nama')
             ->paginate(10);
-
         return response()->json($data);
+    }
+
+    public function export(Request $request)
+    {
+        $bulan  = $request->bulan;
+        $tahun  = $request->tahun;
+        $search = $request->search;
+
+        $filename = "rekap_absen_{$bulan}_{$tahun}.xlsx";
+
+        return Excel::download(
+            new RekapAbsenExport($bulan, $tahun, $search),
+            $filename
+        );
     }
 
     function detail($guru_id, $bulan, $tahun)

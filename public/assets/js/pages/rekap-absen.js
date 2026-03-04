@@ -1,4 +1,82 @@
+let currentPage = 1;
+let isLoading = false;
+
+/* ================= LOAD DATA ================= */
+function loadData(page = 1) {
+
+    if (isLoading) return;
+    isLoading = true;
+    currentPage = page;
+
+    const bulanText = $('#bulan option:selected').text();
+    const tahun = $('#tahun').val();
+
+    $.ajax({
+        url: "/rekapp/filter",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            page: page,
+            bulan: $('#bulan').val(),
+            tahun: tahun,
+            search: $('#search').val()
+        },
+        beforeSend() {
+            $('#tableBody').html(`
+                <tr>
+                    <td colspan="100%" class="text-center text-muted">Loading...</td>
+                </tr>
+            `);
+        },
+        success(res) {
+
+            let rows = "";
+
+            if (!res.data || res.data.length === 0) {
+                rows = `
+                    <tr>
+                        <td colspan="100%" class="text-center text-muted">
+                            Data tidak ditemukan
+                        </td>
+                    </tr>
+                `;
+            } else {
+                res.data.forEach((item, i) => {
+                    rows += renderRekapAbsenRow(
+                        item,
+                        i,
+                        res.current_page,
+                        res.per_page,
+                        bulanText,
+                        tahun
+                    );
+                });
+            }
+
+            $('#tableBody').html(rows);
+
+            renderPagination(res, $("#pagination"));
+            renderDataInfo(res, $("#dataInfo"));
+        },
+        error(xhr) {
+            console.error(xhr);
+            $('#tableBody').html(`
+                <tr>
+                    <td colspan="100%" class="text-center text-danger">
+                        Gagal memuat data
+                    </td>
+                </tr>
+            `);
+        },
+        complete() {
+            isLoading = false;
+        }
+    });
+}
+
+/* ================= INIT ================= */
 $(document).ready(function () {
+
     const bulanSekarang = new Date().getMonth() + 1;
     const tahunSekarang = new Date().getFullYear();
 
@@ -7,73 +85,18 @@ $(document).ready(function () {
 
     loadData();
 
-    $('#bulan, #tahun').change(() => loadData());
-    $('#search').keyup(() => loadData());
+    // SEARCH
+    $('#search').on('keyup', debounce(() => loadData(1)));
 
-    $(document).on('click', '.pageBtn', function () {
-        let page = $(this).data('page');
-        if (page) loadData(page);
-    });
-});
+    // FILTER
+    $('#bulan, #tahun').on('change', () => loadData(1));
 
-function loadData(page = 1) {
-    $.ajax({
-        url: "rekapp/filter",
-        type: "POST",
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            page: page,
-            bulan: $('#bulan').val(),
-            tahun: $('#tahun').val(),
-            search: $('#search').val()
-        },
-        beforeSend() {
-            $('#tableBody').html(`
-                <tr>
-                    <td colspan="11" class="text-center">Loading...</td>
-                </tr>
-            `);
-        },
-        success(res) {
-            let html = '';
-            let no = (res.current_page - 1) * res.per_page;
-
-            if (res.data.length === 0) {
-                html = `<tr><td colspan="11" class="text-center">Data tidak ditemukan</td></tr>`;
-            } else {
-                res.data.forEach((item, i) => {
-                    html += `
-                        <tr>
-                            <th>${no + i + 1}.</th>
-                            <td class="text-capitalize">${item.nama}</td>
-                            <td class="text-capitalize">${item.jabatan}</td>
-                            <td>${$('#bulan option:selected').text()} ${$('#tahun').val()}</td>
-                            <td>${item.total_mapel}</td>
-                            <td>${item.total_hadir_harian}</td>
-                            <td>${item.total_izin}</td>
-                            <td>${item.total_sakit}</td>
-                            <td>${item.total_alpha}</td>
-                            <td>${item.total_hadir_mapel}</td>
-                            <td>
-                                <span class="badge bg-success">
-                                    ${item.total_kehadiran}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="/detail/${item.guru_id}/${$('#bulan').val()}/${$('#tahun').val()}"
-                                   class="btn btn-sm btn-purple">
-                                    <i class="ri-bar-chart-horizontal-fill"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-
-            $('#tableBody').html(html);
-            renderPagination(res, $("#pagination"));
-            renderDataInfo(res, $("#dataInfo"));
+    // PAGINATION CLICK
+    $(document).on('click', '#pagination .page-link', function (e) {
+        e.preventDefault();
+        const page = $(this).data('page');
+        if (page && page !== currentPage) {
+            loadData(page);
         }
     });
-}
-
+});

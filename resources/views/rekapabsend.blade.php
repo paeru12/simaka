@@ -15,7 +15,14 @@
 <section class="section dashboard">
     <div class="card recent-sales">
         <div class="card-body">
-            <h5 class="card-title mb-0">Data Rekap Absen Guru & Staff</h5>
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Data Rekap Absen Guru & Staff</h5>
+                <div class="">
+                    <button id="exportExcel" class="btn btn-success">
+                        Excel
+                    </button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12">
                     <div class="row needs-validation" novalidate>
@@ -47,6 +54,7 @@
                                 <label for="search">Search</label>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -89,5 +97,18 @@
 <script src="{{ asset('assets/js/utils/datainfo.js') }}"></script>
 
 {{-- PAGE --}}
+<script src="{{ asset('assets/js/render/rekapAbsenRow.js') }}"></script>
 <script src="{{ asset('assets/js/pages/rekap-absen.js') }}"></script>
+<script>
+    $('#exportExcel').on('click', function() {
+
+        let bulan = $('#bulan').val();
+        let tahun = $('#tahun').val();
+        let search = $('#search').val();
+
+        let url = `/rekapp/export?bulan=${bulan}&tahun=${tahun}&search=${search}`;
+
+        window.open(url, '_blank');
+    });
+</script>
 @endsection

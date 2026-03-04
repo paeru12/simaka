@@ -16,10 +16,13 @@ class GenerateAlphaHarian extends Command
 
     public function handle()
     {
-        $today = Carbon::today()->toDateString();
+        $today = Carbon::today();
         $now   = Carbon::now()->format('H:i:s');
 
-        $gurus = Guru::all();
+        $isSunday = $today->isSunday();
+
+        $gurus = Guru::with(['jadwals', 'jabatan'])->get();
+
         $count = 0;
 
         foreach ($gurus as $guru) {
@@ -28,13 +31,38 @@ class GenerateAlphaHarian extends Command
                 ->whereDate('tanggal', $today)
                 ->exists();
 
-            if (!$exists) {
+            if ($exists) continue;
+
+            $jabatan = strtolower(optional($guru->jabatan)->jabatan);
+
+            $buatAlpha = false;
+
+            if ($jabatan === 'guru') {
+
+                $hariIni = ucfirst($today->translatedFormat('l'));
+
+                $adaJadwal = $guru->jadwals()
+                    ->where('hari', $hariIni)
+                    ->exists();
+
+                if ($adaJadwal) {
+                    $buatAlpha = true;
+                }
+            } else {
+
+                if (!$isSunday) {
+                    $buatAlpha = true;
+                }
+            }
+
+            if ($buatAlpha) {
+
                 AbsensiHarian::create([
                     'guru_id'   => $guru->id,
-                    'tanggal'   => $today,
+                    'tanggal'   => $today->toDateString(),
                     'jam_absen' => $now,
                     'status'    => 'Alpha',
-                    'keterangan'=> 'Tidak absen hari ini, otomatis Alpha oleh sistem',
+                    'keterangan' => 'Tidak absen hari ini, otomatis Alpha oleh sistem',
                     'foto'      => 'assets/img/blank.jpg',
                 ]);
 
